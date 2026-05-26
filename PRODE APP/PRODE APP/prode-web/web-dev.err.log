@@ -1,0 +1,274 @@
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'matches' does not exist on type 'MatchesComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:25:19:
+[37m      25 │     @for (match of [32mmatches[37m; track match.id) {
+         ╵                    [32m~~~~~~~[0m
+
+  Error occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:119:14:
+[37m      119 │               [32m[(ngModel)]="match.homePrediction"[37m
+          ╵               [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:129:14:
+[37m      129 │               [32m[(ngModel)]="match.awayPrediction"[37m
+          ╵               [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:101:63:
+[37m      101 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:282:71:
+[37m      282 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:101:63:
+[37m      101 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:282:71:
+[37m      282 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:551:40:
+[37m      551 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:551:40:
+[37m      551 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -9.5505617978%)
+  color.adjust($color, $lightness: -5%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:101:63:
+[37m      101 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:282:71:
+[37m      282 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:551:40:
+[37m      551 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:551:40:
+[37m      551 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -9.5505617978%)
+  color.adjust($color, $lightness: -5%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:101:63:
+[37m      101 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/matches/matches.component.html:282:71:
+[37m      282 │ ...  <span class="match-venue">📍 {{ match.stadium[32m?.ci[37mty }}</span>
+          ╵                                                  [32m~~~~[0m
+
+  Warning occurs in the template of component MatchesComponent.
+
+    src/app/pages/matches/matches.component.ts:23:15:
+[37m      23 │   templateUrl: [32m'./matches.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:551:40:
+[37m      551 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:551:40:
+[37m      551 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -9.5505617978%)
+  color.adjust($color, $lightness: -5%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:553:40:
+[37m      553 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/pages/matches/matches.component.scss:553:40:
+[37m      553 │     background: linear-gradient(135deg, [32m[37mdarken($gold, 5%), $gold);
+          ╵                                         [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -9.5505617978%)
+  color.adjust($color, $lightness: -5%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+[39m[22m
+node:internal/event_target:1101
+  process.nextTick(() => { throw err; });
+                           ^
+
+Error: EINVAL
+    at new Worker (node:internal/worker:291:19)
+    at new WorkerInfo (C:\MMP\Repos\prode-mundial-2026\prode-web\node_modules\piscina\dist\worker_pool\index.js:38:23)
+    at ThreadPool._addNewWorker (C:\MMP\Repos\prode-mundial-2026\prode-web\node_modules\piscina\dist\index.js:133:28)
+    at ThreadPool._ensureMinimumWorkers (C:\MMP\Repos\prode-mundial-2026\prode-web\node_modules\piscina\dist\index.js:126:18)
+    at ThreadPool._onError (C:\MMP\Repos\prode-mundial-2026\prode-web\node_modules\piscina\dist\index.js:225:18)
+    at ThreadPool.onWorkerError (C:\MMP\Repos\prode-mundial-2026\prode-web\node_modules\piscina\dist\index.js:207:18)
+    at Worker.emit (node:events:518:28)
+    at [kOnErrorMessage] (node:internal/worker:327:10)
+    at [kOnMessage] (node:internal/worker:338:37)
+    at MessagePort.<anonymous> (node:internal/worker:233:57) {
+  code: 'ERR_WORKER_INIT_FAILED'
+}
+
+Node.js v22.16.0

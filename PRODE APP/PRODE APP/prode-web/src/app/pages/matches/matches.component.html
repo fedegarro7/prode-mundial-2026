@@ -1,0 +1,384 @@
+<div class="matches-page">
+
+  <!-- Animated background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ── Hero ───────────────────────────────── -->
+  <header class="hero">
+    <span class="hero-trophy" aria-hidden="true">🏆</span>
+    <h1 class="hero-title">Prode Mundial 2026</h1>
+    <p class="hero-sub">Fixture oficial &middot; Pronósticos &middot; Ranking en tiempo real</p>
+  </header>
+
+  <!-- ── Phase selector ─────────────────────── -->
+  <div class="phase-bar" role="tablist">
+    <button
+      class="phase-btn"
+      role="tab"
+      [class.active]="activePhase === 'groups'"
+      [attr.aria-selected]="activePhase === 'groups'"
+      (click)="setPhase('groups')"
+    >
+      ⚽ Fase de Grupos
+    </button>
+    <button
+      class="phase-btn"
+      role="tab"
+      [class.active]="activePhase === 'knockout'"
+      [attr.aria-selected]="activePhase === 'knockout'"
+      (click)="setPhase('knockout')"
+    >
+      ⚡ Fase Eliminatoria
+    </button>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       GROUP STAGE
+       ════════════════════════════════════════ -->
+  @if (activePhase === 'groups') {
+
+    <!-- Group tabs -->
+    <div class="group-tabs" role="tablist" aria-label="Grupos del Mundial">
+      @for (tab of groupTabs; track tab.key) {
+        <button
+          class="group-tab"
+          role="tab"
+          [class.active]="activeGroup === tab.key"
+          [class.has-arg]="tab.hasArgentina"
+          [attr.aria-selected]="activeGroup === tab.key"
+          [attr.aria-label]="tab.label + (tab.hasArgentina ? ' - Argentina' : '')"
+          (click)="setGroup(tab.key)"
+        >
+          {{ tab.shortLabel }}
+          @if (tab.hasArgentina) {
+            <span class="arg-dot" aria-hidden="true">●</span>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- Skeleton loading -->
+    @if (loading) {
+      <div class="matches-grid" aria-label="Cargando partidos">
+        @for (n of skeletons; track n) {
+          <div class="match-card skeleton-card" aria-hidden="true">
+            <div class="sk-row">
+              <div class="sk-line sk-short"></div>
+              <div class="sk-pill"></div>
+            </div>
+            <div class="sk-teams">
+              <div class="sk-flag"></div>
+              <div class="sk-vs"></div>
+              <div class="sk-flag"></div>
+            </div>
+            <div class="sk-line sk-full"></div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Group matches grid -->
+    @if (!loading) {
+      <div class="matches-grid">
+        @for (match of visibleGroupMatches; track match.id; let idx = $index) {
+
+          <article
+            class="match-card"
+            [class.arg-card]="isArgentina(match)"
+            [class.locked-card]="!canPredict(match)"
+            [style.animation-delay]="(idx * 55) + 'ms'"
+            [attr.aria-label]="getTeamName(match, 'home') + ' vs ' + getTeamName(match, 'away')"
+          >
+
+            <!-- Card header -->
+            <div class="card-header">
+              <div class="match-meta">
+                <span class="match-date">{{ match.matchDate | date:'EEE dd/MM · HH:mm' }}</span>
+                <span class="match-venue">📍 {{ match.stadium.city }}</span>
+              </div>
+              @if (isArgentina(match)) {
+                <span class="badge badge-arg">⭐ ARG</span>
+              } @else if (canPredict(match)) {
+                <span class="badge badge-open">{{ closingLabel(match) }}</span>
+              } @else {
+                <span class="badge badge-locked">{{ lockReason(match) }}</span>
+              }
+            </div>
+
+            <!-- Argentina gold accent bar -->
+            @if (isArgentina(match)) {
+              <div class="arg-accent" aria-hidden="true"></div>
+            }
+
+            <!-- Teams row -->
+            <div class="teams-row">
+
+              <div class="team" [class.is-arg]="isArgentineTeam(match, 'home')">
+                @if (match.homeTeam?.flagUrl) {
+                  <img
+                    class="flag-img"
+                    [src]="match.homeTeam!.flagUrl"
+                    [alt]="match.homeTeam!.name + ' flag'"
+                    loading="lazy"
+                  />
+                } @else {
+                  <div class="flag-ph" aria-hidden="true">{{ getTeamCode(match, 'home') }}</div>
+                }
+                <span class="team-name">{{ getTeamName(match, 'home') }}</span>
+              </div>
+
+              <div class="mid-col">
+                @if (match.isFinished) {
+                  <div class="final-score">{{ match.homeScore }} : {{ match.awayScore }}</div>
+                  <div class="final-lbl">Final</div>
+                } @else {
+                  <div class="vs-text">VS</div>
+                  @if (isSaved(match)) {
+                    <div class="saved-preview" aria-label="Pronóstico guardado">
+                      {{ match.homePrediction }} – {{ match.awayPrediction }}
+                    </div>
+                  }
+                }
+              </div>
+
+              <div class="team" [class.is-arg]="isArgentineTeam(match, 'away')">
+                @if (match.awayTeam?.flagUrl) {
+                  <img
+                    class="flag-img"
+                    [src]="match.awayTeam!.flagUrl"
+                    [alt]="match.awayTeam!.name + ' flag'"
+                    loading="lazy"
+                  />
+                } @else {
+                  <div class="flag-ph" aria-hidden="true">{{ getTeamCode(match, 'away') }}</div>
+                }
+                <span class="team-name">{{ getTeamName(match, 'away') }}</span>
+              </div>
+
+            </div>
+
+            <!-- Prediction area -->
+            @if (canPredict(match)) {
+              <div class="prediction-section">
+
+                <div class="steppers-row">
+                  <!-- Home stepper -->
+                  <div class="stepper" [class.arg-stepper]="isArgentineTeam(match, 'home')">
+                    <button
+                      class="step-btn"
+                      (click)="adjustScore(match, 'home', -1)"
+                      aria-label="Restar gol local"
+                    >−</button>
+                    <span class="step-val" aria-live="polite">{{ match.homePrediction ?? 0 }}</span>
+                    <button
+                      class="step-btn"
+                      (click)="adjustScore(match, 'home', 1)"
+                      aria-label="Sumar gol local"
+                    >+</button>
+                  </div>
+
+                  <span class="stepper-sep" aria-hidden="true">:</span>
+
+                  <!-- Away stepper -->
+                  <div class="stepper" [class.arg-stepper]="isArgentineTeam(match, 'away')">
+                    <button
+                      class="step-btn"
+                      (click)="adjustScore(match, 'away', -1)"
+                      aria-label="Restar gol visitante"
+                    >−</button>
+                    <span class="step-val" aria-live="polite">{{ match.awayPrediction ?? 0 }}</span>
+                    <button
+                      class="step-btn"
+                      (click)="adjustScore(match, 'away', 1)"
+                      aria-label="Sumar gol visitante"
+                    >+</button>
+                  </div>
+                </div>
+
+                <button
+                  class="save-btn"
+                  [class.is-saved]="isSaved(match)"
+                  [class.is-saving]="isSaving(match)"
+                  [class.arg-save]="isArgentina(match)"
+                  [disabled]="isSaving(match)"
+                  (click)="savePrediction(match)"
+                  [attr.aria-label]="isSaved(match) ? 'Pronóstico guardado' : 'Guardar pronóstico'"
+                >
+                  @if (isSaving(match)) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span>Guardando…</span>
+                  } @else if (isSaved(match)) {
+                    <span aria-hidden="true">✓</span>
+                    <span>Guardado</span>
+                  } @else {
+                    <span>Guardar pronóstico</span>
+                  }
+                </button>
+
+              </div>
+            } @else {
+              <div class="locked-footer" role="status">{{ lockReason(match) }}</div>
+            }
+
+          </article>
+
+        }
+      </div>
+    }
+
+  }
+
+  <!-- ════════════════════════════════════════
+       KNOCKOUT STAGE
+       ════════════════════════════════════════ -->
+  @if (activePhase === 'knockout') {
+
+    @if (loading) {
+      <div class="loading-text" role="status">Cargando eliminatorias…</div>
+    }
+
+    @if (!loading) {
+      <div class="knockout-container">
+        @for (phase of knockoutPhases; track phase.key) {
+
+          <section class="knockout-section">
+
+            <button
+              class="phase-header"
+              [class.expanded]="expandedPhase === phase.key"
+              (click)="toggleKnockout(phase.key)"
+              [attr.aria-expanded]="expandedPhase === phase.key"
+              [attr.aria-controls]="'phase-' + phase.key"
+            >
+              <span class="phase-label">{{ phase.label }}</span>
+              <span class="phase-count">{{ knockoutMatches.get(phase.key)?.length }} partidos</span>
+              <span class="phase-chevron" aria-hidden="true">
+                {{ expandedPhase === phase.key ? '▲' : '▼' }}
+              </span>
+            </button>
+
+            @if (expandedPhase === phase.key) {
+              <div
+                class="knockout-grid"
+                [id]="'phase-' + phase.key"
+                role="region"
+              >
+                @for (match of knockoutMatches.get(phase.key) || []; track match.id; let idx = $index) {
+
+                  <article
+                    class="match-card"
+                    [class.arg-card]="isArgentina(match)"
+                    [class.unknown-card]="isUnknownKnockout(match)"
+                    [style.animation-delay]="(idx * 55) + 'ms'"
+                  >
+
+                    <div class="card-header">
+                      <div class="match-meta">
+                        <span class="match-date">{{ match.matchDate | date:'EEE dd/MM · HH:mm' }}</span>
+                        <span class="match-venue">📍 {{ match.stadium.city }}</span>
+                      </div>
+                      @if (isUnknownKnockout(match)) {
+                        <span class="badge badge-pending">⏳ Por definir</span>
+                      } @else if (isArgentina(match)) {
+                        <span class="badge badge-arg">⭐ ARG</span>
+                      } @else if (canPredict(match)) {
+                        <span class="badge badge-open">{{ closingLabel(match) }}</span>
+                      } @else {
+                        <span class="badge badge-locked">{{ lockReason(match) }}</span>
+                      }
+                    </div>
+
+                    @if (isArgentina(match)) {
+                      <div class="arg-accent" aria-hidden="true"></div>
+                    }
+
+                    <div class="teams-row" [class.blurred]="isUnknownKnockout(match)">
+
+                      <div class="team">
+                        @if (match.homeTeam?.flagUrl) {
+                          <img class="flag-img" [src]="match.homeTeam!.flagUrl" [alt]="match.homeTeam!.name" loading="lazy" />
+                        } @else {
+                          <div class="flag-ph">{{ getTeamCode(match, 'home') }}</div>
+                        }
+                        <span class="team-name">{{ getTeamName(match, 'home') }}</span>
+                      </div>
+
+                      <div class="mid-col">
+                        <div class="vs-text">VS</div>
+                        @if (isSaved(match) && !isUnknownKnockout(match)) {
+                          <div class="saved-preview">{{ match.homePrediction }} – {{ match.awayPrediction }}</div>
+                        }
+                      </div>
+
+                      <div class="team">
+                        @if (match.awayTeam?.flagUrl) {
+                          <img class="flag-img" [src]="match.awayTeam!.flagUrl" [alt]="match.awayTeam!.name" loading="lazy" />
+                        } @else {
+                          <div class="flag-ph">{{ getTeamCode(match, 'away') }}</div>
+                        }
+                        <span class="team-name">{{ getTeamName(match, 'away') }}</span>
+                      </div>
+
+                    </div>
+
+                    @if (isUnknownKnockout(match)) {
+                      <div class="pending-footer" role="status">⏳ Clasificados por definir</div>
+                    } @else if (canPredict(match)) {
+                      <div class="prediction-section">
+                        <div class="steppers-row">
+                          <div class="stepper">
+                            <button class="step-btn" (click)="adjustScore(match, 'home', -1)" aria-label="Restar gol local">−</button>
+                            <span class="step-val" aria-live="polite">{{ match.homePrediction ?? 0 }}</span>
+                            <button class="step-btn" (click)="adjustScore(match, 'home', 1)" aria-label="Sumar gol local">+</button>
+                          </div>
+                          <span class="stepper-sep" aria-hidden="true">:</span>
+                          <div class="stepper">
+                            <button class="step-btn" (click)="adjustScore(match, 'away', -1)" aria-label="Restar gol visitante">−</button>
+                            <span class="step-val" aria-live="polite">{{ match.awayPrediction ?? 0 }}</span>
+                            <button class="step-btn" (click)="adjustScore(match, 'away', 1)" aria-label="Sumar gol visitante">+</button>
+                          </div>
+                        </div>
+                        <button
+                          class="save-btn"
+                          [class.is-saved]="isSaved(match)"
+                          [class.is-saving]="isSaving(match)"
+                          [disabled]="isSaving(match)"
+                          (click)="savePrediction(match)"
+                        >
+                          @if (isSaving(match)) { <span class="btn-spinner" aria-hidden="true"></span><span>Guardando…</span> }
+                          @else if (isSaved(match)) { <span aria-hidden="true">✓</span><span>Guardado</span> }
+                          @else { <span>Guardar pronóstico</span> }
+                        </button>
+                      </div>
+                    } @else {
+                      <div class="locked-footer" role="status">{{ lockReason(match) }}</div>
+                    }
+
+                  </article>
+
+                }
+              </div>
+            }
+
+          </section>
+
+        }
+      </div>
+    }
+
+  }
+
+  <!-- ── Toast notification ──────────────────── -->
+  <div class="toast-wrap" aria-live="polite" aria-atomic="true">
+    @if (toastVisible) {
+      <div class="toast" [class.toast-error]="toastType === 'error'">
+        {{ toastMessage }}
+      </div>
+    }
+  </div>
+
+</div>

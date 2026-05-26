@@ -1,0 +1,40 @@
+<main class="rankings-page">
+  <header class="rankings-hero">
+    <p class="eyebrow">Competencia global</p>
+    <h1>Ranking Mundial 2026</h1>
+    <p>La tabla general de todos los usuarios. Los grupos privados mantienen su propio ranking.</p>
+  </header>
+
+  @if (loading) {
+    <section class="ranking-list" aria-busy="true">
+      @for (row of [1,2,3,4,5]; track row) {
+        <div class="ranking-row skeleton"></div>
+      }
+    </section>
+  } @else if (rankings.length === 0) {
+    <section class="empty-card">
+      <h2>Todavia no hay puntos</h2>
+      <p>Cuando se carguen resultados, esta tabla empieza a moverse.</p>
+    </section>
+  } @else {
+    <section class="podium" aria-label="Podio">
+      @for (ranking of rankings.slice(0, 3); track ranking.userId; let i = $index) {
+        <article class="podium-card" [class.first]="i === 0">
+          <span class="position">#{{ i + 1 }}</span>
+          <strong>{{ ranking.name }}</strong>
+          <em>{{ ranking.totalPoints }} pts</em>
+        </article>
+      }
+    </section>
+
+    <section class="ranking-list" aria-label="Ranking completo">
+      @for (ranking of rankings; track ranking.userId; let i = $index) {
+        <article class="ranking-row">
+          <span class="rank">#{{ i + 1 }}</span>
+          <strong>{{ ranking.name }}</strong>
+          <em>{{ ranking.totalPoints }} pts</em>
+        </article>
+      }
+    </section>
+  }
+</main>

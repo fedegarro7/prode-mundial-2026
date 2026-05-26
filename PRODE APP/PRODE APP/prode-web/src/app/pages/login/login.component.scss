@@ -1,0 +1,125 @@
+.auth-page {
+  min-height: calc(100vh - 72px);
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.auth-card {
+  width: min(460px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(7, 17, 34, 0.82);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+form,
+.recover-flow {
+  display: grid;
+  gap: 15px;
+}
+
+.eyebrow {
+  color: #9dd9ff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin-top: 4px;
+  font-size: 2.2rem;
+}
+
+.sub {
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.55;
+}
+
+input {
+  min-height: 48px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  padding: 0 14px;
+  font-size: 1rem;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  &:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+  }
+}
+
+button {
+  min-height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #16a34a, #2563eb);
+  color: #fff;
+  font-weight: 800;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.secondary {
+  background: rgba(96, 165, 250, 0.16);
+  border: 1px solid rgba(96, 165, 250, 0.36);
+}
+
+.link-btn {
+  width: 100%;
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.token-box {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.22);
+
+  span {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  code {
+    white-space: normal;
+    word-break: break-all;
+    color: #bfdbfe;
+  }
+}
+
+.feedback {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 700;
+
+  &.ok {
+    color: #86efac;
+    background: rgba(34, 197, 94, 0.14);
+  }
+
+  &.error {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.14);
+  }
+}

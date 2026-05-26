@@ -1,0 +1,125 @@
+.rankings-page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 50px 0 82px;
+}
+
+.rankings-hero {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4.8rem);
+    line-height: 0.98;
+    margin: 8px 0 12px;
+  }
+
+  p:not(.eyebrow) {
+    max-width: 680px;
+    color: rgba(255, 255, 255, 0.68);
+    line-height: 1.65;
+  }
+}
+
+.eyebrow {
+  color: #9dd9ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.podium-card,
+.ranking-row,
+.empty-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(7, 17, 34, 0.78);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+
+.podium-card {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+
+  &.first {
+    border-color: rgba(250, 204, 21, 0.45);
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.16), rgba(7, 17, 34, 0.78));
+  }
+
+  .position {
+    color: #bfdbfe;
+    font-weight: 800;
+  }
+
+  strong {
+    font-size: 1.15rem;
+  }
+
+  em {
+    color: #86efac;
+    font-style: normal;
+    font-weight: 800;
+  }
+}
+
+.ranking-list {
+  display: grid;
+  gap: 10px;
+}
+
+.ranking-row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+
+  .rank {
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 800;
+  }
+
+  em {
+    color: #bfdbfe;
+    font-style: normal;
+    font-weight: 800;
+  }
+
+  &.skeleton {
+    height: 54px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+    background-size: 220% 100%;
+    animation: shimmer 1.35s ease-in-out infinite;
+  }
+}
+
+.empty-card {
+  padding: 24px;
+
+  p {
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.64);
+  }
+}
+
+@keyframes shimmer {
+  to { background-position: -220% 0; }
+}
+
+@media (max-width: 760px) {
+  .podium {
+    grid-template-columns: 1fr;
+  }
+
+  .ranking-row {
+    grid-template-columns: 56px 1fr auto;
+  }
+}

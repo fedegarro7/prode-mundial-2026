@@ -1,0 +1,124 @@
+<main class="home-page">
+
+  @if (!user) {
+    <section class="landing">
+      <div class="hero-copy">
+        <p class="eyebrow">Mundial 2026</p>
+        <h1>Prode privado para competir con tu gente</h1>
+        <p class="hero-text">
+          Pronostica cada partido, arma grupos por amigos, familia u oficina y segui el ranking
+          con una experiencia clara, rapida y lista para compartir.
+        </p>
+        <div class="hero-actions">
+          <a routerLink="/register" class="primary-action">Crear cuenta</a>
+          <a routerLink="/login" class="secondary-action">Ingresar</a>
+        </div>
+      </div>
+
+      <div class="hero-board" aria-label="Vista previa del prode">
+        <div class="board-top">
+          <span>Final</span>
+          <strong>Argentina 2 - 1 Brasil</strong>
+        </div>
+        <div class="board-row">
+          <span>Tu pronostico</span>
+          <strong>2 - 1</strong>
+          <em>+3 pts</em>
+        </div>
+        <div class="board-row muted">
+          <span>Grupo Oficina</span>
+          <strong>4to</strong>
+          <em>28 pts</em>
+        </div>
+      </div>
+    </section>
+  } @else {
+    <section class="dashboard-hero">
+      <div>
+        <p class="eyebrow">Hola {{ user.name }}</p>
+        <h1>Tu tablero mundialista</h1>
+        <p>Lo importante, arriba: puntos, pendientes y proximo partido para no colgarte.</p>
+      </div>
+      <a routerLink="/matches" class="primary-action">Cargar pronosticos</a>
+    </section>
+
+    <section class="stats-grid" aria-label="Resumen personal">
+      <article class="stat-card">
+        <span>Puntos</span>
+        <strong>{{ dashboard?.totalPoints ?? '-' }}</strong>
+      </article>
+      <article class="stat-card">
+        <span>Ranking global</span>
+        <strong>{{ dashboard?.globalPosition ? '#' + dashboard?.globalPosition : '-' }}</strong>
+      </article>
+      <article class="stat-card urgent">
+        <span>Pendientes</span>
+        <strong>{{ dashboard?.pendingPredictions ?? '-' }}</strong>
+      </article>
+      <article class="stat-card">
+        <span>Grupos</span>
+        <strong>{{ dashboard?.approvedGroups ?? '-' }}</strong>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel span-2">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Accion rapida</p>
+            <h2>Predicciones pendientes</h2>
+          </div>
+          <a routerLink="/matches">Ver fixture</a>
+        </div>
+
+        @if (pending.length === 0 && !loading) {
+          <p class="empty">No tenes pendientes abiertos por ahora.</p>
+        } @else {
+          <div class="pending-list">
+            @for (match of pending; track match.matchId) {
+              <a routerLink="/matches" class="pending-row">
+                <span class="match-date">{{ match.matchDate | date:'dd/MM HH:mm' }}</span>
+                <strong>{{ teamName(match, 'home') }} vs {{ teamName(match, 'away') }}</strong>
+                <em>{{ match.stadium.city }}</em>
+              </a>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="panel">
+        <p class="eyebrow">Reglas</p>
+        <h2>Puntaje simple</h2>
+        <div class="rules-list">
+          @for (rule of rules; track rule.label) {
+            <div class="rule">
+              <strong>{{ rule.points }}</strong>
+              <span>
+                {{ rule.label }}
+                <small>{{ rule.detail }}</small>
+              </span>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="panel">
+        <p class="eyebrow">Historial</p>
+        <h2>Ultimos puntos</h2>
+        @if (history.length === 0) {
+          <p class="empty">Cuando haya partidos finalizados, vas a verlos aca.</p>
+        } @else {
+          <div class="history-list">
+            @for (item of history; track item.matchId) {
+              <div class="history-row">
+                <span>{{ teamCode(item, 'home') }} {{ item.homeScore }} - {{ item.awayScore }} {{ teamCode(item, 'away') }}</span>
+                <strong>+{{ item.pointsEarned }}</strong>
+              </div>
+            }
+          </div>
+        }
+      </article>
+    </section>
+  }
+
+</main>

@@ -1,0 +1,55 @@
+<nav class="navbar">
+
+  <div class="logo">
+    AR Prode Mundial 2026
+  </div>
+
+  <div class="links">
+
+    <a routerLink="/matches">
+      Partidos
+    </a>
+
+    <a routerLink="/standings">
+      Posiciones
+    </a>
+
+    <a routerLink="/groups">
+      Grupos
+    </a>
+
+    <a routerLink="/rankings">
+      Ranking
+    </a>
+
+  </div>
+
+  <div class="user-section">
+
+    <div *ngIf="user; else guest">
+      <span>
+        Hola {{ user.name }}
+      </span>
+
+      <a routerLink="/account">
+        Cuenta
+      </a>
+
+      <button (click)="logout()">
+        Salir
+      </button>
+    </div>
+
+    <ng-template #guest>
+      <a routerLink="/login">
+        Ingresar
+      </a>
+
+      <a routerLink="/register">
+        Registrarse
+      </a>
+    </ng-template>
+
+  </div>
+
+</nav>

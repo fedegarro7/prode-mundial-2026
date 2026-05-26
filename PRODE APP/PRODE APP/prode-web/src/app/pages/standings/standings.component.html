@@ -1,0 +1,126 @@
+<div class="standings-page">
+
+  <!-- Animated background orbs (shared visual language with Matches page) -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Hero -->
+  <header class="hero">
+    <span class="hero-icon" aria-hidden="true">📊</span>
+    <h1 class="hero-title">Posiciones por Grupo</h1>
+    <p class="hero-sub">Copa Mundial FIFA 2026™ &middot; Fase de Grupos</p>
+    @if (lastUpdated) {
+      <p class="hero-updated" aria-live="polite">
+        Actualizado: {{ lastUpdated | date:'HH:mm:ss' }} · se refresca automáticamente cada 60 s
+      </p>
+    }
+  </header>
+
+  <!-- Error state -->
+  @if (error) {
+    <div class="error-box" role="alert">
+      <span aria-hidden="true">⚠️</span> No se pudieron cargar las posiciones. Intentá de nuevo más tarde.
+    </div>
+  }
+
+  <!-- Skeleton loading -->
+  @if (loading) {
+    <div class="groups-grid" aria-label="Cargando posiciones" aria-busy="true">
+      @for (n of [1,2,3,4,5,6]; track n) {
+        <div class="group-card skeleton-card" aria-hidden="true">
+          <div class="sk-title"></div>
+          @for (r of [1,2,3,4]; track r) {
+            <div class="sk-row"></div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Standings tables -->
+  @if (!loading && !error && groups.length > 0) {
+    <div class="groups-grid">
+      @for (group of groups; track group.groupName) {
+        <section class="group-card" [attr.aria-label]="group.groupName">
+          <h2 class="group-title">{{ group.groupName }}</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <caption class="sr-only">Tabla de posiciones {{ group.groupName }}</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="col-pos" aria-label="Posición">#</th>
+                  <th scope="col" class="col-team">Equipo</th>
+                  <th scope="col" title="Partidos Jugados">PJ</th>
+                  <th scope="col" title="Victorias">G</th>
+                  <th scope="col" title="Empates">E</th>
+                  <th scope="col" title="Derrotas">P</th>
+                  <th scope="col" title="Goles a Favor" class="hide-xs">GF</th>
+                  <th scope="col" title="Goles en Contra" class="hide-xs">GC</th>
+                  <th scope="col" title="Diferencia de Goles">DG</th>
+                  <th scope="col" title="Puntos" class="col-pts">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (entry of group.entries; track entry.teamId) {
+                  <tr [class.qualify-row]="entry.position <= 2">
+                    <td class="col-pos">
+                      @if (entry.position <= 2) {
+                        <span class="qualify-dot" aria-label="Clasifica" aria-hidden="true">●</span>
+                      }
+                      {{ entry.position }}
+                    </td>
+                    <td class="col-team">
+                      <img
+                        [src]="entry.flagUrl"
+                        [alt]="entry.teamName + ' flag'"
+                        [title]="entry.teamName"
+                        class="flag"
+                        width="24"
+                        height="18"
+                        loading="lazy"
+                      />
+                      <span class="team-name">{{ entry.teamName }}</span>
+                      <span class="team-code" aria-hidden="true">{{ entry.teamCode }}</span>
+                    </td>
+                    <td>{{ entry.played }}</td>
+                    <td>{{ entry.won }}</td>
+                    <td>{{ entry.drawn }}</td>
+                    <td>{{ entry.lost }}</td>
+                    <td class="hide-xs">{{ entry.goalsFor }}</td>
+                    <td class="hide-xs">{{ entry.goalsAgainst }}</td>
+                    <td [class.positive]="entry.goalDifference > 0" [class.negative]="entry.goalDifference < 0">
+                      {{ entry.goalDifference > 0 ? '+' : '' }}{{ entry.goalDifference }}
+                    </td>
+                    <td class="col-pts">{{ entry.points }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+      }
+    </div>
+
+    <!-- Legend -->
+    <footer class="legend" aria-label="Leyenda">
+      <span class="legend-dot" aria-hidden="true">●</span>
+      <span>Clasifica a la siguiente ronda</span>
+      <span class="legend-sep" aria-hidden="true">&middot;</span>
+      <span>PJ Partidos jugados &nbsp; G Victorias &nbsp; E Empates &nbsp; P Derrotas &nbsp; DG Diferencia de goles &nbsp; Pts Puntos</span>
+    </footer>
+  }
+
+  <!-- Empty state (no group data at all — DB not yet seeded) -->
+  @if (!loading && !error && groups.length === 0) {
+    <div class="empty-state">
+      <span aria-hidden="true">⏳</span>
+      <p>Los grupos aún no están disponibles. El fixture se sincronizará automáticamente en breve.</p>
+    </div>
+  }
+
+</div>

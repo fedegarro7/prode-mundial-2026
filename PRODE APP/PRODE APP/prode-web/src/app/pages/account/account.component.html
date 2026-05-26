@@ -1,0 +1,76 @@
+<main class="account-page">
+  <section class="account-hero">
+    <p class="eyebrow">Cuenta</p>
+    <h1>Tu acceso, bajo control</h1>
+    <p>Actualiza tu contrasena y deja lista la recuperacion para el MVP publico.</p>
+  </section>
+
+  <section class="account-grid">
+    <form class="panel" (ngSubmit)="changePassword()">
+      <div>
+        <p class="panel-kicker">Seguridad</p>
+        <h2>Cambiar contrasena</h2>
+      </div>
+
+      <label>
+        Actual
+        <input type="password" name="currentPassword" [(ngModel)]="currentPassword" autocomplete="current-password">
+      </label>
+
+      <label>
+        Nueva
+        <input type="password" name="newPassword" [(ngModel)]="newPassword" autocomplete="new-password">
+      </label>
+
+      <label>
+        Repetir nueva
+        <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password">
+      </label>
+
+      <button type="submit" [disabled]="loading">Guardar cambio</button>
+    </form>
+
+    <div class="panel">
+      <div>
+        <p class="panel-kicker">Recuperacion</p>
+        <h2>Generar token</h2>
+      </div>
+
+      <label>
+        Email
+        <input type="email" name="recoveryEmail" [(ngModel)]="recoveryEmail" autocomplete="email">
+      </label>
+
+      <button type="button" class="secondary" [disabled]="loading" (click)="requestRecovery()">
+        Solicitar recuperacion
+      </button>
+
+      @if (devToken) {
+        <div class="token-box">
+          <span>Token dev</span>
+          <code>{{ devToken }}</code>
+        </div>
+      }
+
+      <label>
+        Token
+        <input type="text" name="resetToken" [(ngModel)]="resetToken" autocomplete="one-time-code">
+      </label>
+
+      <label>
+        Nueva contrasena
+        <input type="password" name="resetPasswordValue" [(ngModel)]="resetPasswordValue" autocomplete="new-password">
+      </label>
+
+      <button type="button" [disabled]="loading" (click)="resetPassword()">Usar token</button>
+    </div>
+  </section>
+
+  @if (message) {
+    <p class="feedback ok">{{ message }}</p>
+  }
+
+  @if (error) {
+    <p class="feedback error">{{ error }}</p>
+  }
+</main>

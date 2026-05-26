@@ -1,0 +1,19 @@
+<div class="auth-page">
+
+  <form class="auth-card" (ngSubmit)="register()">
+    <p class="eyebrow">Mundial 2026</p>
+    <h1>Crear cuenta</h1>
+    <p class="sub">Entra, pronostica y arma tu primer grupo privado.</p>
+
+    <input type="text" name="name" [(ngModel)]="name" placeholder="Nombre" autocomplete="name">
+    <input type="email" name="email" [(ngModel)]="email" placeholder="Email" autocomplete="email">
+    <input type="password" name="password" [(ngModel)]="password" placeholder="Contrasena" autocomplete="new-password">
+
+    <button type="submit">Registrarme</button>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+  </form>
+
+</div>

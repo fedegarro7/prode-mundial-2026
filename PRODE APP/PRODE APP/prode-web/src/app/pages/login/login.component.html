@@ -1,0 +1,51 @@
+<div class="auth-page">
+
+  <section class="auth-card">
+    <p class="eyebrow">Prode Mundial 2026</p>
+
+    @if (mode === 'login') {
+      <form (ngSubmit)="login()">
+        <h1>Ingresar</h1>
+        <p class="sub">Volvemos al fixture sin vueltas.</p>
+
+        <input type="email" name="email" [(ngModel)]="email" placeholder="Email" autocomplete="email">
+        <input type="password" name="password" [(ngModel)]="password" placeholder="Contrasena" autocomplete="current-password">
+
+        <button type="submit">Entrar</button>
+      </form>
+
+      <button type="button" class="link-btn" (click)="mode = 'recover'; recoveryEmail = email">
+        Olvide mi contrasena
+      </button>
+    } @else {
+      <div class="recover-flow">
+        <h1>Recuperar acceso</h1>
+        <p class="sub">Genera un token y usalo para crear una nueva contrasena.</p>
+
+        <input type="email" name="recoveryEmail" [(ngModel)]="recoveryEmail" placeholder="Email" autocomplete="email">
+        <button type="button" class="secondary" (click)="requestRecovery()">Generar token</button>
+
+        @if (devToken) {
+          <div class="token-box">
+            <span>Token dev</span>
+            <code>{{ devToken }}</code>
+          </div>
+        }
+
+        <input type="text" name="resetToken" [(ngModel)]="resetToken" placeholder="Token" autocomplete="one-time-code">
+        <input type="password" name="resetPasswordValue" [(ngModel)]="resetPasswordValue" placeholder="Nueva contrasena" autocomplete="new-password">
+        <button type="button" (click)="resetPassword()">Actualizar contrasena</button>
+        <button type="button" class="link-btn" (click)="mode = 'login'">Volver al ingreso</button>
+      </div>
+    }
+
+    @if (message) {
+      <p class="feedback ok">{{ message }}</p>
+    }
+
+    @if (error) {
+      <p class="feedback error">{{ error }}</p>
+    }
+  </section>
+
+</div>
