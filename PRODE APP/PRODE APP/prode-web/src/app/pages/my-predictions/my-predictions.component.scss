@@ -1,0 +1,328 @@
+// ─── Layout ────────────────────────────────────────────────────────────────
+.my-predictions-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+// ─── Header ────────────────────────────────────────────────────────────────
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 .75rem;
+  }
+}
+
+// ─── Progress bar ──────────────────────────────────────────────────────────
+.progress-block {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.progress-text {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .9rem;
+
+  .done { font-weight: 700; font-size: 1.05rem; }
+  .sep, .total { color: #888; }
+}
+
+.pending-badge {
+  background: #ff6b3510;
+  color: #ff6b35;
+  border: 1px solid #ff6b3540;
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+.complete-badge {
+  background: #22c55e15;
+  color: #22c55e;
+  border: 1px solid #22c55e40;
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+.progress-bar-track {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 4px;
+  transition: width .4s ease;
+}
+
+// ─── States ────────────────────────────────────────────────────────────────
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #888;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ─── Day section ───────────────────────────────────────────────────────────
+.day-section {
+  margin-bottom: 2rem;
+}
+
+.day-label {
+  font-size: .85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #6366f1;
+  border-bottom: 2px solid #6366f120;
+  padding-bottom: .35rem;
+  margin: 0 0 .75rem;
+}
+
+// ─── Match list ────────────────────────────────────────────────────────────
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+// ─── Match card ────────────────────────────────────────────────────────────
+.match-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: .75rem 1rem;
+  transition: border-color .15s, box-shadow .15s;
+
+  &:hover { box-shadow: 0 2px 8px #0001; }
+
+  &.saved {
+    border-color: #22c55e60;
+    background: #f0fdf4;
+  }
+
+  &.locked {
+    opacity: .85;
+  }
+}
+
+// ─── Meta row ──────────────────────────────────────────────────────────────
+.match-meta {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .5rem;
+  font-size: .75rem;
+  color: #888;
+}
+
+.stage-badge {
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+.match-time { font-weight: 600; color: #333; }
+
+.stadium { margin-left: auto; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+
+// ─── Match body ────────────────────────────────────────────────────────────
+.match-body {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+// ─── Team block ────────────────────────────────────────────────────────────
+.team-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  min-width: 0;
+
+  &.home { justify-content: flex-end; }
+  &.away { justify-content: flex-start; }
+
+  .flag {
+    flex-shrink: 0;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #0001;
+    object-fit: cover;
+  }
+}
+
+.team-name {
+  font-size: .85rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+
+// ─── Score controls ────────────────────────────────────────────────────────
+.score-controls {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  flex-shrink: 0;
+}
+
+.score-input {
+  display: flex;
+  align-items: center;
+  gap: .15rem;
+}
+
+.adj-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s, border-color .1s;
+  padding: 0;
+
+  &:hover { background: #e5e7eb; border-color: #9ca3af; }
+  &:active { background: #d1d5db; }
+}
+
+.score-val {
+  min-width: 22px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.score-sep {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #aaa;
+  padding: 0 2px;
+}
+
+.score-locked {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+.locked-score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #374151;
+  min-width: 50px;
+  text-align: center;
+}
+
+.no-prediction {
+  font-size: 1.1rem;
+  color: #d1d5db;
+  min-width: 50px;
+  text-align: center;
+}
+
+.lock-icon { font-size: .8rem; color: #9ca3af; }
+
+// ─── Footer / save button ──────────────────────────────────────────────────
+.match-footer {
+  margin-top: .6rem;
+  text-align: right;
+}
+
+.save-btn {
+  padding: .35rem 1rem;
+  border: 1px solid #6366f1;
+  background: #6366f1;
+  color: #fff;
+  border-radius: 8px;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, opacity .15s;
+
+  &:hover { background: #4f46e5; }
+  &:disabled { opacity: .6; cursor: default; }
+
+  &.saved {
+    background: #22c55e;
+    border-color: #22c55e;
+    cursor: default;
+  }
+}
+
+// ─── Toast ─────────────────────────────────────────────────────────────────
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #22c55e;
+  color: #fff;
+  padding: .55rem 1.2rem;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px #0003;
+  z-index: 9999;
+  animation: slideUp .2s ease;
+
+  &.error { background: #ef4444; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+// ─── Dark mode ─────────────────────────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  .match-card {
+    background: #1f2937;
+    border-color: #374151;
+    &.saved { background: #052e16; border-color: #166534; }
+  }
+  .stage-badge { background: #374151; color: #d1d5db; }
+  .adj-btn { background: #374151; border-color: #4b5563; color: #f9fafb; &:hover { background: #4b5563; } }
+  .progress-bar-track { background: #374151; }
+}
+
+// ─── Responsive ────────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .team-name { max-width: 80px; font-size: .75rem; }
+  .adj-btn { width: 24px; height: 24px; font-size: .9rem; }
+  .stadium { display: none; }
+}

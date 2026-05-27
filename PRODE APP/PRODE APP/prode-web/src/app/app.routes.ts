@@ -7,7 +7,7 @@ import { MatchesComponent } from './pages/matches/matches.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { StandingsComponent } from './pages/standings/standings.component';
 import { GroupsComponent } from './pages/groups/groups.component';
-import { RankingsComponent } from './pages/rankings/rankings.component';
+import { MyPredictionsComponent } from './pages/my-predictions/my-predictions.component';
 import { AccountComponent } from './pages/account/account.component';
 import { authGuard } from './guards/auth.guard';
 
@@ -52,8 +52,8 @@ export const routes: Routes = [
   },
 
 	{
-    path: 'rankings',
-    component: RankingsComponent,
+    path: 'my-predictions',
+    component: MyPredictionsComponent,
     canActivate: [authGuard]
   },
 

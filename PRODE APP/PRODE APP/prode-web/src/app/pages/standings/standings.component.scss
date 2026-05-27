@@ -205,11 +205,15 @@ tbody tr {
 // ── Team cell ─────────────────────────────────────────────────────────────────
 .col-team {
   text-align: left !important;
-  white-space: normal !important;   // allow long names (e.g. Bosnia y Herzegovina) to wrap
+  white-space: normal !important;
+  width: 40%;
+  max-width: 0;          // forces column to respect width constraint in table
+}
+
+.team-cell {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 40%;
+  gap: 6px;
 }
 
 .flag {

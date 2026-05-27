@@ -74,17 +74,18 @@
                       {{ entry.position }}
                     </td>
                     <td class="col-team">
-                      <img
-                        [src]="entry.flagUrl"
-                        [alt]="entry.teamName + ' flag'"
-                        [title]="entry.teamName"
-                        class="flag"
-                        width="24"
-                        height="18"
-                        loading="lazy"
-                      />
-                      <span class="team-name">{{ entry.teamName }}</span>
-                      <span class="team-code" aria-hidden="true">{{ entry.teamCode }}</span>
+                      <div class="team-cell">
+                        <img
+                          [src]="entry.flagUrl"
+                          [alt]="entry.teamName + ' flag'"
+                          [title]="entry.teamName"
+                          class="flag"
+                          width="24"
+                          height="18"
+                          loading="lazy"
+                        />
+                        <span class="team-name">{{ entry.teamName }}</span>
+                      </div>
                     </td>
                     <td>{{ entry.played }}</td>
                     <td>{{ entry.won }}</td>

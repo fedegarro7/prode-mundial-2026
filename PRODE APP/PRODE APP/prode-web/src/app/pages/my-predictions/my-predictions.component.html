@@ -1,0 +1,149 @@
+<div class="my-predictions-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Mis Pronósticos</h1>
+
+    @if (!loading) {
+      <div class="progress-block">
+        <div class="progress-text">
+          <span class="done">{{ predictedCount }}</span>
+          <span class="sep"> / </span>
+          <span class="total">{{ totalMatches }} pronósticos</span>
+          @if (pendingCount > 0) {
+            <span class="pending-badge">{{ pendingCount }} pendientes</span>
+          } @else {
+            <span class="complete-badge">¡Todo listo!</span>
+          }
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" [style.width.%]="progressPercent"></div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando partidos…</p>
+    </div>
+  }
+
+  <!-- Empty -->
+  @if (!loading && dayGroups.length === 0) {
+    <div class="empty-state">
+      <p>No hay partidos próximos disponibles.</p>
+    </div>
+  }
+
+  <!-- Day groups -->
+  @for (day of dayGroups; track day.label) {
+    <section class="day-section">
+      <h2 class="day-label">{{ day.label }}</h2>
+
+      <div class="match-list">
+        @for (match of day.matches; track match.id) {
+          <div class="match-card" [class.locked]="!canPredict(match)" [class.saved]="isSaved(match)">
+
+            <!-- Stage / group -->
+            <div class="match-meta">
+              <span class="stage-badge">
+                @if (match.groupName) {
+                  Grupo {{ match.groupName }}
+                } @else {
+                  {{ match.stage }}
+                }
+              </span>
+              <span class="match-time">
+                {{ match.matchDate | date:'HH:mm' }} hs
+              </span>
+              @if (match.stadium) {
+                <span class="stadium">{{ match.stadium.city }}</span>
+              }
+            </div>
+
+            <!-- Teams + prediction -->
+            <div class="match-body">
+
+              <!-- Home team -->
+              <div class="team-block home">
+                @if (match.homeTeam?.flagUrl) {
+                  <img [src]="match.homeTeam!.flagUrl" [alt]="match.homeTeam!.name" class="flag" width="32" height="24" loading="lazy" />
+                }
+                <span class="team-name">{{ getTeamName(match, 'home') }}</span>
+              </div>
+
+              <!-- Score controls -->
+              <div class="score-controls">
+                @if (canPredict(match)) {
+                  <div class="score-input">
+                    <button class="adj-btn" (click)="adjustScore(match, 'home', -1)" aria-label="Restar gol local">−</button>
+                    <span class="score-val">{{ match.homePrediction ?? 0 }}</span>
+                    <button class="adj-btn" (click)="adjustScore(match, 'home', 1)" aria-label="Sumar gol local">+</button>
+                  </div>
+                  <span class="score-sep">:</span>
+                  <div class="score-input">
+                    <button class="adj-btn" (click)="adjustScore(match, 'away', -1)" aria-label="Restar gol visitante">−</button>
+                    <span class="score-val">{{ match.awayPrediction ?? 0 }}</span>
+                    <button class="adj-btn" (click)="adjustScore(match, 'away', 1)" aria-label="Sumar gol visitante">+</button>
+                  </div>
+                } @else {
+                  <div class="score-locked">
+                    @if (match.myPrediction) {
+                      <span class="locked-score">
+                        {{ match.myPrediction.homeScorePrediction }} : {{ match.myPrediction.awayScorePrediction }}
+                      </span>
+                    } @else {
+                      <span class="no-prediction">— : —</span>
+                    }
+                    <span class="lock-icon" title="Predicciones cerradas">🔒</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Away team -->
+              <div class="team-block away">
+                <span class="team-name">{{ getTeamName(match, 'away') }}</span>
+                @if (match.awayTeam?.flagUrl) {
+                  <img [src]="match.awayTeam!.flagUrl" [alt]="match.awayTeam!.name" class="flag" width="32" height="24" loading="lazy" />
+                }
+              </div>
+
+            </div>
+
+            <!-- Save button -->
+            @if (canPredict(match)) {
+              <div class="match-footer">
+                <button
+                  class="save-btn"
+                  [class.saved]="isSaved(match)"
+                  [disabled]="isSaving(match)"
+                  (click)="savePrediction(match)"
+                >
+                  @if (isSaving(match)) {
+                    Guardando…
+                  } @else if (isSaved(match)) {
+                    ✓ Guardado
+                  } @else {
+                    Guardar pronóstico
+                  }
+                </button>
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Toast -->
+  @if (toastVisible) {
+    <div class="toast" [class.error]="toastType === 'error'">
+      {{ toastMessage }}
+    </div>
+  }
+
+</div>

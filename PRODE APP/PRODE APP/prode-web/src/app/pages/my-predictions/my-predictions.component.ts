@@ -1,0 +1,185 @@
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
+
+import { Match } from '../../models/match.model';
+import { MatchService } from '../../services/match.service';
+import { PredictionService } from '../../services/prediction.service';
+
+export interface DayGroup {
+  label: string;
+  date: Date;
+  matches: Match[];
+}
+
+@Component({
+  selector: 'app-my-predictions',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './my-predictions.component.html',
+  styleUrls: ['./my-predictions.component.scss']
+})
+export class MyPredictionsComponent implements OnInit, OnDestroy {
+
+  private matchService = inject(MatchService);
+  private predictionService = inject(PredictionService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
+  loading = true;
+  dayGroups: DayGroup[] = [];
+  totalMatches = 0;
+  predictedCount = 0;
+
+  savedIds = new Set<number>();
+  savingIds = new Set<number>();
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
+  toastVisible = false;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+  ngOnInit(): void {
+    this.load();
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(e => {
+        if (e.urlAfterRedirects === '/my-predictions') this.load();
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+  }
+
+  load(): void {
+    this.loading = true;
+    this.matchService.getUpcomingMatches().subscribe({
+      next: (res) => {
+        const mapped = res.map(m => ({
+          ...m,
+          homePrediction: m.myPrediction?.homeScorePrediction ?? 0,
+          awayPrediction: m.myPrediction?.awayScorePrediction ?? 0
+        }));
+
+        this.savedIds.clear();
+        for (const m of mapped) {
+          if (m.myPrediction) this.savedIds.add(m.id);
+        }
+
+        this.totalMatches = mapped.length;
+        this.predictedCount = this.savedIds.size;
+        this.dayGroups = this.buildDayGroups(mapped);
+        this.loading = false;
+        try { this.cdr.detectChanges(); } catch {}
+      },
+      error: () => { this.loading = false; try { this.cdr.detectChanges(); } catch {} }
+    });
+  }
+
+  private buildDayGroups(matches: Match[]): DayGroup[] {
+    const map = new Map<string, Match[]>();
+    for (const m of matches) {
+      const d = new Date(m.matchDate);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(m);
+    }
+    return [...map.entries()]
+      .sort((a, b) => {
+        const da = new Date(a[1][0].matchDate);
+        const db = new Date(b[1][0].matchDate);
+        return da.getTime() - db.getTime();
+      })
+      .map(([, matches]) => {
+        const d = new Date(matches[0].matchDate);
+        return {
+          label: d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }),
+          date: d,
+          matches
+        };
+      });
+  }
+
+  getTeamName(match: Match, side: 'home' | 'away'): string {
+    const team = side === 'home' ? match.homeTeam : match.awayTeam;
+    const ph = side === 'home' ? match.homePlaceholder : match.awayPlaceholder;
+    return team?.name || ph || 'TBD';
+  }
+
+  canPredict(match: Match): boolean {
+    return !match.predictionsLocked &&
+      !match.isFinished &&
+      !!match.homeTeam &&
+      !!match.awayTeam &&
+      new Date(match.matchDate).getTime() > Date.now();
+  }
+
+  isSaved(match: Match): boolean { return this.savedIds.has(match.id); }
+  isSaving(match: Match): boolean { return this.savingIds.has(match.id); }
+
+  adjustScore(match: Match, side: 'home' | 'away', delta: number): void {
+    if (side === 'home') {
+      match.homePrediction = Math.max(0, (match.homePrediction ?? 0) + delta);
+    } else {
+      match.awayPrediction = Math.max(0, (match.awayPrediction ?? 0) + delta);
+    }
+    this.savedIds.delete(match.id);
+    try { this.cdr.detectChanges(); } catch {}
+  }
+
+  savePrediction(match: Match): void {
+    if (!this.canPredict(match) || this.savingIds.has(match.id)) return;
+
+    this.savingIds.add(match.id);
+    try { this.cdr.detectChanges(); } catch {}
+
+    const data = {
+      matchId: match.id,
+      homeScorePrediction: match.homePrediction ?? 0,
+      awayScorePrediction: match.awayPrediction ?? 0
+    };
+
+    this.predictionService.savePrediction(data).subscribe({
+      next: () => {
+        this.savingIds.delete(match.id);
+        const wasNew = !this.savedIds.has(match.id);
+        this.savedIds.add(match.id);
+        if (wasNew) this.predictedCount++;
+        match.myPrediction = {
+          homeScorePrediction: data.homeScorePrediction,
+          awayScorePrediction: data.awayScorePrediction,
+          pointsEarned: 0
+        };
+        this.showToast('✓ Pronóstico guardado', 'success');
+        try { this.cdr.detectChanges(); } catch {}
+      },
+      error: () => {
+        this.savingIds.delete(match.id);
+        this.showToast('Error al guardar', 'error');
+        try { this.cdr.detectChanges(); } catch {}
+      }
+    });
+  }
+
+  get progressPercent(): number {
+    return this.totalMatches > 0
+      ? Math.round((this.predictedCount / this.totalMatches) * 100)
+      : 0;
+  }
+
+  get pendingCount(): number {
+    return this.totalMatches - this.predictedCount;
+  }
+
+  showToast(message: string, type: 'success' | 'error'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.toastVisible = true;
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => {
+      this.toastVisible = false;
+      try { this.cdr.detectChanges(); } catch {}
+    }, 2500);
+  }
+}
