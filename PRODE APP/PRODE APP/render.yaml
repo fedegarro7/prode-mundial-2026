@@ -10,7 +10,7 @@ services:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: Database__AutoMigrate
-        value: true
+        value: "true"
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: Jwt__Key
