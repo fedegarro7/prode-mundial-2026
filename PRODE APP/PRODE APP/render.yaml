@@ -16,4 +16,4 @@ services:
       - key: Jwt__Key
         generateValue: true
       - key: Cors__AllowedOrigins__0
-        value: https://TU-WEB.vercel.app
+        value: https://prode-mundial-2026-ecru.vercel.app
