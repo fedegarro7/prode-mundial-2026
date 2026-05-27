@@ -2,18 +2,16 @@
 
   <!-- Header -->
   <div class="page-header">
-    <h1>Mis Pronósticos</h1>
+    <h1 class="page-title">Mis Pronósticos</h1>
 
     @if (!loading) {
       <div class="progress-block">
-        <div class="progress-text">
-          <span class="done">{{ predictedCount }}</span>
-          <span class="sep"> / </span>
-          <span class="total">{{ totalMatches }} pronósticos</span>
+        <div class="progress-labels">
+          <span class="prog-count"><span class="prog-done">{{ predictedCount }}</span> / {{ totalMatches }}</span>
           @if (pendingCount > 0) {
-            <span class="pending-badge">{{ pendingCount }} pendientes</span>
-          } @else {
-            <span class="complete-badge">¡Todo listo!</span>
+            <span class="pending-badge">{{ pendingCount }} sin pronosticar</span>
+          } @else if (totalMatches > 0) {
+            <span class="complete-badge">✓ ¡Todo listo!</span>
           }
         </div>
         <div class="progress-bar-track">
@@ -41,94 +39,110 @@
   <!-- Day groups -->
   @for (day of dayGroups; track day.label) {
     <section class="day-section">
-      <h2 class="day-label">{{ day.label }}</h2>
+      <div class="day-header">
+        <h2 class="day-label">{{ day.label }}</h2>
+      </div>
 
       <div class="match-list">
         @for (match of day.matches; track match.id) {
-          <div class="match-card" [class.locked]="!canPredict(match)" [class.saved]="isSaved(match)">
+          <div class="match-card"
+               [class.card-saved]="isSaved(match)"
+               [class.card-locked]="!canPredict(match)">
 
-            <!-- Stage / group -->
+            <!-- Saved accent bar -->
+            @if (isSaved(match)) {
+              <div class="saved-bar"></div>
+            }
+
+            <!-- Meta row -->
             <div class="match-meta">
-              <span class="stage-badge">
-                @if (match.groupName) {
-                  Grupo {{ match.groupName }}
-                } @else {
-                  {{ match.stage }}
-                }
+              <span class="stage-pill">
+                @if (match.groupName) { Grupo {{ match.groupName }} } @else { {{ match.stage }} }
               </span>
-              <span class="match-time">
-                {{ match.matchDate | date:'HH:mm' }} hs
-              </span>
-              @if (match.stadium) {
-                <span class="stadium">{{ match.stadium.city }}</span>
+              <span class="match-time">{{ match.matchDate | date:'HH:mm' }} hs</span>
+              @if (match.stadium?.city) {
+                <span class="match-city">📍 {{ match.stadium.city }}</span>
+              }
+              @if (!canPredict(match)) {
+                <span class="lock-pill">🔒 Cerrado</span>
               }
             </div>
 
-            <!-- Teams + prediction -->
-            <div class="match-body">
+            <!-- Matchup row -->
+            <div class="matchup">
 
-              <!-- Home team -->
-              <div class="team-block home">
+              <!-- Home -->
+              <div class="team-col home">
                 @if (match.homeTeam?.flagUrl) {
-                  <img [src]="match.homeTeam!.flagUrl" [alt]="match.homeTeam!.name" class="flag" width="32" height="24" loading="lazy" />
+                  <img [src]="match.homeTeam!.flagUrl"
+                       [alt]="match.homeTeam!.name"
+                       [title]="match.homeTeam!.name"
+                       class="flag-img" loading="lazy" />
+                } @else {
+                  <div class="flag-ph">?</div>
                 }
                 <span class="team-name">{{ getTeamName(match, 'home') }}</span>
               </div>
 
-              <!-- Score controls -->
-              <div class="score-controls">
+              <!-- Score zone -->
+              <div class="score-zone">
                 @if (canPredict(match)) {
-                  <div class="score-input">
-                    <button class="adj-btn" (click)="adjustScore(match, 'home', -1)" aria-label="Restar gol local">−</button>
-                    <span class="score-val">{{ match.homePrediction ?? 0 }}</span>
-                    <button class="adj-btn" (click)="adjustScore(match, 'home', 1)" aria-label="Sumar gol local">+</button>
+                  <div class="steppers-row">
+                    <div class="stepper">
+                      <button class="step-btn" (click)="adjustScore(match, 'home', -1)" aria-label="Restar">−</button>
+                      <span class="step-val">{{ match.homePrediction ?? 0 }}</span>
+                      <button class="step-btn" (click)="adjustScore(match, 'home', 1)" aria-label="Sumar">+</button>
+                    </div>
+                    <span class="score-sep">:</span>
+                    <div class="stepper">
+                      <button class="step-btn" (click)="adjustScore(match, 'away', -1)" aria-label="Restar">−</button>
+                      <span class="step-val">{{ match.awayPrediction ?? 0 }}</span>
+                      <button class="step-btn" (click)="adjustScore(match, 'away', 1)" aria-label="Sumar">+</button>
+                    </div>
                   </div>
-                  <span class="score-sep">:</span>
-                  <div class="score-input">
-                    <button class="adj-btn" (click)="adjustScore(match, 'away', -1)" aria-label="Restar gol visitante">−</button>
-                    <span class="score-val">{{ match.awayPrediction ?? 0 }}</span>
-                    <button class="adj-btn" (click)="adjustScore(match, 'away', 1)" aria-label="Sumar gol visitante">+</button>
-                  </div>
+                  @if (isSaved(match)) {
+                    <span class="saved-label">✓ guardado</span>
+                  } @else {
+                    <span class="unsaved-label">sin guardar</span>
+                  }
                 } @else {
-                  <div class="score-locked">
-                    @if (match.myPrediction) {
-                      <span class="locked-score">
-                        {{ match.myPrediction.homeScorePrediction }} : {{ match.myPrediction.awayScorePrediction }}
-                      </span>
-                    } @else {
-                      <span class="no-prediction">— : —</span>
-                    }
-                    <span class="lock-icon" title="Predicciones cerradas">🔒</span>
-                  </div>
+                  @if (match.myPrediction) {
+                    <span class="locked-result">
+                      {{ match.myPrediction.homeScorePrediction }} : {{ match.myPrediction.awayScorePrediction }}
+                    </span>
+                    <span class="pred-lbl">tu pronóstico</span>
+                  } @else {
+                    <span class="locked-result no-pred">— : —</span>
+                    <span class="pred-lbl">sin pronóstico</span>
+                  }
                 }
               </div>
 
-              <!-- Away team -->
-              <div class="team-block away">
-                <span class="team-name">{{ getTeamName(match, 'away') }}</span>
+              <!-- Away -->
+              <div class="team-col away">
                 @if (match.awayTeam?.flagUrl) {
-                  <img [src]="match.awayTeam!.flagUrl" [alt]="match.awayTeam!.name" class="flag" width="32" height="24" loading="lazy" />
+                  <img [src]="match.awayTeam!.flagUrl"
+                       [alt]="match.awayTeam!.name"
+                       [title]="match.awayTeam!.name"
+                       class="flag-img" loading="lazy" />
+                } @else {
+                  <div class="flag-ph">?</div>
                 }
+                <span class="team-name">{{ getTeamName(match, 'away') }}</span>
               </div>
 
             </div>
 
             <!-- Save button -->
             @if (canPredict(match)) {
-              <div class="match-footer">
-                <button
-                  class="save-btn"
-                  [class.saved]="isSaved(match)"
-                  [disabled]="isSaving(match)"
-                  (click)="savePrediction(match)"
-                >
-                  @if (isSaving(match)) {
-                    Guardando…
-                  } @else if (isSaved(match)) {
-                    ✓ Guardado
-                  } @else {
-                    Guardar pronóstico
-                  }
+              <div class="card-footer">
+                <button class="save-btn"
+                        [class.btn-saved]="isSaved(match)"
+                        [disabled]="isSaving(match)"
+                        (click)="savePrediction(match)">
+                  @if (isSaving(match)) { <span class="btn-spinner"></span> Guardando… }
+                  @else if (isSaved(match)) { ✓ Guardado }
+                  @else { Guardar pronóstico }
                 </button>
               </div>
             }
@@ -141,7 +155,7 @@
 
   <!-- Toast -->
   @if (toastVisible) {
-    <div class="toast" [class.error]="toastType === 'error'">
+    <div class="toast" [class.toast-error]="toastType === 'error'">
       {{ toastMessage }}
     </div>
   }

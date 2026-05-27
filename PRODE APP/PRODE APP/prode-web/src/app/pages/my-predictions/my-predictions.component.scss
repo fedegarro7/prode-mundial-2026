@@ -1,328 +1,460 @@
-// ─── Layout ────────────────────────────────────────────────────────────────
+// ── Variables (alineadas al resto de la app) ─────────────────────────────────
+$glass:      rgba(255, 255, 255, 0.07);
+$glass-md:   rgba(255, 255, 255, 0.10);
+$glass-hi:   rgba(255, 255, 255, 0.14);
+$border:     rgba(255, 255, 255, 0.12);
+$border-hi:  rgba(255, 255, 255, 0.22);
+$green:      #22c55e;
+$amber:      #f59e0b;
+$text:       rgba(255, 255, 255, 0.90);
+$text-muted: rgba(255, 255, 255, 0.45);
+$accent:     #818cf8;  // indigo suave
+
+// ── Layout ───────────────────────────────────────────────────────────────────
 .my-predictions-page {
-  max-width: 760px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 4rem;
+  padding: 1.5rem 1rem 5rem;
 }
 
-// ─── Header ────────────────────────────────────────────────────────────────
+// ── Header ───────────────────────────────────────────────────────────────────
 .page-header {
-  margin-bottom: 1.5rem;
-
-  h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin: 0 0 .75rem;
-  }
+  margin-bottom: 2rem;
 }
 
-// ─── Progress bar ──────────────────────────────────────────────────────────
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 1rem;
+  letter-spacing: -.01em;
+}
+
+// ── Progress ─────────────────────────────────────────────────────────────────
 .progress-block {
   display: flex;
   flex-direction: column;
-  gap: .4rem;
+  gap: .5rem;
 }
 
-.progress-text {
+.progress-labels {
   display: flex;
   align-items: center;
-  gap: .4rem;
+  gap: .6rem;
   font-size: .9rem;
-
-  .done { font-weight: 700; font-size: 1.05rem; }
-  .sep, .total { color: #888; }
+  color: $text-muted;
 }
 
+.prog-count { color: $text; }
+.prog-done  { font-size: 1.15rem; font-weight: 800; color: #fff; }
+
 .pending-badge {
-  background: #ff6b3510;
-  color: #ff6b35;
-  border: 1px solid #ff6b3540;
+  background: rgba($amber, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba($amber, 0.28);
   border-radius: 20px;
-  padding: 1px 8px;
-  font-size: .75rem;
-  font-weight: 600;
+  padding: 2px 10px;
+  font-size: .72rem;
+  font-weight: 700;
 }
 
 .complete-badge {
-  background: #22c55e15;
-  color: #22c55e;
-  border: 1px solid #22c55e40;
+  background: rgba($green, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba($green, 0.28);
   border-radius: 20px;
-  padding: 1px 8px;
-  font-size: .75rem;
-  font-weight: 600;
+  padding: 2px 10px;
+  font-size: .72rem;
+  font-weight: 700;
 }
 
 .progress-bar-track {
-  height: 6px;
-  background: #e5e7eb;
+  height: 5px;
+  background: rgba(255,255,255,.08);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #22c55e, #16a34a);
+  background: linear-gradient(90deg, #4ade80, #22c55e);
   border-radius: 4px;
-  transition: width .4s ease;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
 }
 
-// ─── States ────────────────────────────────────────────────────────────────
+// ── States ───────────────────────────────────────────────────────────────────
 .loading-state,
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
-  color: #888;
+  padding: 4rem 1rem;
+  color: $text-muted;
+  font-size: .95rem;
 }
 
 .spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid #e5e7eb;
-  border-top-color: #6366f1;
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(255,255,255,.1);
+  border-top-color: $accent;
   border-radius: 50%;
-  animation: spin .8s linear infinite;
+  animation: spin .7s linear infinite;
   margin: 0 auto 1rem;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-// ─── Day section ───────────────────────────────────────────────────────────
+// ── Day section ───────────────────────────────────────────────────────────────
 .day-section {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.day-header {
+  margin-bottom: .7rem;
 }
 
 .day-label {
-  font-size: .85rem;
-  font-weight: 600;
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .06em;
-  color: #6366f1;
-  border-bottom: 2px solid #6366f120;
-  padding-bottom: .35rem;
-  margin: 0 0 .75rem;
+  letter-spacing: .1em;
+  color: $accent;
+  padding-bottom: .3rem;
+  border-bottom: 2px solid rgba($accent, .25);
 }
 
-// ─── Match list ────────────────────────────────────────────────────────────
+// ── Match list ────────────────────────────────────────────────────────────────
 .match-list {
   display: flex;
   flex-direction: column;
-  gap: .6rem;
+  gap: .8rem;
 }
 
-// ─── Match card ────────────────────────────────────────────────────────────
+// ── Match card ────────────────────────────────────────────────────────────────
 .match-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: .75rem 1rem;
-  transition: border-color .15s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+  background: $glass;
+  border: 1px solid $border;
+  border-radius: 16px;
+  padding: .9rem 1.1rem .85rem;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(0,0,0,.22);
+  transition: border-color .18s, box-shadow .18s, transform .18s;
+  animation: card-in .35s ease both;
 
-  &:hover { box-shadow: 0 2px 8px #0001; }
-
-  &.saved {
-    border-color: #22c55e60;
-    background: #f0fdf4;
+  &:hover {
+    border-color: $border-hi;
+    box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    transform: translateY(-2px);
   }
 
-  &.locked {
-    opacity: .85;
+  &.card-saved {
+    border-color: rgba($green, .35);
+    background: linear-gradient(135deg, rgba($green, .06), $glass);
+  }
+
+  &.card-locked {
+    opacity: .80;
   }
 }
 
-// ─── Meta row ──────────────────────────────────────────────────────────────
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// Barra verde superior cuando está guardado
+.saved-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, $green, #4ade80, $green, transparent);
+}
+
+// ── Meta row ─────────────────────────────────────────────────────────────────
 .match-meta {
   display: flex;
-  align-items: center;
-  gap: .5rem;
-  margin-bottom: .5rem;
-  font-size: .75rem;
-  color: #888;
-}
-
-.stage-badge {
-  background: #f3f4f6;
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-weight: 600;
-  color: #555;
-}
-
-.match-time { font-weight: 600; color: #333; }
-
-.stadium { margin-left: auto; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-
-// ─── Match body ────────────────────────────────────────────────────────────
-.match-body {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-// ─── Team block ────────────────────────────────────────────────────────────
-.team-block {
-  flex: 1;
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: .4rem;
-  min-width: 0;
-
-  &.home { justify-content: flex-end; }
-  &.away { justify-content: flex-start; }
-
-  .flag {
-    flex-shrink: 0;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px #0001;
-    object-fit: cover;
-  }
+  margin-bottom: .75rem;
+  font-size: .72rem;
 }
 
-.team-name {
-  font-size: .85rem;
-  font-weight: 600;
+.stage-pill {
+  background: $glass-hi;
+  border: 1px solid $border;
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-weight: 700;
+  color: rgba(255,255,255,.8);
+  white-space: nowrap;
+}
+
+.match-time {
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.match-city {
+  color: $text-muted;
+  font-style: italic;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 130px;
+  max-width: 160px;
 }
 
-// ─── Score controls ────────────────────────────────────────────────────────
-.score-controls {
+.lock-pill {
+  margin-left: auto;
+  font-size: .68rem;
+  color: #f87171;
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.2);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+// ── Matchup ───────────────────────────────────────────────────────────────────
+.matchup {
   display: flex;
   align-items: center;
-  gap: .25rem;
+  justify-content: space-between;
+  gap: .5rem;
+  min-height: 80px;
+}
+
+// ── Team columns ──────────────────────────────────────────────────────────────
+.team-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+
+  &.home { align-items: flex-end; }
+  &.away { align-items: flex-start; }
+}
+
+.flag-img {
+  width: 46px;
+  height: 31px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.4);
   flex-shrink: 0;
 }
 
-.score-input {
-  display: flex;
-  align-items: center;
-  gap: .15rem;
-}
-
-.adj-btn {
-  width: 28px;
-  height: 28px;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
-  border-radius: 6px;
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
+.flag-ph {
+  width: 46px;
+  height: 31px;
+  border-radius: 5px;
+  border: 1px solid $border;
+  background: $glass-md;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .1s, border-color .1s;
-  padding: 0;
-
-  &:hover { background: #e5e7eb; border-color: #9ca3af; }
-  &:active { background: #d1d5db; }
+  font-size: .7rem;
+  color: $text-muted;
+  font-weight: 700;
 }
 
-.score-val {
-  min-width: 22px;
+.team-name {
+  font-size: .75rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.88);
   text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 100px;
+
+  .home & { text-align: right; }
+  .away & { text-align: left; }
+}
+
+// ── Score zone ────────────────────────────────────────────────────────────────
+.score-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.steppers-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  background: $glass-md;
+  border: 1px solid $border-hi;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.step-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.1rem;
   font-weight: 700;
+  background: transparent;
+  color: rgba(255,255,255,.75);
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background .12s, color .12s, transform .08s;
+  -webkit-user-select: none;
+  user-select: none;
+
+  &:hover  { background: rgba(255,255,255,.12); color: #fff; }
+  &:active { transform: scale(.85); background: rgba(255,255,255,.18); }
+}
+
+.step-val {
+  min-width: 30px;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
 }
 
 .score-sep {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #aaa;
-  padding: 0 2px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: rgba(255,255,255,.35);
 }
 
-.score-locked {
+.saved-label {
+  font-size: .65rem;
+  font-weight: 700;
+  color: #4ade80;
+  letter-spacing: .04em;
+}
+
+.unsaved-label {
+  font-size: .65rem;
+  color: $text-muted;
+  letter-spacing: .04em;
+}
+
+// Estado cerrado
+.locked-result {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .04em;
+  line-height: 1;
+
+  &.no-pred { color: rgba(255,255,255,.25); }
+}
+
+.pred-lbl {
+  font-size: .63rem;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+// ── Card footer ───────────────────────────────────────────────────────────────
+.card-footer {
+  margin-top: .75rem;
   display: flex;
-  align-items: center;
-  gap: .3rem;
-}
-
-.locked-score {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #374151;
-  min-width: 50px;
-  text-align: center;
-}
-
-.no-prediction {
-  font-size: 1.1rem;
-  color: #d1d5db;
-  min-width: 50px;
-  text-align: center;
-}
-
-.lock-icon { font-size: .8rem; color: #9ca3af; }
-
-// ─── Footer / save button ──────────────────────────────────────────────────
-.match-footer {
-  margin-top: .6rem;
-  text-align: right;
+  justify-content: flex-end;
 }
 
 .save-btn {
-  padding: .35rem 1rem;
-  border: 1px solid #6366f1;
-  background: #6366f1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: .4rem 1.1rem;
+  background: rgba(99,102,241,.75);
+  border: 1px solid rgba(99,102,241,.9);
   color: #fff;
-  border-radius: 8px;
-  font-size: .8rem;
-  font-weight: 600;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background .15s, opacity .15s;
+  transition: background .15s, opacity .15s, transform .1s;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 
-  &:hover { background: #4f46e5; }
-  &:disabled { opacity: .6; cursor: default; }
+  &:hover:not(:disabled) {
+    background: rgba(99,102,241,.95);
+    transform: translateY(-1px);
+  }
 
-  &.saved {
-    background: #22c55e;
-    border-color: #22c55e;
+  &:active:not(:disabled) { transform: scale(.96); }
+
+  &:disabled { opacity: .55; cursor: default; }
+
+  &.btn-saved {
+    background: rgba($green, .2);
+    border-color: rgba($green, .4);
+    color: #4ade80;
     cursor: default;
+    &:hover { transform: none; }
   }
 }
 
-// ─── Toast ─────────────────────────────────────────────────────────────────
+.btn-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  flex-shrink: 0;
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
 .toast {
   position: fixed;
   bottom: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  background: #22c55e;
+  background: rgba($green, .85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   color: #fff;
-  padding: .55rem 1.2rem;
-  border-radius: 8px;
-  font-size: .9rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px #0003;
+  padding: .55rem 1.4rem;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(0,0,0,.35);
   z-index: 9999;
-  animation: slideUp .2s ease;
+  white-space: nowrap;
+  animation: toast-in .2s ease;
 
-  &.error { background: #ef4444; }
+  &.toast-error { background: rgba(239,68,68,.85); }
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-// ─── Dark mode ─────────────────────────────────────────────────────────────
-@media (prefers-color-scheme: dark) {
-  .match-card {
-    background: #1f2937;
-    border-color: #374151;
-    &.saved { background: #052e16; border-color: #166534; }
-  }
-  .stage-badge { background: #374151; color: #d1d5db; }
-  .adj-btn { background: #374151; border-color: #4b5563; color: #f9fafb; &:hover { background: #4b5563; } }
-  .progress-bar-track { background: #374151; }
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 440px) {
+  .flag-img, .flag-ph { width: 38px; height: 26px; }
+  .team-name           { font-size: .68rem; max-width: 80px; }
+  .step-btn            { width: 28px; height: 28px; font-size: 1rem; }
+  .step-val            { min-width: 26px; font-size: 1rem; }
+  .locked-result       { font-size: 1.35rem; }
+  .match-city          { display: none; }
 }
 
-// ─── Responsive ────────────────────────────────────────────────────────────
-@media (max-width: 480px) {
-  .team-name { max-width: 80px; font-size: .75rem; }
-  .adj-btn { width: 24px; height: 24px; font-size: .9rem; }
-  .stadium { display: none; }
-}
