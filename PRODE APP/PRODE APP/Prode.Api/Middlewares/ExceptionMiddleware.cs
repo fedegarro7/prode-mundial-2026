@@ -29,7 +29,9 @@ public class ExceptionMiddleware
             var response = new
             {
                 message = "Ocurrió un error interno",
-                detail = ex.Message
+                detail = ex.Message,
+                inner = ex.InnerException?.Message,
+                inner2 = ex.InnerException?.InnerException?.Message
             };
 
             var json = JsonSerializer.Serialize(response);
