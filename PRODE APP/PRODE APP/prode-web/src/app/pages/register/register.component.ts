@@ -31,6 +31,12 @@ export class RegisterComponent {
 
   error = '';
 
+  showPassword = false;
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
   register() {
 
     this.error = '';
@@ -64,12 +70,22 @@ export class RegisterComponent {
 
         console.error(error);
 
-        this.error =
-          error.error?.message ||
-          error.error?.title ||
-          (typeof error.error === 'string' ? error.error : null) ||
-          error.statusText ||
-          'Error de conexión. Verificá que el servidor esté disponible.';
+        if (error.status === 0) {
+          this.error = 'Error de conexión. Verificá que el servidor esté disponible.';
+        } else if (error.status === 400) {
+          this.error =
+            error.error?.message ||
+            error.error?.title ||
+            (typeof error.error === 'string' ? error.error : null) ||
+            'Datos inválidos. Revisá los campos e intentá de nuevo.';
+        } else if (error.status === 409) {
+          this.error = 'Ya existe una cuenta con ese email.';
+        } else {
+          this.error =
+            error.error?.message ||
+            (typeof error.error === 'string' ? error.error : null) ||
+            'Ocurrió un error inesperado. Intentá de nuevo.';
+        }
 
         try { this.cdr.detectChanges(); } catch {}
 

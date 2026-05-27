@@ -67,12 +67,17 @@ export class LoginComponent {
 
         console.error(err);
 
-        this.error =
-          err.error?.message ||
-          err.error?.title ||
-          (typeof err.error === 'string' ? err.error : null) ||
-          err.statusText ||
-          'Error de conexión. Verificá que el servidor esté disponible.';
+        if (err.status === 401) {
+          this.error = 'Contraseña incorrecta o usuario inexistente.';
+        } else if (err.status === 0) {
+          this.error = 'Error de conexión. Verificá que el servidor esté disponible.';
+        } else {
+          this.error =
+            err.error?.message ||
+            err.error?.title ||
+            (typeof err.error === 'string' ? err.error : null) ||
+            'Ocurrió un error inesperado. Intentá de nuevo.';
+        }
 
         try { this.cdr.detectChanges(); } catch {}
       }

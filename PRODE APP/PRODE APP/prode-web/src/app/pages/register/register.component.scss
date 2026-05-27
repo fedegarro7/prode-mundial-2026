@@ -54,6 +54,35 @@ input {
   }
 }
 
+.password-field {
+  position: relative;
+  display: grid;
+
+  input {
+    padding-right: 48px;
+  }
+}
+
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-height: unset;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+
+  &:hover {
+    color: #fff;
+    background: transparent;
+  }
+}
+
 button {
   min-height: 48px;
   border-radius: 8px;
