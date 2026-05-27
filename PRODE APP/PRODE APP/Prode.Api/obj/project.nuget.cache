@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "4sz2O0Y80VU=",
+  "dgSpecHash": "ZxWpF1tjVbA=",
   "success": true,
-  "projectFilePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+  "projectFilePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\federico.garro\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\fluentvalidation.aspnetcore\\11.3.1\\fluentvalidation.aspnetcore.11.3.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
@@ -17,10 +18,12 @@
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.codeanalysis.csharp.workspaces\\5.0.0\\microsoft.codeanalysis.csharp.workspaces.5.0.0.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.codeanalysis.workspaces.common\\5.0.0\\microsoft.codeanalysis.workspaces.common.5.0.0.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.codeanalysis.workspaces.msbuild\\5.0.0\\microsoft.codeanalysis.workspaces.msbuild.5.0.0.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.codecoverage\\17.11.1\\microsoft.codecoverage.17.11.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.8\\microsoft.entityframeworkcore.10.0.8.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.8\\microsoft.entityframeworkcore.abstractions.10.0.8.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\10.0.8\\microsoft.entityframeworkcore.analyzers.10.0.8.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.entityframeworkcore.design\\10.0.8\\microsoft.entityframeworkcore.design.10.0.8.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.entityframeworkcore.inmemory\\10.0.8\\microsoft.entityframeworkcore.inmemory.10.0.8.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.8\\microsoft.entityframeworkcore.relational.10.0.8.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.extensions.dependencymodel\\10.0.8\\microsoft.extensions.dependencymodel.10.0.8.nupkg.sha512",
@@ -30,9 +33,13 @@
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.identitymodel.protocols\\8.0.1\\microsoft.identitymodel.protocols.8.0.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\8.0.1\\microsoft.identitymodel.protocols.openidconnect.8.0.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.18.0\\microsoft.identitymodel.tokens.8.18.0.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.net.test.sdk\\17.11.1\\microsoft.net.test.sdk.17.11.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.openapi\\1.6.14\\microsoft.openapi.1.6.14.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.testplatform.objectmodel\\17.11.1\\microsoft.testplatform.objectmodel.17.11.1.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.testplatform.testhost\\17.11.1\\microsoft.testplatform.testhost.17.11.1.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\microsoft.visualstudio.solutionpersistence\\1.0.52\\microsoft.visualstudio.solutionpersistence.1.0.52.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\mono.texttemplating\\3.0.0\\mono.texttemplating.3.0.0.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\moq\\4.20.70\\moq.4.20.70.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\npgsql\\10.0.2\\npgsql.10.0.2.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\10.0.1\\npgsql.entityframeworkcore.postgresql.10.0.1.nupkg.sha512",
@@ -47,7 +54,28 @@
     "C:\\Users\\federico.garro\\.nuget\\packages\\system.composition.hosting\\9.0.0\\system.composition.hosting.9.0.0.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\system.composition.runtime\\9.0.0\\system.composition.runtime.9.0.0.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\system.composition.typedparts\\9.0.0\\system.composition.typedparts.9.0.0.nupkg.sha512",
-    "C:\\Users\\federico.garro\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.18.0\\system.identitymodel.tokens.jwt.8.18.0.nupkg.sha512"
+    "C:\\Users\\federico.garro\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.18.0\\system.identitymodel.tokens.jwt.8.18.0.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit\\2.9.3\\xunit.2.9.3.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.abstractions\\2.0.3\\xunit.abstractions.2.0.3.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.analyzers\\1.18.0\\xunit.analyzers.1.18.0.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.assert\\2.9.3\\xunit.assert.2.9.3.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.core\\2.9.3\\xunit.core.2.9.3.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.extensibility.core\\2.9.3\\xunit.extensibility.core.2.9.3.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.extensibility.execution\\2.9.3\\xunit.extensibility.execution.2.9.3.nupkg.sha512",
+    "C:\\Users\\federico.garro\\.nuget\\packages\\xunit.runner.visualstudio\\3.0.0\\xunit.runner.visualstudio.3.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "Prode.Api depends on xunit.runner.visualstudio (>= 2.9.3) but xunit.runner.visualstudio 2.9.3 was not found. xunit.runner.visualstudio 3.0.0 was resolved instead.",
+      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
+      "libraryId": "xunit.runner.visualstudio",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }
