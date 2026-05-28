@@ -148,8 +148,12 @@ $border:     rgba(255, 255, 255, 0.12);
   position: relative;
   z-index: 1;
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 0 20px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
   overflow-x: auto;
   scrollbar-width: none;
 
@@ -204,10 +208,10 @@ $border:     rgba(255, 255, 255, 0.12);
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   padding: 0 20px;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -596,7 +600,7 @@ $border:     rgba(255, 255, 255, 0.12);
 .knockout-container {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -654,7 +658,7 @@ $border:     rgba(255, 255, 255, 0.12);
 
 .knockout-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   padding: 16px;
 }
@@ -756,6 +760,11 @@ $border:     rgba(255, 255, 255, 0.12);
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .matches-grid { grid-template-columns: repeat(2, 1fr); }
+  .knockout-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 768px) {
   .hero { padding: 36px 16px 24px; }
   .phase-bar { padding: 0 16px 22px; }

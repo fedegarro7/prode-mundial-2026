@@ -1,11 +1,12 @@
 using Xunit;
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using Prode.Api.Data;
 using Prode.Api.Services;
 using Prode.Api.DTOs;
 using Prode.Api.Entities;
 using System.Security.Claims;
+
+using Match = Prode.Api.Entities.Match;
 
 namespace Prode.Api.Tests.Services;
 
@@ -220,7 +221,7 @@ public class PredictionServiceTests : IDisposable
         var result = await _predictionService.CreatePrediction(dto, claims);
 
         // Assert
-        Assert.Equal("Las predicciones están cerradas", result);
+        Assert.Equal("Predicciones cerradas", result);
     }
 
     [Fact]

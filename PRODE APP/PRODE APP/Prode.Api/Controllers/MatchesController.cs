@@ -237,7 +237,7 @@ public class MatchesController : ControllerBase
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
             .Include(x => x.Stadium)
-            .Where(x => x.IsFinished || x.MatchDate > DateTime.UtcNow)
+            .Where(x => x.IsFinished || x.MatchDate > DateTime.UtcNow.AddHours(-3))
             .OrderBy(x => x.MatchDate)
             .ToListAsync();
 

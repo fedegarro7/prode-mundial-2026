@@ -19,10 +19,10 @@ public class JwtServiceTests
         _mockConfiguration = new Mock<IConfiguration>();
         _mockJwtSection = new Mock<IConfigurationSection>();
 
-        _mockJwtSection["Key"] = "this-is-a-very-long-secret-key-for-testing-purposes-at-least-32-characters";
-        _mockJwtSection["Issuer"] = "ProdeApp";
-        _mockJwtSection["Audience"] = "ProdeUsers";
-        _mockJwtSection["ExpireMinutes"] = "60";
+        _mockJwtSection.Setup(x => x["Key"]).Returns("this-is-a-very-long-secret-key-for-testing-purposes-at-least-32-characters");
+        _mockJwtSection.Setup(x => x["Issuer"]).Returns("ProdeApp");
+        _mockJwtSection.Setup(x => x["Audience"]).Returns("ProdeUsers");
+        _mockJwtSection.Setup(x => x["ExpireMinutes"]).Returns("60");
 
         _mockConfiguration
             .Setup(c => c.GetSection("Jwt"))
