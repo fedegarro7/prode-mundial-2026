@@ -2,10 +2,35 @@
   <section class="account-hero">
     <p class="eyebrow">Cuenta</p>
     <h1>Tu acceso, bajo control</h1>
-    <p>Actualiza tu contrasena y deja lista la recuperacion para el MVP publico.</p>
+    <p>Actualizá tu nombre, contraseña y dejá lista la recuperación.</p>
   </section>
 
   <section class="account-grid">
+
+    <!-- ── Nombre ── -->
+    <section class="panel name-panel">
+      <div>
+        <p class="panel-kicker">Perfil</p>
+        <h2>Nombre para mostrar</h2>
+      </div>
+
+      @if (!editingName) {
+        <div class="name-display">
+          <span class="name-value">{{ user?.name }}</span>
+          <button type="button" class="secondary" (click)="startEditName()">Editar</button>
+        </div>
+      } @else {
+        <label>
+          Nuevo nombre
+          <input type="text" name="newName" [(ngModel)]="newName" maxlength="60" autocomplete="name">
+        </label>
+        <div class="name-actions">
+          <button type="button" [disabled]="loading" (click)="saveName()">Guardar</button>
+          <button type="button" class="secondary" [disabled]="loading" (click)="cancelEditName()">Cancelar</button>
+        </div>
+      }
+    </section>
+
     <form class="panel" (ngSubmit)="changePassword()">
       <div>
         <p class="panel-kicker">Seguridad</p>

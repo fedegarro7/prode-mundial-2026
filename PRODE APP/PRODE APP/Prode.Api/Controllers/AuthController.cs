@@ -208,6 +208,34 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
+    [HttpPut("name")]
+    public async Task<IActionResult> UpdateName([FromBody] UpdateNameDto dto)
+    {
+        var name = dto.Name?.Trim();
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 60)
+            return BadRequest("El nombre debe tener entre 1 y 60 caracteres.");
+
+        var userId = Guid.Parse(
+            User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value
+        );
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        if (user is null) return Unauthorized();
+
+        user.Name = name;
+        await _context.SaveChangesAsync();
+
+        var token = _jwtService.GenerateToken(user);
+        return Ok(new AuthResponseDto
+        {
+            Token = token,
+            Name = user.Name,
+            Email = user.Email,
+            IsAdmin = user.IsAdmin
+        });
+    }
+
     private static string NormalizeEmail(string email)
     {
         return email.Trim().ToLowerInvariant();

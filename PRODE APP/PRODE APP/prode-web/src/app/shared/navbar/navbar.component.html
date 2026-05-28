@@ -15,7 +15,12 @@
            (click)="notifyRoute('/matches')">Partidos</a>
       </li>
       <li><a routerLink="/standings" routerLinkActive="active">Posiciones</a></li>
-      <li><a routerLink="/groups"    routerLinkActive="active">Grupos</a></li>
+      <li><a routerLink="/groups"    routerLinkActive="active" class="nav-link-badge">
+        Grupos
+        @if (user && groupsService.pendingCount() > 0) {
+          <span class="nav-red-dot" [attr.aria-label]="groupsService.pendingCount() + ' solicitudes pendientes'"></span>
+        }
+      </a></li>
       <li><a routerLink="/my-predictions" routerLinkActive="active">Mis Pronósticos</a></li>
     </ul>
 
@@ -32,10 +37,10 @@
     <!-- ── Right area ────────────────────────────────────────────────────── -->
     <div class="nav-end">
 
-      @if (user) {
+      @if (authService.currentUser()) {
         <!-- User chip + dropdown -->
         <div class="user-chip" [class.open]="dropdownOpen" (click)="toggleDropdown()">
-          <div class="avatar" [title]="user.name">{{ userInitials }}</div>
+          <div class="avatar" [title]="authService.currentUser()?.name">{{ userInitials }}</div>
           <span class="greeting">{{ firstName }}</span>
           <svg class="chevron" [class.flipped]="dropdownOpen"
                xmlns="http://www.w3.org/2000/svg" width="13" height="13"
@@ -90,15 +95,20 @@
     <div class="mobile-drawer" role="navigation" aria-label="Menú móvil">
       <a routerLink="/matches"        routerLinkActive="active" (click)="closeMenu(); notifyRoute('/matches')">⚽ Partidos</a>
       <a routerLink="/standings"      routerLinkActive="active" (click)="closeMenu()">📊 Posiciones</a>
-      <a routerLink="/groups"         routerLinkActive="active" (click)="closeMenu()">👥 Grupos</a>
+      <a routerLink="/groups"         routerLinkActive="active" (click)="closeMenu()" class="nav-link-badge">
+        👥 Grupos
+        @if (user && groupsService.pendingCount() > 0) {
+          <span class="nav-red-dot"></span>
+        }
+      </a>
       <a routerLink="/my-predictions" routerLinkActive="active" (click)="closeMenu()">🔮 Pronósticos</a>
 
       <hr class="drawer-sep" />
 
-      @if (user) {
+      @if (authService.currentUser()) {
         <div class="drawer-user">
           <div class="avatar sm">{{ userInitials }}</div>
-          <span>{{ user.name }}</span>
+          <span>{{ authService.currentUser()?.name }}</span>
         </div>
         <a routerLink="/account" (click)="closeMenu()">👤 Mi cuenta</a>
         <button class="drawer-logout" (click)="logout()">🚪 Cerrar sesión</button>

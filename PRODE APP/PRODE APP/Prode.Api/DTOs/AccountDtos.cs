@@ -1,5 +1,7 @@
 namespace Prode.Api.DTOs;
 
+public record UpdateNameDto(string Name);
+
 public record ChangePasswordDto(
     string CurrentPassword,
     string NewPassword

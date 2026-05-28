@@ -15,7 +15,29 @@ export class AccountComponent {
 
   private auth = inject(AuthService);
 
-  user = this.auth.getUser();
+  // Use the reactive signal so UI updates instantly after name change
+  get user() { return this.auth.currentUser(); }
+
+  // ── Name edit ──────────────────────────────────────────────────────────────
+  editingName = false;
+  newName = this.user?.name ?? '';
+
+  startEditName(): void { this.editingName = true; this.newName = this.user?.name ?? ''; }
+  cancelEditName(): void { this.editingName = false; }
+
+  saveName(): void {
+    const name = this.newName.trim();
+    if (!name || name.length > 60) { this.error = 'El nombre debe tener entre 1 y 60 caracteres.'; return; }
+    this.message = ''; this.error = ''; this.loading = true;
+    this.auth.updateName(name).subscribe({
+      next: () => {
+        this.editingName = false;
+        this.loading = false;
+        this.message = 'Nombre actualizado correctamente.';
+      },
+      error: (err) => { this.loading = false; this.error = this.readError(err, 'No se pudo actualizar el nombre.'); }
+    });
+  }
 
   currentPassword = '';
   newPassword = '';

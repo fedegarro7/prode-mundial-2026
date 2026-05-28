@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 import { NavigationService } from '../../services/navigation.service';
+import { GroupsService } from '../../services/groups.service';
 
 // Partido inaugural: 11 jun 2026 a las 21:00 UTC
 const FIRST_MATCH = new Date('2026-06-11T21:00:00Z');
@@ -24,6 +25,7 @@ export class NavbarComponent implements OnDestroy {
   private ngZone            = inject(NgZone);
   private cdr               = inject(ChangeDetectorRef);
   private platformId        = inject(PLATFORM_ID);
+  groupsService             = inject(GroupsService);
 
   user: any = null;
   menuOpen     = false;
@@ -78,7 +80,7 @@ export class NavbarComponent implements OnDestroy {
     if (this.countdownInterval) clearInterval(this.countdownInterval);
   }
 
-  loadUser() { this.user = this.authService.getUser(); }
+  loadUser() { this.user = this.authService.currentUser(); }
 
   logout() {
     this.authService.logout();
@@ -96,8 +98,9 @@ export class NavbarComponent implements OnDestroy {
   closeDropdown() { this.dropdownOpen = false; }
 
   get userInitials(): string {
-    if (!this.user?.name) return '?';
-    return this.user.name
+    const name = this.authService.currentUser()?.name;
+    if (!name) return '?';
+    return name
       .split(' ')
       .filter((w: string) => w.length > 0)
       .slice(0, 2)
@@ -106,7 +109,7 @@ export class NavbarComponent implements OnDestroy {
   }
 
   get firstName(): string {
-    return this.user?.name?.split(' ')[0] ?? '';
+    return this.authService.currentUser()?.name?.split(' ')[0] ?? '';
   }
 
   @HostListener('document:click', ['$event'])

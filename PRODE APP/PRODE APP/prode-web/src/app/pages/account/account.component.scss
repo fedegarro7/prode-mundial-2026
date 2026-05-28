@@ -34,6 +34,28 @@
   gap: 18px;
 }
 
+.name-panel {
+  grid-column: 1 / -1;
+}
+
+.name-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.name-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.name-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .panel {
   display: flex;
   flex-direction: column;

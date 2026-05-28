@@ -86,6 +86,30 @@ $text:    rgba(255, 255, 255, 0.80);
   }
 }
 
+// ── Nav link with notification dot ───────────────────────────────────────────
+.nav-link-badge {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-red-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.7; transform: scale(1.25); }
+}
+
 // ── Countdown badge ───────────────────────────────────────────────────────────
 .countdown-badge {
   display: flex;
