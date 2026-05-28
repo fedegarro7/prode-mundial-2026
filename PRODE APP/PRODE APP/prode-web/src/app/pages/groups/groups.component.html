@@ -223,7 +223,7 @@
                           @if (entry.isCurrentUser) {
                             <span class="you-label">vos</span>
                           }
-                          @if (titleFor(entry.position, rankingsFor(group.id).length); as title) {
+                          @if (titleFor(entry.position, rankingsFor(group.id).length, rankingsFor(group.id)[0]?.totalPoints ?? 0); as title) {
                             <span class="rank-title">{{ title }}</span>
                           }
                         </span>
