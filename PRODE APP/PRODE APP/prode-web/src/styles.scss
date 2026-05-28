@@ -26,17 +26,8 @@
 }
 
 body {
-  background:
-    linear-gradient(
-      rgba(2, 8, 24, 0.76),
-      rgba(2, 8, 24, 0.91)
-    ),
-    url('https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?q=80&w=1920');
-
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(135deg, #020818 0%, #0a0f24 50%, #020818 100%);
   background-attachment: fixed;
-
   min-height: 100vh;
   font-family: 'Montserrat', sans-serif;
   color: white;

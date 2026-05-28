@@ -1,3 +1,13 @@
+// -- Full-page background ------------------------------------------------------
+:host {
+  display: block;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(2, 8, 24, 0.55) 0%, rgba(2, 8, 24, 0.80) 60%, rgba(2, 8, 24, 0.95) 100%),
+    url('/assets/images/pronosticos.jpg') no-repeat center top;
+  background-size: cover;
+  background-attachment: fixed;
+}
 // ── Variables (alineadas al resto de la app) ─────────────────────────────────
 $glass:      rgba(255, 255, 255, 0.07);
 $glass-md:   rgba(255, 255, 255, 0.10);
@@ -23,11 +33,14 @@ $accent:     #818cf8;  // indigo suave
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
+  font-family: 'Bebas Neue', 'Montserrat', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
   color: #fff;
   margin: 0 0 1rem;
-  letter-spacing: -.01em;
 }
 
 // ── Progress ─────────────────────────────────────────────────────────────────

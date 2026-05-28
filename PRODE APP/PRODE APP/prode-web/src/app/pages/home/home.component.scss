@@ -1,8 +1,19 @@
-﻿// ── Variables ────────────────────────────────────────────────────────────────
+// ── Variables ────────────────────────────────────────────────────────────────
 $gold:    #d4af37;
 $celeste: #74c3e8;
 $glass:   rgba(255, 255, 255, 0.07);
 $border:  rgba(255, 255, 255, 0.12);
+
+// ── Full-page background ──────────────────────────────────────────────────────
+:host {
+  display: block;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(2, 8, 24, 0.55) 0%, rgba(2, 8, 24, 0.80) 60%, rgba(2, 8, 24, 0.95) 100%),
+    url('/assets/images/worldcup-2026-bg.jpg') no-repeat center top;
+  background-size: cover;
+  background-attachment: fixed;
+}
 
 // ── Page wrapper ─────────────────────────────────────────────────────────────
 .home-page {
@@ -242,16 +253,29 @@ $border:  rgba(255, 255, 255, 0.12);
 
 // ── Stats grid ────────────────────────────────────────────────────────────────
 .stats-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 28px;
+  padding: 60px 40px;
+  background: rgba(2, 11, 45, 0.25);
+  border-radius: 20px;
+  overflow: hidden;
 
-  @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 400px) { grid-template-columns: 1fr; }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 30px 0;
+  }
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+    padding: 24px 0;
+  }
 }
 
 .stat-card {
+  position: relative;
+  z-index: 1;
   background: $glass;
   border: 1px solid $border;
   border-radius: 16px;
