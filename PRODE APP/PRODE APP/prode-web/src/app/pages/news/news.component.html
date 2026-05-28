@@ -7,7 +7,7 @@
   <!-- ── Page header ───────────────────────────────────────────────────── -->
   <header class="page-header">
     <p class="header-eyebrow">📰 MUNDIAL 2026</p>
-    <h1>ÚLTIMAS NOTICIAS DEL FÚTBOL</h1>
+    <h1>NOVEDADES</h1>
     <p class="header-sub">
       Mantenete informado para hacer los mejores pronósticos del Mundial 2026.
     </p>
@@ -111,5 +111,51 @@
       <button class="btn btn-primary" (click)="load()">Reintentar</button>
     </div>
   }
+
+  <!-- ── Stats Carousel ────────────────────────────────────────────────── -->
+  <section class="stats-section" aria-label="Estadísticas históricas del Mundial">
+    <div class="stats-header">
+      <p class="stats-eyebrow">📈 DATOS HISTÓRICOS</p>
+      <h2 class="stats-title">Estadísticas del Mundial</h2>
+      <p class="stats-sub">Récords y curiosidades de la Copa del Mundo FIFA</p>
+    </div>
+
+    <div class="carousel-wrapper">
+      <button class="carousel-nav carousel-prev" (click)="prevStat()" aria-label="Estadística anterior">&#8249;</button>
+
+      <div class="carousel-viewport">
+        @for (stat of stats; track stat.label; let i = $index) {
+          <div class="stat-card"
+               [class.active]="i === currentStat()"
+               [class.is-prev]="i === (currentStat() - 1 + stats.length) % stats.length"
+               [class.is-next]="i === (currentStat() + 1) % stats.length"
+               [style.--accent]="stat.accent">
+            <div class="stat-category">
+              <span class="stat-icon">{{ stat.icon }}</span>
+              {{ stat.category }}
+            </div>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+            <p class="stat-detail">{{ stat.detail }}</p>
+          </div>
+        }
+      </div>
+
+      <button class="carousel-nav carousel-next" (click)="nextStat()" aria-label="Estadística siguiente">&#8250;</button>
+    </div>
+
+    <div class="carousel-dots" role="tablist" aria-label="Navegación estadísticas">
+      @for (stat of stats; track stat.label; let i = $index) {
+        <button class="carousel-dot"
+                [class.active]="i === currentStat()"
+                [title]="'Estadística ' + (i + 1)"
+                (click)="goToStat(i)"
+                role="tab"
+                [attr.aria-selected]="i === currentStat()"
+                [attr.aria-label]="'Estadística ' + (i + 1)">
+        </button>
+      }
+    </div>
+  </section>
 
 </div>
