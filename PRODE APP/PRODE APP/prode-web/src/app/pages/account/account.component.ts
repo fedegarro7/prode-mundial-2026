@@ -57,12 +57,12 @@ export class AccountComponent {
     this.error = '';
 
     if (this.newPassword.length < 8) {
-      this.error = 'La nueva contrasena debe tener al menos 8 caracteres.';
+      this.error = 'La nueva contraseña debe tener al menos 8 caracteres.';
       return;
     }
 
     if (this.newPassword !== this.confirmPassword) {
-      this.error = 'Las contrasenas no coinciden.';
+      this.error = 'Las contraseñas no coinciden.';
       return;
     }
 
@@ -76,11 +76,11 @@ export class AccountComponent {
         this.currentPassword = '';
         this.newPassword = '';
         this.confirmPassword = '';
-        this.message = 'Contrasena actualizada.';
+        this.message = 'Contraseña actualizada.';
       },
       error: (err) => {
         this.loading = false;
-        this.error = this.readError(err, 'No pudimos cambiar la contrasena.');
+        this.error = this.readError(err, 'No pudimos cambiar la contraseña.');
       }
     });
   }
@@ -109,7 +109,7 @@ export class AccountComponent {
     this.error = '';
 
     if (this.resetPasswordValue.length < 8) {
-      this.error = 'La nueva contrasena debe tener al menos 8 caracteres.';
+      this.error = 'La nueva contraseña debe tener al menos 8 caracteres.';
       return;
     }
 
@@ -123,11 +123,11 @@ export class AccountComponent {
         this.loading = false;
         this.resetToken = '';
         this.resetPasswordValue = '';
-        this.message = 'Contrasena recuperada. Ya podes ingresar.';
+        this.message = 'Contraseña recuperada. Ya podes ingresar.';
       },
       error: (err) => {
         this.loading = false;
-        this.error = this.readError(err, 'No pudimos recuperar la contrasena.');
+        this.error = this.readError(err, 'No pudimos recuperar la contraseña.');
       }
     });
   }

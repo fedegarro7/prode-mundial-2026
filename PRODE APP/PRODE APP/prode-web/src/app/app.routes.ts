@@ -9,6 +9,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
 import { GroupsComponent } from './pages/groups/groups.component';
 import { MyPredictionsComponent } from './pages/my-predictions/my-predictions.component';
 import { AccountComponent } from './pages/account/account.component';
+import { NewsComponent } from './pages/news/news.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -61,6 +62,11 @@ export const routes: Routes = [
     path: 'account',
     component: AccountComponent,
     canActivate: [authGuard]
+  },
+
+	{
+    path: 'noticias',
+    component: NewsComponent
   },
 
 ];

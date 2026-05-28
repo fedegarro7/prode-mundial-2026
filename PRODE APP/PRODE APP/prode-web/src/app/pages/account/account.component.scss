@@ -1,3 +1,14 @@
+// ── Host background ───────────────────────────────────────────────────────────
+:host {
+  display: block;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(2,8,24,0.50) 0%, rgba(2,8,24,0.80) 60%, rgba(2,8,24,0.96) 100%),
+    url('/assets/images/micuenta.jpg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
 .account-page {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;

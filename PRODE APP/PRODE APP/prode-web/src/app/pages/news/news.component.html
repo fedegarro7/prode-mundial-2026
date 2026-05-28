@@ -1,0 +1,132 @@
+<div class="news-page">
+
+  <!-- ── Background orbs ──────────────────────────────────────────────── -->
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+
+  <!-- ── Page header ───────────────────────────────────────────────────── -->
+  <header class="page-header">
+    <p class="header-eyebrow">📰 MUNDIAL 2026</p>
+    <h1>ÚLTIMAS NOTICIAS DEL FÚTBOL</h1>
+    <p class="header-sub">
+      Mantenete informado para hacer los mejores pronósticos del Mundial 2026.
+    </p>
+
+    <!-- Quick portal links -->
+    <div class="portal-links" role="list" aria-label="Portales deportivos">
+      @for (p of portals; track p.name) {
+        <a [href]="p.url"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="portal-chip"
+           role="listitem"
+           [style.border-color]="p.color + '55'"
+           [attr.aria-label]="'Ir a ' + p.name">
+          <span class="portal-dot" [style.background]="p.color"></span>
+          {{ p.name }}
+        </a>
+      }
+    </div>
+
+    <button class="btn-refresh" (click)="load()" [disabled]="loading()" aria-label="Actualizar noticias">
+      <span [class.spin]="loading()">↺</span>
+      {{ loading() ? 'Cargando…' : 'Actualizar' }}
+    </button>
+  </header>
+
+  <!-- ── Loading skeletons ─────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="news-grid" aria-busy="true" aria-label="Cargando noticias">
+      @for (s of skeletons; track s) {
+        <div class="news-card sk-card" aria-hidden="true">
+          <div class="sk-image"></div>
+          <div class="sk-body">
+            <div class="sk-line w40"></div>
+            <div class="sk-line full"></div>
+            <div class="sk-line w75"></div>
+            <div class="sk-line w50"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Error ─────────────────────────────────────────────────────────── -->
+  @if (!loading() && error()) {
+    <div class="empty-state" role="alert">
+      <span class="empty-icon">⚠️</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="load()">Reintentar</button>
+    </div>
+  }
+
+  <!-- ── News grid ─────────────────────────────────────────────────────── -->
+  @if (!loading() && !error() && news().length > 0) {
+    <div class="news-grid" role="feed" aria-label="Últimas noticias del fútbol">
+      @for (item of news(); track item.link; let i = $index) {
+        <article class="news-card" [class.featured]="i === 0">
+          <a [href]="item.link"
+             target="_blank"
+             rel="noopener noreferrer"
+             [attr.aria-label]="item.title + ' — ' + item.source">
+
+            <!-- Image -->
+            @if (item.imageUrl) {
+              <div class="card-image">
+                <img [src]="item.imageUrl" [alt]="item.title" loading="lazy"
+                     (error)="$any($event.target).style.display='none'" />
+                <div class="card-image-overlay"></div>
+              </div>
+            } @else {
+              <div class="card-image-placeholder" [style.background]="placeholderGradient(item)">
+                <span aria-hidden="true">⚽</span>
+              </div>
+            }
+
+            <!-- Body -->
+            <div class="card-body">
+              <div class="card-source">
+                <span class="source-dot" [style.background]="item.sourceColor"></span>
+                <span class="source-name" [style.color]="item.sourceColor">{{ item.source }}</span>
+                <span class="card-date">· {{ timeAgo(item.publishedAt) }}</span>
+              </div>
+              <h3 class="card-title">{{ item.title }}</h3>
+              @if (item.description) {
+                <p class="card-desc">{{ item.description }}</p>
+              }
+              <span class="read-more" aria-hidden="true">Leer nota →</span>
+            </div>
+
+          </a>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- ── Empty state ───────────────────────────────────────────────────── -->
+  @if (!loading() && !error() && news().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon">📰</span>
+      <p>No hay noticias disponibles en este momento.</p>
+      <button class="btn btn-primary" (click)="load()">Reintentar</button>
+    </div>
+  }
+
+  <!-- ── Footer portals ────────────────────────────────────────────────── -->
+  <footer class="portals-footer">
+    <p class="portals-footer-label">Explorá más en</p>
+    <div class="portal-cards">
+      @for (p of portals; track p.name) {
+        <a [href]="p.url"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="portal-card"
+           [style.--accent]="p.color">
+          <span class="portal-card-name">{{ p.name }}</span>
+          <span class="portal-card-arrow">↗</span>
+        </a>
+      }
+    </div>
+  </footer>
+
+</div>

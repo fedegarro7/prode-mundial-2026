@@ -129,7 +129,7 @@ export class LoginComponent {
         this.password = '';
         this.resetToken = '';
         this.resetPasswordValue = '';
-        this.message = 'Contrasena actualizada. Ya podes ingresar.';
+        this.message = 'Contraseña actualizada. Ya podes ingresar.';
         try { this.cdr.detectChanges(); } catch {}
       },
       error: (err) => {
@@ -137,7 +137,7 @@ export class LoginComponent {
         this.error =
           err.error?.message ||
           (typeof err.error === 'string' ? err.error : null) ||
-          'No se pudo recuperar la contrasena.';
+          'No se pudo recuperar la contraseña.';
         try { this.cdr.detectChanges(); } catch {}
       }
     });

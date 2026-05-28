@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
 
         if (!IsValidPassword(dto.Password))
         {
-            return BadRequest("La contrasena debe tener al menos 8 caracteres");
+            return BadRequest("La contraseña debe tener al menos 8 caracteres");
         }
 
         var email = NormalizeEmail(dto.Email);
@@ -114,7 +114,7 @@ public class AuthController : ControllerBase
     {
         if (!IsValidPassword(dto.NewPassword))
         {
-            return BadRequest("La nueva contrasena debe tener al menos 8 caracteres");
+            return BadRequest("La nueva contraseña debe tener al menos 8 caracteres");
         }
 
         var userId = Guid.Parse(
@@ -135,7 +135,7 @@ public class AuthController : ControllerBase
 
         if (!validPassword)
         {
-            return BadRequest("La contrasena actual no es correcta");
+            return BadRequest("La contraseña actual no es correcta");
         }
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
@@ -181,7 +181,7 @@ public class AuthController : ControllerBase
     {
         if (!IsValidPassword(dto.NewPassword))
         {
-            return BadRequest("La nueva contrasena debe tener al menos 8 caracteres");
+            return BadRequest("La nueva contraseña debe tener al menos 8 caracteres");
         }
 
         var email = NormalizeEmail(dto.Email);
