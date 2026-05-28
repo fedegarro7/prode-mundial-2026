@@ -19,6 +19,16 @@
       <li><a routerLink="/my-predictions" routerLinkActive="active">Mis Pronósticos</a></li>
     </ul>
 
+    <!-- ── Countdown ─────────────────────────────────────────────────────── -->
+    @if (countdown) {
+      <div class="countdown-badge" [class.started]="matchStarted" aria-label="Tiempo hasta el primer partido">
+        @if (!matchStarted) {
+          <span class="countdown-label">⚽ Primer partido</span>
+        }
+        <span class="countdown-time">{{ countdown }}</span>
+      </div>
+    }
+
     <!-- ── Right area ────────────────────────────────────────────────────── -->
     <div class="nav-end">
 
