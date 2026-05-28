@@ -112,21 +112,4 @@
     </div>
   }
 
-  <!-- ── Footer portals ────────────────────────────────────────────────── -->
-  <footer class="portals-footer">
-    <p class="portals-footer-label">Explorá más en</p>
-    <div class="portal-cards">
-      @for (p of portals; track p.name) {
-        <a [href]="p.url"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="portal-card"
-           [style.--accent]="p.color">
-          <span class="portal-card-name">{{ p.name }}</span>
-          <span class="portal-card-arrow">↗</span>
-        </a>
-      }
-    </div>
-  </footer>
-
 </div>

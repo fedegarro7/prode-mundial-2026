@@ -133,12 +133,38 @@ public class NewsController : ControllerBase
                     return new NewsItemDto(title, desc, link, sourceName, sourceUrl, sourceColor, pubDate, image);
                 })
                 .Where(n => !string.IsNullOrWhiteSpace(n.Title) && n.Link.StartsWith("http"))
+                .Where(n => IsMundialRelated(n.Title, n.Description))
                 .Take(8);
         }
         catch
         {
             return [];
         }
+    }
+
+    private static readonly string[] MundialKeywords =
+    [
+        "mundial", "world cup", "copa del mundo",
+        "selección", "seleccion", "albiceleste",
+        "messi", "scaloni", "lautaro", "di maría", "di maria",
+        "eliminatorias", "fase de grupos", "octavos", "cuartos", "semifinal",
+        "usa 2026", "estados unidos 2026", "fifa",
+        "seleccion argentina", "selección argentina",
+    ];
+
+    private static readonly string[] ClubExclusions =
+    [
+        "river plate", "boca juniors", "racing club", "independiente",
+        "san lorenzo", "huracán", "huracan", "vélez", "velez",
+        "estudiantes", "gimnasia", "newells", "rosario central",
+        "talleres", "belgrano", "liga profesional", "copa de la liga", "superliga",
+    ];
+
+    private static bool IsMundialRelated(string title, string desc)
+    {
+        var text = (title + " " + desc).ToLowerInvariant();
+        if (ClubExclusions.Any(k => text.Contains(k, StringComparison.OrdinalIgnoreCase))) return false;
+        return MundialKeywords.Any(k => text.Contains(k, StringComparison.OrdinalIgnoreCase));
     }
 
     private static readonly Regex HtmlTagRx = new("<[^>]*>", RegexOptions.Compiled);
