@@ -26,5 +26,11 @@ public class UpcomingMatchDto
 
     public bool PredictionsLocked { get; set; }
 
+    public int? HomeScore { get; set; }
+
+    public int? AwayScore { get; set; }
+
+    public bool IsFinished { get; set; }
+
     public MyPredictionDto? MyPrediction { get; set; }
 }

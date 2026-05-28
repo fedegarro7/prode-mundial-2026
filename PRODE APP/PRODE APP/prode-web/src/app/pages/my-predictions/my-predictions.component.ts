@@ -34,6 +34,7 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
 
   savedIds = new Set<number>();
   savingIds = new Set<number>();
+  collapsedDays = new Set<string>();
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
   toastVisible = false;
@@ -64,12 +65,14 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
 
         this.savedIds.clear();
         for (const m of mapped) {
-          if (m.myPrediction) this.savedIds.add(m.id);
+          if (m.myPrediction && !m.isFinished) this.savedIds.add(m.id);
         }
 
-        this.totalMatches = mapped.length;
+        const predictable = mapped.filter(m => !m.isFinished);
+        this.totalMatches = predictable.length;
         this.predictedCount = this.savedIds.size;
         this.dayGroups = this.buildDayGroups(mapped);
+        this.initCollapsedDays();
         this.loading = false;
         try { this.cdr.detectChanges(); } catch {}
       },
@@ -99,6 +102,29 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
           matches
         };
       });
+  }
+
+  private initCollapsedDays(): void {
+    this.collapsedDays.clear();
+    for (const day of this.dayGroups) {
+      // Auto-collapse if ALL matches in the day are finished, or ALL predictable ones are already saved
+      const allDone = day.matches.every(m => m.isFinished);
+      const allSaved = day.matches.every(m => !this.canPredict(m) || this.savedIds.has(m.id));
+      if (allDone || allSaved) {
+        this.collapsedDays.add(day.label);
+      }
+    }
+  }
+
+  isDayCollapsed(label: string): boolean { return this.collapsedDays.has(label); }
+
+  toggleDay(label: string): void {
+    if (this.collapsedDays.has(label)) {
+      this.collapsedDays.delete(label);
+    } else {
+      this.collapsedDays.add(label);
+    }
+    try { this.cdr.detectChanges(); } catch {}
   }
 
   getTeamName(match: Match, side: 'home' | 'away'): string {
@@ -170,6 +196,17 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
 
   get pendingCount(): number {
     return this.totalMatches - this.predictedCount;
+  }
+
+  getDayRating(day: DayGroup): { label: string; cls: string } | null {
+    const finished = day.matches.filter(m => m.isFinished && m.myPrediction);
+    if (finished.length === 0) return null;
+    const earned = finished.reduce((sum, m) => sum + (m.myPrediction?.pointsEarned ?? 0), 0);
+    const max = finished.length * 3;
+    if (earned === max)        return { label: '🧠 Genio de la predicción',       cls: 'rating-genius' };
+    if (earned >= max / 2)    return { label: '👍 Bastante bien',                 cls: 'rating-good' };
+    if (earned > 0)           return { label: '😐 Pudo estar mejor',              cls: 'rating-meh' };
+    return                           { label: '💀 Pronósticos para el olvido',   cls: 'rating-bad' };
   }
 
   showToast(message: string, type: 'success' | 'error'): void {

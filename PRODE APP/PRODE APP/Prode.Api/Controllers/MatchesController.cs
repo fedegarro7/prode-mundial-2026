@@ -237,11 +237,7 @@ public class MatchesController : ControllerBase
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
             .Include(x => x.Stadium)
-            .Where(x =>
-                x.MatchDate > DateTime.UtcNow
-                &&
-                !x.IsFinished
-            )
+            .Where(x => x.IsFinished || x.MatchDate > DateTime.UtcNow)
             .OrderBy(x => x.MatchDate)
             .ToListAsync();
 
@@ -272,6 +268,12 @@ public class MatchesController : ControllerBase
 
                 PredictionsLocked =
                     match.PredictionsLocked,
+
+                HomeScore = match.HomeScore,
+
+                AwayScore = match.AwayScore,
+
+                IsFinished = match.IsFinished,
 
                 MyPrediction =
                     match.Predictions

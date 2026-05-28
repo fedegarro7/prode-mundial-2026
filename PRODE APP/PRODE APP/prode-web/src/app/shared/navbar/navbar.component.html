@@ -1,55 +1,102 @@
 <nav class="navbar">
+  <div class="nav-inner">
 
-  <div class="logo">
-    AR Prode Mundial 2026
-  </div>
-
-  <div class="links">
-
-    <a routerLink="/matches">
-      Partidos
+    <!-- ── Logo ─────────────────────────────────────────────────────────── -->
+    <a routerLink="/" class="nav-logo" (click)="closeMenu()">
+      <span class="logo-icon">⚽</span>
+      <span class="logo-wordmark">Prode<span class="logo-year"> 2026</span></span>
     </a>
 
-    <a routerLink="/standings">
-      Posiciones
-    </a>
+    <!-- ── Desktop nav links ─────────────────────────────────────────────── -->
+    <ul class="nav-links" role="list">
+      <li>
+        <a routerLink="/matches"
+           routerLinkActive="active"
+           (click)="notifyRoute('/matches')">Partidos</a>
+      </li>
+      <li><a routerLink="/standings" routerLinkActive="active">Posiciones</a></li>
+      <li><a routerLink="/groups"    routerLinkActive="active">Grupos</a></li>
+      <li><a routerLink="/my-predictions" routerLinkActive="active">Mis Pronósticos</a></li>
+    </ul>
 
-    <a routerLink="/groups">
-      Grupos
-    </a>
+    <!-- ── Right area ────────────────────────────────────────────────────── -->
+    <div class="nav-end">
 
-    <a routerLink="/my-predictions">
-      Mis Pronósticos
-    </a>
+      @if (user) {
+        <!-- User chip + dropdown -->
+        <div class="user-chip" [class.open]="dropdownOpen" (click)="toggleDropdown()">
+          <div class="avatar" [title]="user.name">{{ userInitials }}</div>
+          <span class="greeting">{{ firstName }}</span>
+          <svg class="chevron" [class.flipped]="dropdownOpen"
+               xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+          @if (dropdownOpen) {
+            <div class="dropdown" role="menu">
+              <a routerLink="/account" class="dropdown-item" (click)="closeDropdown()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Mi cuenta
+              </a>
+              <button class="dropdown-item logout" (click)="logout()" role="menuitem">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="guest-btns">
+          <a routerLink="/login"    class="btn-ghost-nav">Ingresar</a>
+          <a routerLink="/register" class="btn-primary-nav">Registrarse</a>
+        </div>
+      }
 
-  </div>
-
-  <div class="user-section">
-
-    <div *ngIf="user; else guest">
-      <span>
-        Hola {{ user.name }}
-      </span>
-
-      <a routerLink="/account">
-        Cuenta
-      </a>
-
-      <button (click)="logout()">
-        Salir
+      <!-- Hamburger (mobile only) -->
+      <button class="hamburger"
+              (click)="toggleMenu()"
+              [class.is-active]="menuOpen"
+              aria-label="Menú"
+              [attr.aria-expanded]="menuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
+
     </div>
-
-    <ng-template #guest>
-      <a routerLink="/login">
-        Ingresar
-      </a>
-
-      <a routerLink="/register">
-        Registrarse
-      </a>
-    </ng-template>
-
   </div>
 
+  <!-- ── Mobile drawer ─────────────────────────────────────────────────────── -->
+  @if (menuOpen) {
+    <div class="mobile-drawer" role="navigation" aria-label="Menú móvil">
+      <a routerLink="/matches"        routerLinkActive="active" (click)="closeMenu(); notifyRoute('/matches')">⚽ Partidos</a>
+      <a routerLink="/standings"      routerLinkActive="active" (click)="closeMenu()">📊 Posiciones</a>
+      <a routerLink="/groups"         routerLinkActive="active" (click)="closeMenu()">👥 Grupos</a>
+      <a routerLink="/my-predictions" routerLinkActive="active" (click)="closeMenu()">🔮 Pronósticos</a>
+
+      <hr class="drawer-sep" />
+
+      @if (user) {
+        <div class="drawer-user">
+          <div class="avatar sm">{{ userInitials }}</div>
+          <span>{{ user.name }}</span>
+        </div>
+        <a routerLink="/account" (click)="closeMenu()">👤 Mi cuenta</a>
+        <button class="drawer-logout" (click)="logout()">🚪 Cerrar sesión</button>
+      } @else {
+        <a routerLink="/login"    (click)="closeMenu()">Ingresar</a>
+        <a routerLink="/register" class="drawer-cta" (click)="closeMenu()">⚽ Registrarse gratis</a>
+      }
+    </div>
+  }
 </nav>
+

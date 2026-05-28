@@ -39,10 +39,19 @@
   <!-- Day groups -->
   @for (day of dayGroups; track day.label) {
     <section class="day-section">
-      <div class="day-header">
+      <div class="day-header"
+           (click)="toggleDay(day.label)"
+           [class.is-collapsed]="isDayCollapsed(day.label)"
+           role="button"
+           [attr.aria-expanded]="!isDayCollapsed(day.label)">
         <h2 class="day-label">{{ day.label }}</h2>
+        @if (getDayRating(day); as rating) {
+          <span class="day-rating {{ rating.cls }}">{{ rating.label }}</span>
+        }
+        <span class="day-chevron" aria-hidden="true">{{ isDayCollapsed(day.label) ? '›' : '⌄' }}</span>
       </div>
 
+      @if (!isDayCollapsed(day.label)) {
       <div class="match-list">
         @for (match of day.matches; track match.id) {
           <div class="match-card"
@@ -60,7 +69,7 @@
                 @if (match.groupName) { Grupo {{ match.groupName }} } @else { {{ match.stage }} }
               </span>
               <span class="match-time">{{ match.matchDate | date:'HH:mm' }} hs</span>
-              @if (match.stadium?.city) {
+              @if (match.stadium.city) {
                 <span class="match-city">📍 {{ match.stadium.city }}</span>
               }
               @if (!canPredict(match)) {
@@ -106,14 +115,35 @@
                     <span class="unsaved-label">sin guardar</span>
                   }
                 } @else {
-                  @if (match.myPrediction) {
-                    <span class="locked-result">
-                      {{ match.myPrediction.homeScorePrediction }} : {{ match.myPrediction.awayScorePrediction }}
-                    </span>
-                    <span class="pred-lbl">tu pronóstico</span>
+                  @if (match.isFinished) {
+                    <div class="finished-zone">
+                      <div class="final-result-row">
+                        <span class="final-badge">FINAL</span>
+                        <span class="final-score">{{ match.homeScore }} : {{ match.awayScore }}</span>
+                      </div>
+                      @if (match.myPrediction) {
+                        <div class="pred-comparison">
+                          <span class="pred-small">Pronóstico: {{ match.myPrediction.homeScorePrediction }}–{{ match.myPrediction.awayScorePrediction }}</span>
+                          @if (match.myPrediction.pointsEarned > 0) {
+                            <span class="pts-pill pts-earned">+{{ match.myPrediction.pointsEarned }} pts</span>
+                          } @else {
+                            <span class="pts-pill pts-zero">0 pts</span>
+                          }
+                        </div>
+                      } @else {
+                        <span class="no-pred-lbl">Sin pronóstico</span>
+                      }
+                    </div>
                   } @else {
-                    <span class="locked-result no-pred">— : —</span>
-                    <span class="pred-lbl">sin pronóstico</span>
+                    @if (match.myPrediction) {
+                      <span class="locked-result">
+                        {{ match.myPrediction.homeScorePrediction }} : {{ match.myPrediction.awayScorePrediction }}
+                      </span>
+                      <span class="pred-lbl">tu pronóstico</span>
+                    } @else {
+                      <span class="locked-result no-pred">— : —</span>
+                      <span class="pred-lbl">sin pronóstico</span>
+                    }
                   }
                 }
               </div>
@@ -150,6 +180,7 @@
           </div>
         }
       </div>
+      }
     </section>
   }
 

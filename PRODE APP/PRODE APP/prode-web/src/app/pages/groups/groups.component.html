@@ -223,6 +223,9 @@
                           @if (entry.isCurrentUser) {
                             <span class="you-label">vos</span>
                           }
+                          @if (titleFor(entry.position, rankingsFor(group.id).length); as title) {
+                            <span class="rank-title">{{ title }}</span>
+                          }
                         </span>
                         <span class="rank-pts" role="cell">{{ entry.totalPoints }}</span>
                       </div>

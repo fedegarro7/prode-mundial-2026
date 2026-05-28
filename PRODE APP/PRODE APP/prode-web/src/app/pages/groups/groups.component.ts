@@ -236,5 +236,15 @@ export class GroupsComponent implements OnInit, OnDestroy {
   // ── Helpers for template ───────────────────────────────────────────────────
   trackById(_: number, item: { id: number }) { return item.id; }
   medalFor(pos: number): string { return pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : String(pos); }
+
+  titleFor(pos: number, total: number): string {
+    if (total <= 1) return '';
+    if (pos === 1)                           return '👑 El Messi del grupo';
+    if (pos === 2 && total > 2)             return '🥈 Casi campeón';
+    if (pos === 3 && total > 3)             return '🥉 Tercer tiempo';
+    if (pos === total && total > 3)         return '🪣 La madera del grupo';
+    if (pos === total - 1 && total > 4)     return '😬 Penúltimo y con frío';
+    return '';
+  }
 }
 

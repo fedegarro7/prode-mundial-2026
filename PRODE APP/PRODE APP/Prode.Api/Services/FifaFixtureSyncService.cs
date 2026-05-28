@@ -181,7 +181,11 @@ public class FifaFixtureSyncService
 
         var matchesByFifaId = await _context.Matches
             .Where(x => x.FifaId != null)
+            .Include(x => x.Predictions)
             .ToDictionaryAsync(x => x.FifaId!, cancellationToken);
+
+        var scoring = new ScoringService();
+        var toRescore = new List<Match>();
 
         foreach (var data in matchData)
         {
@@ -210,13 +214,18 @@ public class FifaFixtureSyncService
             match.GroupName = data.GroupName;
             match.StadiumId = stadiumsByFifaId[data.StadiumFifaId].Id;
 
-            if (data.HomeScore.HasValue || data.AwayScore.HasValue)
+            if (data.HomeScore.HasValue && data.AwayScore.HasValue)
             {
+                bool scoreChanged = !match.IsFinished
+                    || match.HomeScore != data.HomeScore
+                    || match.AwayScore != data.AwayScore;
+
                 match.HomeScore = data.HomeScore;
                 match.AwayScore = data.AwayScore;
-                match.IsFinished =
-                    data.HomeScore.HasValue &&
-                    data.AwayScore.HasValue;
+                match.IsFinished = true;
+
+                if (scoreChanged && match.Predictions.Count > 0)
+                    toRescore.Add(match);
             }
 
             match.PredictionsLocked =
@@ -224,6 +233,16 @@ public class FifaFixtureSyncService
                 data.MatchDate <= DateTime.UtcNow ||
                 !homeTeamId.HasValue ||
                 !awayTeamId.HasValue;
+        }
+
+        // Recalculate PointsEarned for every prediction of newly-scored matches.
+        foreach (var match in toRescore)
+        {
+            foreach (var prediction in match.Predictions)
+            {
+                prediction.PointsEarned =
+                    scoring.CalculatePoints(prediction, match);
+            }
         }
     }
 

@@ -1,123 +1,189 @@
-<main class="home-page">
+﻿<main class="home-page">
 
+  <!-- ══════════════════ GUEST LANDING ══════════════════ -->
   @if (!user) {
-    <section class="landing">
-      <div class="hero-copy">
-        <p class="eyebrow">Mundial 2026</p>
-        <h1>Prode FIFA Mundial 2026</h1>
-        <p class="hero-text">
-          Pronostica cada partido, arma grupos por amigos, familia u oficina y segui el ranking
-          con una experiencia clara, rapida y lista para compartir.
+    <section class="hero-landing">
+      <div class="hero-glow glow-1"></div>
+      <div class="hero-glow glow-2"></div>
+
+      <div class="hero-content">
+        <span class="hero-eyebrow">⚽ Copa Mundial FIFA 2026™</span>
+        <h1 class="hero-title">
+          El prode<br>
+          <span class="title-accent">definitivo</span><br>
+          del mundial
+        </h1>
+        <p class="hero-desc">
+          Pronosticá cada partido, armá grupos privados con amigos,
+          familia u oficina y seguí el ranking en tiempo real.
+          Totalmente gratis.
         </p>
         <div class="hero-actions">
-          <a routerLink="/register" class="primary-action">Crear cuenta</a>
-          <a routerLink="/login" class="secondary-action">Ingresar</a>
+          <a routerLink="/register" class="cta-primary">Crear cuenta gratis →</a>
+          <a routerLink="/login"    class="cta-secondary">Ya tengo cuenta</a>
         </div>
       </div>
 
-      <div class="hero-board" aria-label="Vista previa del prode">
-        <div class="board-top">
-          <span>Final</span>
-          <strong>Argentina 2 - 1 Brasil</strong>
+      <div class="hero-preview" aria-label="Vista previa del prode">
+        <div class="preview-label">DEMO</div>
+        <div class="preview-match">
+          <div class="preview-team">
+            <span class="preview-flag">🇦🇷</span>
+            <span class="preview-name">Argentina</span>
+            <span class="preview-score">2</span>
+          </div>
+          <div class="preview-vs">Final</div>
+          <div class="preview-team">
+            <span class="preview-flag">🇫🇷</span>
+            <span class="preview-name">Francia</span>
+            <span class="preview-score">1</span>
+          </div>
         </div>
-        <div class="board-row">
-          <span>Tu pronostico</span>
-          <strong>2 - 1</strong>
-          <em>+3 pts</em>
+        <div class="preview-row hit">
+          <span>Tu pronóstico</span>
+          <span class="preview-pred">2 – 1</span>
+          <span class="preview-pts">+3 pts</span>
         </div>
-        <div class="board-row muted">
+        <div class="preview-row">
           <span>Grupo Oficina</span>
-          <strong>4to</strong>
-          <em>28 pts</em>
+          <span class="preview-pred">4to lugar</span>
+          <span class="preview-pts gold">28 pts</span>
         </div>
       </div>
     </section>
-  } @else {
-    <section class="dashboard-hero">
-      <div>
-        <p class="eyebrow">Hola {{ user.name }}</p>
-        <h1>Tu tablero mundialista</h1>
-        <p>Lo importante, arriba: puntos, pendientes y proximo partido para no colgarte.</p>
+
+    <!-- Feature chips -->
+    <section class="features-row">
+      <div class="feature-chip">
+        <span class="chip-icon">🔮</span>
+        <div>
+          <strong>Pronóstico exacto</strong>
+          <span>Acertá el resultado y sumá 3 puntos</span>
+        </div>
       </div>
-      <a routerLink="/matches" class="primary-action">Cargar pronosticos</a>
+      <div class="feature-chip">
+        <span class="chip-icon">👥</span>
+        <div>
+          <strong>Grupos privados</strong>
+          <span>Competí solo con quienes querés</span>
+        </div>
+      </div>
+      <div class="feature-chip">
+        <span class="chip-icon">📊</span>
+        <div>
+          <strong>Ranking en vivo</strong>
+          <span>Actualizamos los puntos al instante</span>
+        </div>
+      </div>
+      <div class="feature-chip">
+        <span class="chip-icon">🏆</span>
+        <div>
+          <strong>Gratis para siempre</strong>
+          <span>Sin suscripciones ni sorpresas</span>
+        </div>
+      </div>
     </section>
 
+  <!-- ══════════════════ LOGGED-IN DASHBOARD ══════════════════ -->
+  } @else {
+    <section class="dash-hero">
+      <div class="hero-glow glow-1"></div>
+      <div class="dash-hero-copy">
+        <span class="hero-eyebrow">Hola, {{ user.name.split(` `)[0] }} 👋</span>
+        <h1 class="dash-title">Tu tablero mundialista</h1>
+        <p class="dash-sub">Todo lo importante en un solo lugar.</p>
+      </div>
+      <a routerLink="/my-predictions" class="cta-primary">Mis pronósticos →</a>
+    </section>
+
+    <!-- Stats -->
     <section class="stats-grid" aria-label="Resumen personal">
       <article class="stat-card">
-        <span>Puntos</span>
-        <strong>{{ dashboard?.totalPoints ?? '-' }}</strong>
+        <span class="stat-icon">⭐</span>
+        <span class="stat-lbl">Puntos</span>
+        <strong class="stat-val">{{ dashboard?.totalPoints ?? '—' }}</strong>
       </article>
       <article class="stat-card">
-        <span>Ranking global</span>
-        <strong>{{ dashboard?.globalPosition ? '#' + dashboard?.globalPosition : '-' }}</strong>
+        <span class="stat-icon">🌍</span>
+        <span class="stat-lbl">Ranking global</span>
+        <strong class="stat-val">{{ dashboard?.globalPosition ? '#' + dashboard?.globalPosition : '—' }}</strong>
       </article>
-      <article class="stat-card urgent">
-        <span>Pendientes</span>
-        <strong>{{ dashboard?.pendingPredictions ?? '-' }}</strong>
+      <article class="stat-card accent-urgent">
+        <span class="stat-icon">⏳</span>
+        <span class="stat-lbl">Pendientes</span>
+        <strong class="stat-val">{{ dashboard?.pendingPredictions ?? '—' }}</strong>
       </article>
       <article class="stat-card">
-        <span>Grupos</span>
-        <strong>{{ dashboard?.approvedGroups ?? '-' }}</strong>
+        <span class="stat-icon">👥</span>
+        <span class="stat-lbl">Grupos</span>
+        <strong class="stat-val">{{ dashboard?.approvedGroups ?? '—' }}</strong>
       </article>
     </section>
 
     <section class="content-grid">
+
+      <!-- Pending predictions -->
       <article class="panel span-2">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">Accion rapida</p>
-            <h2>Predicciones pendientes</h2>
+            <span class="panel-eyebrow">Acción rápida</span>
+            <h2>Pronósticos pendientes</h2>
           </div>
-          <a routerLink="/matches">Ver fixture</a>
+          <a routerLink="/my-predictions" class="panel-link">Ver todos →</a>
         </div>
 
         @if (pending.length === 0 && !loading) {
-          <p class="empty">No tenes pendientes abiertos por ahora.</p>
+          <p class="empty-msg">No tenés pronósticos pendientes por ahora. 🎉</p>
         } @else {
           <div class="pending-list">
             @for (match of pending; track match.matchId) {
-              <a routerLink="/matches" class="pending-row">
-                <span class="match-date">{{ match.matchDate | date:'dd/MM HH:mm' }}</span>
-                <strong>{{ teamName(match, 'home') }} vs {{ teamName(match, 'away') }}</strong>
-                <em>{{ match.stadium.city }}</em>
+              <a routerLink="/my-predictions" class="pending-row">
+                <span class="pending-date">{{ match.matchDate | date:'EEE dd/MM HH:mm' }}</span>
+                <span class="pending-teams">{{ teamName(match, 'home') }} <em>vs</em> {{ teamName(match, 'away') }}</span>
+                <span class="pending-city">📍 {{ match.stadium.city }}</span>
               </a>
             }
           </div>
         }
       </article>
 
+      <!-- Scoring rules -->
       <article class="panel">
-        <p class="eyebrow">Reglas</p>
-        <h2>Puntaje simple</h2>
+        <span class="panel-eyebrow">Cómo se juega</span>
+        <h2>Sistema de puntaje</h2>
         <div class="rules-list">
           @for (rule of rules; track rule.label) {
-            <div class="rule">
-              <strong>{{ rule.points }}</strong>
-              <span>
-                {{ rule.label }}
+            <div class="rule-row">
+              <span class="rule-pts">{{ rule.points }}</span>
+              <div>
+                <strong>{{ rule.label }}</strong>
                 <small>{{ rule.detail }}</small>
-              </span>
+              </div>
             </div>
           }
         </div>
       </article>
 
+      <!-- History -->
       <article class="panel">
-        <p class="eyebrow">Historial</p>
-        <h2>Ultimos puntos</h2>
+        <span class="panel-eyebrow">Historial</span>
+        <h2>Últimos resultados</h2>
         @if (history.length === 0) {
-          <p class="empty">Cuando haya partidos finalizados, vas a verlos aca.</p>
+          <p class="empty-msg">Cuando se jueguen partidos vas a ver tus puntos acá.</p>
         } @else {
           <div class="history-list">
             @for (item of history; track item.matchId) {
               <div class="history-row">
-                <span>{{ teamCode(item, 'home') }} {{ item.homeScore }} - {{ item.awayScore }} {{ teamCode(item, 'away') }}</span>
-                <strong>+{{ item.pointsEarned }}</strong>
+                <span class="history-match">
+                  {{ teamCode(item, 'home') }} {{ item.homeScore }} – {{ item.awayScore }} {{ teamCode(item, 'away') }}
+                </span>
+                <span class="history-pts">+{{ item.pointsEarned }}</span>
               </div>
             }
           </div>
         }
       </article>
+
     </section>
   }
 

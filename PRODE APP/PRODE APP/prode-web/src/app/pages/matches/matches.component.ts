@@ -144,12 +144,51 @@ export class MatchesComponent implements OnInit, OnDestroy {
         hasArgentina: (this.knockoutMatches.get(k) || []).some(m => this.isArgentina(m))
       }));
 
+    const now = Date.now();
+
+    // Default group: the one with the nearest upcoming match.
+    // Falls back to the most recently-played group if all are done.
     if (!this.activeGroup && this.groupTabs.length) {
-      const argTab = this.groupTabs.find(t => t.hasArgentina);
-      this.activeGroup = argTab?.key ?? this.groupTabs[0].key;
+      let bestKey = '';
+      let bestTs = Infinity;
+      let latestDoneKey = '';
+      let latestDoneTs = -Infinity;
+
+      for (const tab of this.groupTabs) {
+        for (const m of this.groupMatches.get(tab.key) ?? []) {
+          const ts = new Date(m.matchDate).getTime();
+          if (!m.isFinished && ts >= now && ts < bestTs) {
+            bestTs = ts; bestKey = tab.key;
+          }
+          if (m.isFinished && ts > latestDoneTs) {
+            latestDoneTs = ts; latestDoneKey = tab.key;
+          }
+        }
+      }
+      this.activeGroup = bestKey || latestDoneKey || this.groupTabs[0].key;
     }
+
+    // Default knockout phase: nearest upcoming phase, else first.
     if (!this.expandedPhase && this.knockoutPhases.length) {
-      this.expandedPhase = this.knockoutPhases[0].key;
+      let bestKey = '';
+      let bestTs = Infinity;
+      for (const phase of this.knockoutPhases) {
+        for (const m of this.knockoutMatches.get(phase.key) ?? []) {
+          const ts = new Date(m.matchDate).getTime();
+          if (!m.isFinished && ts >= now && ts < bestTs) {
+            bestTs = ts; bestKey = phase.key;
+          }
+        }
+      }
+      this.expandedPhase = bestKey || this.knockoutPhases[0].key;
+    }
+
+    // Auto-switch to knockout tab if all group matches are finished.
+    const allGroupsDone = [...this.groupMatches.values()]
+      .flat()
+      .every(m => m.isFinished);
+    if (allGroupsDone && this.knockoutPhases.length) {
+      this.activePhase = 'knockout';
     }
   }
 

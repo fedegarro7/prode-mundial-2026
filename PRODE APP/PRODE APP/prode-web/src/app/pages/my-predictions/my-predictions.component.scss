@@ -109,7 +109,26 @@ $accent:     #818cf8;  // indigo suave
 }
 
 .day-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
   margin-bottom: .7rem;
+  cursor: pointer;
+  padding: .35rem .5rem;
+  border-radius: 8px;
+  transition: background .15s;
+  -webkit-user-select: none;
+  user-select: none;
+
+  &:hover {
+    background: rgba(255,255,255,.05);
+  }
+
+  &.is-collapsed {
+    margin-bottom: 0;
+    .day-chevron { opacity: .55; }
+  }
 }
 
 .day-label {
@@ -121,6 +140,17 @@ $accent:     #818cf8;  // indigo suave
   color: $accent;
   padding-bottom: .3rem;
   border-bottom: 2px solid rgba($accent, .25);
+}
+
+.day-chevron {
+  margin-left: auto;
+  font-size: 1rem;
+  color: $accent;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: transform .18s;
+
+  .is-collapsed & { transform: rotate(-90deg); }
 }
 
 // ── Match list ────────────────────────────────────────────────────────────────
@@ -419,6 +449,113 @@ $accent:     #818cf8;  // indigo suave
   border-radius: 50%;
   animation: spin .6s linear infinite;
   flex-shrink: 0;
+}
+
+// ── Daily rating badge ───────────────────────────────────────────────────────
+.day-rating {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  border: 1px solid;
+  white-space: nowrap;
+
+  &.rating-genius {
+    background: rgba(#a855f7, .18);
+    border-color: rgba(#a855f7, .45);
+    color: #d8b4fe;
+  }
+  &.rating-good {
+    background: rgba(#22c55e, .15);
+    border-color: rgba(#22c55e, .40);
+    color: #86efac;
+  }
+  &.rating-meh {
+    background: rgba(#f59e0b, .15);
+    border-color: rgba(#f59e0b, .40);
+    color: #fcd34d;
+  }
+  &.rating-bad {
+    background: rgba(#ef4444, .14);
+    border-color: rgba(#ef4444, .35);
+    color: #fca5a5;
+  }
+}
+
+// ── Finished match zone ───────────────────────────────────────────────────────
+.finished-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.final-result-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.final-badge {
+  font-size: .58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #fcd34d;
+  background: rgba(#f59e0b, .15);
+  border: 1px solid rgba(#f59e0b, .3);
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+}
+
+.final-score {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+
+.pred-comparison {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pred-small {
+  font-size: .63rem;
+  color: $text-muted;
+  letter-spacing: .02em;
+}
+
+.pts-pill {
+  font-size: .65rem;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 1px 7px;
+  border: 1px solid;
+  line-height: 1.5;
+
+  &.pts-earned {
+    background: rgba(#22c55e, .18);
+    border-color: rgba(#22c55e, .4);
+    color: #86efac;
+  }
+  &.pts-zero {
+    background: rgba(255,255,255, .06);
+    border-color: rgba(255,255,255, .15);
+    color: $text-muted;
+  }
+}
+
+.no-pred-lbl {
+  font-size: .63rem;
+  color: rgba(255,255,255,.2);
+  font-style: italic;
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────

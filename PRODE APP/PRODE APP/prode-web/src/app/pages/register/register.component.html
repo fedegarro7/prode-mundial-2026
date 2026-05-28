@@ -1,36 +1,92 @@
 <div class="auth-page">
 
-  <form class="auth-card" (ngSubmit)="register()">
-    <p class="eyebrow">Mundial 2026</p>
-    <h1>Crear cuenta</h1>
-    <p class="sub">Entra, pronostica y arma tu primer grupo privado.</p>
-
-    <input type="text" name="name" [(ngModel)]="name" placeholder="Nombre" autocomplete="name">
-    <input type="email" name="email" [(ngModel)]="email" placeholder="Email" autocomplete="email">
-
-    <div class="password-field">
-      <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" placeholder="Contraseña" autocomplete="new-password">
-      <button type="button" class="eye-btn" (click)="togglePassword()" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
-        @if (!showPassword) {
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        } @else {
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-            <line x1="1" y1="1" x2="23" y2="23"/>
-          </svg>
-        }
-      </button>
+  <!-- ── Left hero ──────────────────────────────────────────────────────── -->
+  <div class="auth-hero" aria-hidden="true">
+    <div class="hero-glow glow-1"></div>
+    <div class="hero-glow glow-2"></div>
+    <div class="hero-inner">
+      <span class="hero-eyebrow">⚽ Copa Mundial FIFA 2026™</span>
+      <h1 class="hero-title">Sumate<br>al prode<br>del mundial</h1>
+      <p class="hero-desc">
+        Creá tu cuenta en segundos. Pronosticá cada partido y competí
+        en grupos privados con quienes querés.
+      </p>
+      <div class="hero-pills">
+        <span>✅ Gratis para siempre</span>
+        <span>🏆 Grupos privados</span>
+        <span>🔮 Ranking en tiempo real</span>
+      </div>
     </div>
+    <div class="hero-deco">
+      <span class="deco-ball">🏆</span>
+    </div>
+  </div>
 
-    <button type="submit">Registrarme</button>
+  <!-- ── Right form ─────────────────────────────────────────────────────── -->
+  <div class="auth-form-col">
+    <section class="auth-card">
 
-    @if (error) {
-      <p class="error">{{ error }}</p>
-    }
-  </form>
+      <div class="card-top">
+        <span class="card-eyebrow">Crear cuenta</span>
+      </div>
+
+      <form class="auth-form" (ngSubmit)="register()">
+        <h2>Registrarse</h2>
+        <p class="form-sub">Entra, pronosticá y armá tu primer grupo privado.</p>
+
+        <label class="field">
+          <span class="field-lbl">Nombre</span>
+          <input type="text" name="name" [(ngModel)]="name"
+                 placeholder="Tu nombre o apodo"
+                 autocomplete="name" />
+        </label>
+
+        <label class="field">
+          <span class="field-lbl">Email</span>
+          <input type="email" name="email" [(ngModel)]="email"
+                 placeholder="tucorreo@ejemplo.com"
+                 autocomplete="email" />
+        </label>
+
+        <label class="field">
+          <span class="field-lbl">Contraseña</span>
+          <div class="password-field">
+            <input [type]="showPassword ? 'text' : 'password'"
+                   name="password" [(ngModel)]="password"
+                   placeholder="Mínimo 6 caracteres"
+                   autocomplete="new-password" />
+            <button type="button" class="eye-btn"
+                    (click)="togglePassword()"
+                    [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              @if (!showPassword) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </label>
+
+        <button type="submit" class="btn-auth">Crear cuenta gratis →</button>
+
+        @if (error) {
+          <div class="feedback error">✕ {{ error }}</div>
+        }
+      </form>
+
+    </section>
+  </div>
 
 </div>
+
