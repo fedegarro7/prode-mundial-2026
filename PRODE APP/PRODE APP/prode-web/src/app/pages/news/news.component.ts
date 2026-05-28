@@ -18,6 +18,11 @@ export class NewsComponent implements OnInit {
   error    = signal<string | null>(null);
   readonly portals = this.svc.portals;
   readonly skeletons = [1, 2, 3, 4, 5, 6];
+  readonly brokenImages = new Set<string>();
+
+  onImageError(url: string): void {
+    this.brokenImages.add(url);
+  }
 
   ngOnInit(): void {
     this.load();

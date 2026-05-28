@@ -71,10 +71,10 @@
              [attr.aria-label]="item.title + ' — ' + item.source">
 
             <!-- Image -->
-            @if (item.imageUrl) {
+            @if (item.imageUrl && !brokenImages.has(item.imageUrl)) {
               <div class="card-image">
-                <img [src]="item.imageUrl" [alt]="item.title" loading="lazy"
-                     (error)="$any($event.target).style.display='none'" />
+                <img [src]="item.imageUrl" [alt]="item.title" [title]="item.title" loading="lazy"
+                     (error)="onImageError(item.imageUrl!)" />
                 <div class="card-image-overlay"></div>
               </div>
             } @else {

@@ -23,7 +23,7 @@ public class NewsController : ControllerBase
         ("TyC Sports",   "https://www.tycsports.com/rss/noticias.rss",               "https://www.tycsports.com",       "#0057A8"),
         ("Infobae",      "https://www.infobae.com/deportes/rss/",                    "https://www.infobae.com/deportes","#E40000"),
         ("AS",           "https://feeds.as.com/mrss-s/pages/as/site/as.com/futbol/", "https://argentina.as.com",        "#D0021B"),
-        ("Marca",        "https://www.marca.com/rss/portada.xml",                    "https://www.marca.com",           "#F5A623"),
+        ("Marca",        "https://www.marca.com/rss/futbol.xml",                      "https://www.marca.com",           "#F5A623"),
     ];
 
     // ── In-memory cache ───────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ public class NewsController : ControllerBase
                 })
                 .Where(n => !string.IsNullOrWhiteSpace(n.Title) && n.Link.StartsWith("http"))
                 .Where(n => IsMundialRelated(n.Title, n.Description))
-                .Take(8);
+                .Take(2);
         }
         catch
         {
@@ -144,18 +144,24 @@ public class NewsController : ControllerBase
 
     private static readonly string[] MundialKeywords =
     [
+        "mundial 2026", "world cup 2026", "copa del mundo 2026",
         "mundial", "world cup", "copa del mundo",
-        "selección", "seleccion", "albiceleste",
-        "messi", "scaloni", "lautaro", "di maría", "di maria",
+        "selecci\u00f3n", "seleccion", "albiceleste",
+        "messi", "scaloni", "lautaro", "di mar\u00eda", "di maria",
         "eliminatorias", "fase de grupos", "octavos", "cuartos", "semifinal",
-        "usa 2026", "estados unidos 2026", "fifa",
-        "seleccion argentina", "selección argentina",
+        "usa 2026", "estados unidos 2026",
+        "seleccion argentina", "selecci\u00f3n argentina",
+        "copa america", "copa am\u00e9rica",
     ];
 
     private static readonly string[] ClubExclusions =
     [
-        "river plate", "boca juniors", "racing club", "independiente",
-        "san lorenzo", "huracán", "huracan", "vélez", "velez",
+        // Excluir noticias del Mundial de Clubes (no es la Copa del Mundo)
+        "mundial de clubes",
+        // Clubes argentinos
+        "river plate", "boca juniors", " boca ", "de boca", "a boca",
+        "racing club", "independiente", "san lorenzo",
+        "huracán", "huracan", "vélez", "velez",
         "estudiantes", "gimnasia", "newells", "rosario central",
         "talleres", "belgrano", "liga profesional", "copa de la liga", "superliga",
     ];
