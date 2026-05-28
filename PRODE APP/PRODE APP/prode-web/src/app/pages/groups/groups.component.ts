@@ -9,7 +9,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { GroupsService } from '../../services/groups.service';
-import { Group, GroupRanking, JoinRequest } from '../../models/group.model';
+import { Group, GroupRanking, JoinRequest, AdminGroup } from '../../models/group.model';
+import { AuthService } from '../../services/auth.service';
 
 type DetailTab = 'ranking' | 'requests' | 'invite';
 
@@ -28,13 +29,30 @@ type DetailTab = 'ranking' | 'requests' | 'invite';
 export class GroupsComponent implements OnInit, OnDestroy {
 
   private svc = inject(GroupsService);
+  private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
 
-  // ── Page state ─────────────────────────────────────────────────────────────
+  // ── Page state ──────────────────────────────────────────────────────────────
   groups   = signal<Group[]>([]);
   loading  = signal(true);
   error    = signal<string | null>(null);
+
+  get isAdmin(): boolean { return !!this.auth.currentUser()?.isAdmin; }
+
+  // ── Admin state ───────────────────────────────────────────────────────────
+  adminGroups        = signal<AdminGroup[]>([]);
+  adminLoading       = signal(false);
+  adminError         = signal<string | null>(null);
+  adminOpenGroupId   = signal<number | null>(null);
+
+  get filteredAdminGroups(): AdminGroup[] {
+    return this.adminGroups();
+  }
+
+  toggleAdminGroup(id: number): void {
+    this.adminOpenGroupId.set(this.adminOpenGroupId() === id ? null : id);
+  }
 
   // ── Accordion state ────────────────────────────────────────────────────────
   /** ID of the currently-open group accordion (null = all closed). */
@@ -68,6 +86,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     }
 
     this.loadGroups();
+    if (this.isAdmin) this.loadAdminGroups();
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
@@ -80,6 +99,15 @@ export class GroupsComponent implements OnInit, OnDestroy {
     this.svc.getMyGroups().pipe(takeUntil(this.destroy$)).subscribe({
       next: (gs) => { this.groups.set(gs); this.loading.set(false); },
       error: () => { this.error.set('No se pudieron cargar los grupos.'); this.loading.set(false); }
+    });
+  }
+
+  loadAdminGroups(): void {
+    this.adminLoading.set(true);
+    this.adminError.set(null);
+    this.svc.getAllGroupsAdmin().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (gs) => { this.adminGroups.set(gs); this.adminLoading.set(false); },
+      error: () => { this.adminError.set('No se pudieron cargar todos los grupos.'); this.adminLoading.set(false); }
     });
   }
 

@@ -285,7 +285,7 @@ public class GroupsController : ControllerBase
             return existing.Status switch
             {
                 MembershipStatus.Approved => Conflict("Ya sos miembro aprobado de este grupo."),
-                MembershipStatus.Pending  => Conflict("Ya tenés una solicitud pendiente de aprobación."),
+                MembershipStatus.Pending => Conflict("Ya tenés una solicitud pendiente de aprobación."),
                 MembershipStatus.Rejected => Conflict("Tu solicitud fue rechazada por el administrador del grupo."),
                 _ => Conflict("Ya tenés una solicitud para este grupo.")
             };
@@ -389,5 +389,47 @@ public class GroupsController : ControllerBase
         _context.PrivateGroups.Remove(group); // Cascade deletes memberships.
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    // ── GET /api/groups/admin/all ──────────────────────────────────────────────
+
+    /// <summary>Returns all groups with their members. Admin only.</summary>
+    [HttpGet("admin/all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllGroupsAdmin()
+    {
+        var groups = await _context.PrivateGroups
+            .Include(g => g.Owner)
+            .Include(g => g.Memberships)
+                .ThenInclude(m => m.User)
+            .OrderBy(g => g.Name)
+            .ToListAsync();
+
+        var result = groups.Select(g =>
+        {
+            var approved = g.Memberships.Where(m => m.Status == MembershipStatus.Approved).ToList();
+            var pending = g.Memberships.Where(m => m.Status == MembershipStatus.Pending).ToList();
+
+            var members = approved
+                .Select(m => new AdminGroupMemberDto { UserId = m.UserId, UserName = m.User?.Name ?? "", Status = "Approved" })
+                .Concat(pending
+                    .Select(m => new AdminGroupMemberDto { UserId = m.UserId, UserName = m.User?.Name ?? "", Status = "Pending" }))
+                .OrderBy(m => m.UserName)
+                .ToList();
+
+            return new AdminGroupDto
+            {
+                Id = g.Id,
+                Name = g.Name,
+                InviteCode = g.InviteCode,
+                OwnerName = g.Owner?.Name ?? "",
+                MemberCount = approved.Count,
+                PendingRequestCount = pending.Count,
+                CreatedAt = g.CreatedAt,
+                Members = members
+            };
+        }).ToList();
+
+        return Ok(result);
     }
 }

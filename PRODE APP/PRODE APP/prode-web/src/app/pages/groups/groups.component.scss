@@ -553,3 +553,54 @@ $whatsapp:  #25d366;
   border: 0;
 }
 
+// ── Admin panel ──────────────────────────────────────────────────────────────
+.admin-panel {
+  position: relative;
+  z-index: 1;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ef4444;
+  margin-bottom: 0.2rem;
+}
+
+.admin-title {
+  font-family: 'Bebas Neue', 'Montserrat', sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  color: #fff;
+  margin: 0;
+}
+
+// Admin accordion items — same structure as regular, with a red-tinted border
+.admin-accordion-item {
+  border-color: rgba(239, 68, 68, 0.2) !important;
+
+  &.is-open {
+    border-color: rgba(239, 68, 68, 0.45) !important;
+  }
+
+  .accordion-header:hover {
+    background: rgba(239, 68, 68, 0.06);
+  }
+}
+
+.btn-xs {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.78rem;
+}
+

@@ -305,3 +305,100 @@
 
 <!-- Screen-reader only utility -->
 <span class="sr-only" id="sr-only-desc">Gestión de grupos privados de predicciones</span>
+
+<!-- ══════════════════ ADMIN PANEL ══════════════════ -->
+@if (isAdmin) {
+  <div class="admin-panel">
+    <div class="admin-header">
+      <div>
+        <p class="admin-eyebrow">🛡️ Vista Admin</p>
+        <h2 class="admin-title">Todos los grupos</h2>
+      </div>
+      <button class="btn btn-outline btn-xs" (click)="loadAdminGroups()" [disabled]="adminLoading()">
+        {{ adminLoading() ? 'Cargando…' : '↺ Recargar' }}
+      </button>
+    </div>
+
+    @if (adminError()) {
+      <p class="msg msg-error">{{ adminError() }}</p>
+    }
+
+    @if (!adminLoading() && filteredAdminGroups.length === 0 && !adminError()) {
+      <p class="msg">No hay grupos.</p>
+    }
+
+    <div class="accordion" role="list">
+      @for (g of filteredAdminGroups; track g.id) {
+        <div class="accordion-item admin-accordion-item" [class.is-open]="adminOpenGroupId() === g.id" role="listitem">
+
+          <button
+            class="accordion-header"
+            [attr.aria-expanded]="adminOpenGroupId() === g.id"
+            [attr.aria-controls]="'admin-group-body-' + g.id"
+            [id]="'admin-group-header-' + g.id"
+            (click)="toggleAdminGroup(g.id)">
+
+            <div class="ah-left">
+              <span class="ah-name">{{ g.name }}</span>
+              <div class="ah-badges">
+                <span class="chip chip-owner" title="Dueño">👑 {{ g.ownerName }}</span>
+                @if (g.pendingRequestCount > 0) {
+                  <span class="chip chip-alert">{{ g.pendingRequestCount }} pend.</span>
+              }
+              </div>
+            </div>
+
+            <div class="ah-right">
+              <span class="ah-members">
+                <span aria-hidden="true">👥</span> {{ g.memberCount }}
+              </span>
+              <span class="chevron" [class.rotated]="adminOpenGroupId() === g.id" aria-hidden="true">›</span>
+            </div>
+          </button>
+
+          @if (adminOpenGroupId() === g.id) {
+            <div
+              class="accordion-body"
+              [id]="'admin-group-body-' + g.id"
+              [attr.aria-labelledby]="'admin-group-header-' + g.id"
+              role="region">
+
+              @if (g.members.length === 0) {
+                <p class="tab-empty">Sin miembros.</p>
+              } @else {
+                <div class="ranking-list" role="table" aria-label="Miembros del grupo">
+                  <div class="ranking-head" role="row">
+                    <span role="columnheader">Usuario</span>
+                    <span role="columnheader" class="pts-head">Estado</span>
+                  </div>
+                  @for (m of g.members; track m.userId) {
+                    <div class="ranking-row" role="row">
+                      <span class="rank-name" role="cell">{{ m.userName }}</span>
+                      <span class="rank-pts" role="cell"
+                            [style.color]="m.status === 'Pending' ? '#fbbf24' : '#4ade80'">
+                        {{ m.status === 'Approved' ? '✓ Aprobado' : '⏳ Pendiente' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+
+              <div class="invite-panel">
+                <p class="invite-label">Código de invitación</p>
+                <div class="invite-code-row">
+                  <span class="invite-code" aria-label="Código de invitación">{{ g.inviteCode }}</span>
+                  <button class="btn btn-outline btn-sm" (click)="copyCode(g.inviteCode)"
+                          aria-label="Copiar código al portapapeles">
+                    📋 Copiar
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+

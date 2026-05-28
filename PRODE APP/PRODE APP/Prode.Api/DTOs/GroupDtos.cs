@@ -30,6 +30,27 @@ public class JoinRequestDto
     public DateTime RequestedAt { get; set; }
 }
 
+/// <summary>A member entry within an admin group view.</summary>
+public class AdminGroupMemberDto
+{
+    public Guid UserId { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty; // "Approved" | "Pending"
+}
+
+/// <summary>Full group details returned to admin users.</summary>
+public class AdminGroupDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string InviteCode { get; set; } = string.Empty;
+    public string OwnerName { get; set; } = string.Empty;
+    public int MemberCount { get; set; }
+    public int PendingRequestCount { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public List<AdminGroupMemberDto> Members { get; set; } = [];
+}
+
 /// <summary>Ranking entry within a private group.</summary>
 public class GroupRankingDto
 {

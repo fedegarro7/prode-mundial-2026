@@ -4,6 +4,17 @@ $celeste: #74c3e8;
 $glass:   rgba(255, 255, 255, 0.07);
 $border:  rgba(255, 255, 255, 0.12);
 
+// ── Host background ───────────────────────────────────────────────────────────
+:host {
+  display: block;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(2,8,24,0.45) 0%, rgba(2,8,24,0.75) 60%, rgba(2,8,24,0.95) 100%),
+    url('/assets/images/login.jpg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
 // ── Page layout ──────────────────────────────────────────────────────────────
 .auth-page {
   min-height: calc(100vh - 64px);

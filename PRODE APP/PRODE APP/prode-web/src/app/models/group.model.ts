@@ -28,3 +28,23 @@ export interface GroupRanking {
   position: number;
   isCurrentUser: boolean;
 }
+
+/** Member entry in the admin group view. */
+export interface AdminGroupMember {
+  userId: string;
+  userName: string;
+  /** "Approved" | "Pending" */
+  status: string;
+}
+
+/** Full group details visible to admin users. */
+export interface AdminGroup {
+  id: number;
+  name: string;
+  inviteCode: string;
+  ownerName: string;
+  memberCount: number;
+  pendingRequestCount: number;
+  createdAt: string;
+  members: AdminGroupMember[];
+}

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Group, GroupRanking, JoinRequest } from '../models/group.model';
+import { Group, GroupRanking, JoinRequest, AdminGroup } from '../models/group.model';
 import { environment } from '../../environments/environment';
 
 /** Service for managing private prediction groups. */
@@ -71,5 +71,10 @@ export class GroupsService {
   /** Deletes a group (owners only). */
   delete(groupId: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${groupId}`);
+  }
+
+  /** Returns all groups with members. Admin only. */
+  getAllGroupsAdmin(): Observable<AdminGroup[]> {
+    return this.http.get<AdminGroup[]>(`${this.base}/admin/all`);
   }
 }

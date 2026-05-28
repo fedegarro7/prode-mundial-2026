@@ -19,7 +19,7 @@ const FIRST_MATCH = new Date('2026-06-11T21:00:00Z');
 })
 export class NavbarComponent implements OnDestroy {
 
-  private authService       = inject(AuthService);
+  authService               = inject(AuthService);
   private router            = inject(Router);
   private navigationService = inject(NavigationService);
   private ngZone            = inject(NgZone);
