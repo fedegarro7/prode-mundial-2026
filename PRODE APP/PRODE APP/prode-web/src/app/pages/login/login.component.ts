@@ -41,10 +41,13 @@ export class LoginComponent {
 
   devToken = '';
 
+  isLoading = false;
+
   login() {
 
   this.error = '';
   this.message = '';
+  this.isLoading = true;
 
   const data = {
     email: this.email,
@@ -65,6 +68,7 @@ export class LoginComponent {
 
       error: (err) => {
 
+        this.isLoading = false;
         console.error(err);
 
         if (err.status === 401) {
@@ -88,15 +92,18 @@ export class LoginComponent {
     this.error = '';
     this.message = '';
     this.devToken = '';
+    this.isLoading = true;
 
     this.authService.forgotPassword(this.recoveryEmail || this.email)
       .subscribe({
         next: (res) => {
+          this.isLoading = false;
           this.message = res.message;
           this.devToken = res.developmentResetToken ?? '';
           try { this.cdr.detectChanges(); } catch {}
         },
         error: (err) => {
+          this.isLoading = false;
           this.error =
             err.error?.message ||
             (typeof err.error === 'string' ? err.error : null) ||
@@ -109,6 +116,7 @@ export class LoginComponent {
   resetPassword() {
     this.error = '';
     this.message = '';
+    this.isLoading = true;
 
     this.authService.resetPassword({
       email: this.recoveryEmail || this.email,
@@ -116,6 +124,7 @@ export class LoginComponent {
       newPassword: this.resetPasswordValue
     }).subscribe({
       next: () => {
+        this.isLoading = false;
         this.mode = 'login';
         this.password = '';
         this.resetToken = '';
@@ -124,6 +133,7 @@ export class LoginComponent {
         try { this.cdr.detectChanges(); } catch {}
       },
       error: (err) => {
+        this.isLoading = false;
         this.error =
           err.error?.message ||
           (typeof err.error === 'string' ? err.error : null) ||

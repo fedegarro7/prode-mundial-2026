@@ -78,7 +78,13 @@
           </div>
         </label>
 
-        <button type="submit" class="btn-auth">Crear cuenta gratis →</button>
+        <button type="submit" class="btn-auth" [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="btn-spinner"></span>Creando cuenta...
+          } @else {
+            Crear cuenta gratis →
+          }
+        </button>
 
         @if (error) {
           <div class="feedback error">✕ {{ error }}</div>

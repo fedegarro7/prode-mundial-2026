@@ -214,12 +214,36 @@ input {
 
   &:active { transform: scale(0.97); }
 
+  &:disabled {
+    opacity: 0.72;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
   &.secondary {
     background: rgba($celeste, 0.12);
     border: 1px solid rgba($celeste, 0.28);
     box-shadow: none;
     &:hover { background: rgba($celeste, 0.20); }
   }
+}
+
+// ── Button spinner ────────────────────────────────────────────────────────────
+.btn-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.65s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
 }
 
 .link-btn {

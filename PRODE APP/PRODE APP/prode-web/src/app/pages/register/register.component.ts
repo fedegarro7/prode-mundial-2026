@@ -33,6 +33,8 @@ export class RegisterComponent {
 
   showPassword = false;
 
+  isLoading = false;
+
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
@@ -45,6 +47,8 @@ export class RegisterComponent {
       this.error = 'La contrasena debe tener al menos 8 caracteres.';
       return;
     }
+
+    this.isLoading = true;
 
     this.auth.register({
       name: this.name,
@@ -68,6 +72,7 @@ export class RegisterComponent {
 
       error: (error: any) => {
 
+        this.isLoading = false;
         console.error(error);
 
         if (error.status === 0) {
