@@ -141,21 +141,6 @@ C:\tmp\prode-api-build\Prode.Api.deps.json
 C:\tmp\prode-api-build\Prode.Api.runtimeconfig.json
 C:\tmp\prode-api-build\Prode.Api.dll
 C:\tmp\prode-api-build\Prode.Api.pdb
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.exe
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\FluentValidation.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.OpenApi.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Npgsql.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\testhost.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\xunit.abstractions.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\testhost.exe
@@ -176,9 +161,18 @@ C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\out\Prode.Api.staticwebassets.endpoints.json
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.staticwebassets.endpoints.json
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\xunit.runner.visualstudio.testadapter.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.exe
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.deps.json
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.runtimeconfig.json
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.pdb
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\BCrypt-Net-Next.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Castle.Core.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\FluentValidation.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Humanizer.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.Build.Framework.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.CodeAnalysis.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -187,8 +181,11 @@ C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.CodeAnalysis.ExternalAccess.RazorCompiler.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Design.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.InMemory.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.Extensions.DependencyModel.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
@@ -196,6 +193,7 @@ C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.TestPlatform.CoreUtilities.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.TestPlatform.PlatformAbstractions.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
@@ -207,6 +205,11 @@ C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Mono.TextTemplating.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Moq.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Newtonsoft.Json.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Npgsql.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\System.CodeDom.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\System.Composition.AttributedModel.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\System.Composition.Convention.dll
@@ -369,8 +372,5 @@ C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\obj\Debug\net10.0\
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\obj\Debug\net10.0\Prode.Api.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\obj\Debug\net10.0\refint\Prode.Api.dll
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\obj\Debug\net10.0\Prode.Api.pdb
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.deps.json
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.runtimeconfig.json
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\bin\Debug\net10.0\Prode.Api.pdb
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\obj\Debug\net10.0\Prode.Api.genruntimeconfig.cache
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\prode.api\obj\Debug\net10.0\ref\Prode.Api.dll

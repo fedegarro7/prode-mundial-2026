@@ -146,7 +146,7 @@ $border:     rgba(255, 255, 255, 0.12);
 
 // ── Table ─────────────────────────────────────────────────────────────────────
 .table-wrapper {
-  overflow-x: hidden;   // no horizontal scrollbar
+  overflow-x: auto;
 }
 
 table {
@@ -263,8 +263,9 @@ tbody tr {
 .positive { color: $green !important; }
 .negative { color: $red   !important; }
 
-// ── Hide columns on very small screens ───────────────────────────────────────
-@media (max-width: 360px) {
+// ── Hide columns on small / very small screens ──────────────────────────────
+// ≤ 500 px: oculta G, E, P, GF, GC → deja #, Equipo, PJ, DG, Pts
+@media (max-width: 500px) {
   .hide-xs { display: none; }
 }
 

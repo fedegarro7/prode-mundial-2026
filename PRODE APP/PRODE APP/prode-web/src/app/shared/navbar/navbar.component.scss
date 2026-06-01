@@ -414,8 +414,15 @@ $text:    rgba(255, 255, 255, 0.80);
 @media (max-width: 768px) {
   .nav-links  { display: none; }
   .hamburger  { display: flex; }
-  .guest-btns { display: none; }
   .greeting   { display: none; }
+
+  // Ocultar solo el botón "Ingresar" (ghost); "Registrarse" sigue visible
+  .guest-btns .btn-ghost-nav { display: none; }
+
+  .btn-primary-nav {
+    font-size: 0.8rem;
+    padding: 7px 12px;
+  }
 
   .user-chip {
     padding: 4px;
