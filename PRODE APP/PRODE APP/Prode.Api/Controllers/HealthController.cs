@@ -16,6 +16,7 @@ public class HealthController : ControllerBase
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Get()
     {
         var canConnect = await _context.Database.CanConnectAsync();
