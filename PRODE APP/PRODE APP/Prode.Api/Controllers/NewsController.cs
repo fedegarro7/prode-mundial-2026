@@ -60,36 +60,12 @@ public class NewsController : ControllerBase
         finally { Lock.Release(); }
     }
 
-    [HttpGet("debug")]
-    [AllowAnonymous]
-    public async Task<IActionResult> DebugFeeds()
-    {
-        var results = new List<object>();
-        foreach (var (name, url, siteUrl, color) in Sources)
-        {
-            try
-            {
-                var xml = await DownloadFeed(url);
-                var doc = XDocument.Parse(xml);
-                var allItems = doc.Descendants("item").ToList();
-                var sample = allItems.Take(5).Select(i => i.Element("title")?.Value ?? "").ToList();
-                results.Add(new { Source = name, Ok = true, Total = allItems.Count, Titles = sample });
-            }
-            catch (Exception ex)
-            {
-                results.Add(new { Source = name, Ok = false, Error = ex.Message });
-            }
-        }
-        return Ok(results);
-    }
-
     // ── Download with compression + realistic headers ─────────────────────────
     private static async Task<string> DownloadFeed(string url)
     {
         using var handler = new HttpClientHandler
         {
-            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
         };
         using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(12) };
         client.DefaultRequestHeaders.UserAgent.ParseAdd(

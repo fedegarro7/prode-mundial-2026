@@ -57,14 +57,7 @@ export class RegisterComponent {
     })
     .subscribe({
 
-      next: (response) => {
-
-        console.log(response);
-
-        localStorage.setItem(
-          'user',
-          JSON.stringify(response)
-        );
+      next: () => {
 
         this.router.navigate(['/matches']);
 

@@ -70,13 +70,6 @@
         Solicitar recuperacion
       </button>
 
-      @if (devToken) {
-        <div class="token-box">
-          <span>Token dev</span>
-          <code>{{ devToken }}</code>
-        </div>
-      }
-
       <label>
         Token
         <input type="text" name="resetToken" [(ngModel)]="resetToken" autocomplete="one-time-code">

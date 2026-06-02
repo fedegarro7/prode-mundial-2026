@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Prode.Api.Data;
 using Prode.Api.DTOs;
 using Prode.Api.Entities;
@@ -17,19 +19,35 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     private readonly JwtService _jwtService;
     private readonly IWebHostEnvironment _environment;
+    private readonly IConfiguration _configuration;
+    private readonly IEmailSender _emailSender;
+    private readonly PasswordResetOptions _passwordResetOptions;
+    private readonly ILogger<AuthController> _logger;
+
+    private const string PasswordResetMessage =
+        "Si el email existe, enviamos instrucciones para recuperar la cuenta.";
 
     public AuthController(
         AppDbContext context,
         JwtService jwtService,
-        IWebHostEnvironment environment
+        IWebHostEnvironment environment,
+        IConfiguration configuration,
+        IEmailSender emailSender,
+        IOptions<PasswordResetOptions> passwordResetOptions,
+        ILogger<AuthController> logger
     )
     {
         _context = context;
         _jwtService = jwtService;
         _environment = environment;
+        _configuration = configuration;
+        _emailSender = emailSender;
+        _passwordResetOptions = passwordResetOptions.Value;
+        _logger = logger;
     }
 
     [HttpPost("register")]
+    [EnableRateLimiting("AuthSensitive")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Name))
@@ -65,16 +83,13 @@ public class AuthController : ControllerBase
 
         var token = _jwtService.GenerateToken(user);
 
-        return Ok(new AuthResponseDto
-        {
-            Token = token,
-            Name = user.Name,
-            Email = user.Email,
-            IsAdmin = user.IsAdmin
-        });
+        SetAuthCookie(token);
+
+        return Ok(CreateAuthResponse(user));
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("AuthSensitive")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
         var email = NormalizeEmail(dto.Email);
@@ -99,13 +114,9 @@ public class AuthController : ControllerBase
 
         var token = _jwtService.GenerateToken(user);
 
-        return Ok(new AuthResponseDto
-        {
-            Token = token,
-            Name = user.Name,
-            Email = user.Email,
-            IsAdmin = user.IsAdmin
-        });
+        SetAuthCookie(token);
+
+        return Ok(CreateAuthResponse(user));
     }
 
     [Authorize]
@@ -149,34 +160,71 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
+    [EnableRateLimiting("PasswordRecovery")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
         var email = NormalizeEmail(dto.Email);
         var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
 
-        string? token = null;
-
         if (user is not null)
         {
-            token = CreateResetToken();
+            var now = DateTime.UtcNow;
+            var cooldownMinutes = Math.Max(
+                1,
+                _passwordResetOptions.RequestCooldownMinutes
+            );
 
-            user.PasswordResetTokenHash = BCrypt.Net.BCrypt.HashPassword(token);
-            user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
-            user.PasswordResetRequestedAt = DateTime.UtcNow;
+            if (
+                user.PasswordResetRequestedAt is null ||
+                user.PasswordResetRequestedAt.Value
+                    .AddMinutes(cooldownMinutes) <= now
+            )
+            {
+                var token = CreateResetToken();
+                var expiresAt = now.AddMinutes(
+                    Math.Clamp(_passwordResetOptions.ExpireMinutes, 5, 120)
+                );
 
-            await _context.SaveChangesAsync();
+                user.PasswordResetTokenHash = BCrypt.Net.BCrypt.HashPassword(token);
+                user.PasswordResetTokenExpiresAt = expiresAt;
+                user.PasswordResetRequestedAt = now;
 
-            Console.WriteLine($"PASSWORD RESET TOKEN for {email}: {token}");
+                await _context.SaveChangesAsync();
+
+                try
+                {
+                    await _emailSender.SendPasswordResetAsync(
+                        user.Email,
+                        token,
+                        expiresAt,
+                        HttpContext.RequestAborted
+                    );
+                }
+                catch (Exception ex)
+                {
+                    user.PasswordResetTokenHash = null;
+                    user.PasswordResetTokenExpiresAt = null;
+                    user.PasswordResetRequestedAt = null;
+
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogError(
+                        ex,
+                        "Could not send password reset email for user {UserId}.",
+                        user.Id
+                    );
+                }
+            }
         }
 
         return Ok(new ForgotPasswordResponseDto
         {
-            Message = "Si el email existe, generamos un token de recuperacion.",
-            DevelopmentResetToken = _environment.IsDevelopment() ? token : null
+            Message = PasswordResetMessage
         });
     }
 
     [HttpPost("reset-password")]
+    [EnableRateLimiting("PasswordRecovery")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
         if (!IsValidPassword(dto.NewPassword))
@@ -209,6 +257,18 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete(
+            AuthCookieDefaults.CookieName,
+            CreateAuthCookieOptions()
+        );
+
+        return NoContent();
+    }
+
+    [Authorize]
     [HttpPut("name")]
     public async Task<IActionResult> UpdateName([FromBody] UpdateNameDto dto)
     {
@@ -227,13 +287,24 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         var token = _jwtService.GenerateToken(user);
-        return Ok(new AuthResponseDto
-        {
-            Token = token,
-            Name = user.Name,
-            Email = user.Email,
-            IsAdmin = user.IsAdmin
-        });
+        SetAuthCookie(token);
+
+        return Ok(CreateAuthResponse(user));
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var userId = Guid.Parse(
+            User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value
+        );
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+        return user is null
+            ? Unauthorized()
+            : Ok(CreateAuthResponse(user));
     }
 
     private static string NormalizeEmail(string email)
@@ -252,5 +323,47 @@ public class AuthController : ControllerBase
             .TrimEnd('=')
             .Replace('+', '-')
             .Replace('/', '_');
+    }
+
+    private static AuthResponseDto CreateAuthResponse(User user)
+    {
+        return new AuthResponseDto
+        {
+            Name = user.Name,
+            Email = user.Email,
+            IsAdmin = user.IsAdmin
+        };
+    }
+
+    private void SetAuthCookie(string token)
+    {
+        var options = CreateAuthCookieOptions();
+        options.Expires = DateTimeOffset.UtcNow.AddMinutes(GetJwtExpireMinutes());
+
+        Response.Cookies.Append(
+            AuthCookieDefaults.CookieName,
+            token,
+            options
+        );
+    }
+
+    private CookieOptions CreateAuthCookieOptions()
+    {
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !_environment.IsDevelopment(),
+            SameSite = _environment.IsDevelopment()
+                ? SameSiteMode.Lax
+                : SameSiteMode.None,
+            Path = "/"
+        };
+    }
+
+    private int GetJwtExpireMinutes()
+    {
+        return int.TryParse(_configuration["Jwt:ExpireMinutes"], out var minutes)
+            ? Math.Clamp(minutes, 5, 24 * 60)
+            : 120;
     }
 }

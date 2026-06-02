@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Prode.Api.Data;
 using Prode.Api.DTOs;
@@ -16,6 +17,7 @@ namespace Prode.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[EnableRateLimiting("Groups")]
 public class GroupsController : ControllerBase
 {
     private readonly AppDbContext _context;

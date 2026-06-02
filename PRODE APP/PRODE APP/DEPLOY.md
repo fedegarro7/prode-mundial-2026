@@ -15,9 +15,19 @@ Variables necesarias:
 
 - `ConnectionStrings__DefaultConnection`: connection string de PostgreSQL.
 - `Jwt__Key`: una clave larga generada al azar.
+- `Jwt__Issuer`: `ProdeApi`.
+- `Jwt__Audience`: `ProdeUsers`.
 - `ASPNETCORE_ENVIRONMENT`: `Production`.
 - `Database__AutoMigrate`: `true` para aplicar migraciones al iniciar.
 - `Cors__AllowedOrigins__0`: URL final de Vercel, por ejemplo `https://prode-mundial.vercel.app`.
+- `PasswordReset__ResetUrl`: URL del formulario de login/reset, por ejemplo `https://TU-WEB.vercel.app/login`.
+- `Email__Smtp__Host`: host SMTP.
+- `Email__Smtp__Port`: puerto SMTP, por ejemplo `587`.
+- `Email__Smtp__Username`: usuario SMTP.
+- `Email__Smtp__Password`: password/API key SMTP.
+- `Email__Smtp__FromEmail`: remitente verificado.
+- `Email__Smtp__FromName`: nombre del remitente.
+- `Email__Smtp__EnableSsl`: `true`.
 
 Cuando Render termine, proba:
 

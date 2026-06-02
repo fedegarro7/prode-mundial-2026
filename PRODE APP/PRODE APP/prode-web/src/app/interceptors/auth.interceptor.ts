@@ -1,29 +1,25 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
-/**
- * Attaches the JWT Bearer token to every outgoing request.
- * On 401 responses the token is cleared and the user is redirected to /login.
- */
+import { AuthService } from '../services/auth.service';
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  const token = localStorage.getItem('token');
+  const auth = inject(AuthService);
 
-  if (token) {
-    req = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
-    });
-  }
+  const credentialedRequest = req.clone({
+    withCredentials: true
+  });
 
-  return next(req).pipe(
+  return next(credentialedRequest).pipe(
     catchError((err: unknown) => {
       if (err instanceof HttpErrorResponse && err.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        auth.clearUser();
         router.navigate(['/login']);
       }
+
       return throwError(() => err);
     })
   );

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Prode.Api.Data;
 using Prode.Api.DTOs;
@@ -12,6 +13,7 @@ namespace Prode.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[EnableRateLimiting("Predictions")]
 public class PredictionsController : ControllerBase
 {
     private readonly PredictionService _predictionService;

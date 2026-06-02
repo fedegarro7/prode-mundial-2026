@@ -1,17 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-
-  private http = inject(HttpClient);
-
-  private apiUrl = environment.apiUrl;
-
-  getTest() {
-    return this.http.get(`${this.apiUrl}/test`);
-  }
 }

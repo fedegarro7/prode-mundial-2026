@@ -49,7 +49,6 @@ export class AccountComponent {
 
   message = '';
   error = '';
-  devToken = '';
   loading = false;
 
   changePassword(): void {
@@ -88,14 +87,12 @@ export class AccountComponent {
   requestRecovery(): void {
     this.message = '';
     this.error = '';
-    this.devToken = '';
     this.loading = true;
 
     this.auth.forgotPassword(this.recoveryEmail).subscribe({
       next: (res) => {
         this.loading = false;
         this.message = res.message;
-        this.devToken = res.developmentResetToken ?? '';
       },
       error: (err) => {
         this.loading = false;

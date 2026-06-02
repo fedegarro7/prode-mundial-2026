@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../services/auth.service';
@@ -21,6 +21,8 @@ export class LoginComponent {
 
   private router = inject(Router);
 
+  private route = inject(ActivatedRoute);
+
   private cdr = inject(ChangeDetectorRef);
 
   email = '';
@@ -39,9 +41,19 @@ export class LoginComponent {
 
   message = '';
 
-  devToken = '';
-
   isLoading = false;
+
+  ngOnInit() {
+    const email = this.route.snapshot.queryParamMap.get('email');
+    const token = this.route.snapshot.queryParamMap.get('token');
+
+    if (email || token) {
+      this.mode = 'recover';
+      this.recoveryEmail = email ?? '';
+      this.email = email ?? this.email;
+      this.resetToken = token ?? '';
+    }
+  }
 
   login() {
 
@@ -56,15 +68,9 @@ export class LoginComponent {
 
   this.authService.login(data)
     .subscribe({
-     next: (response) => {
-
-  localStorage.setItem(
-    'user',
-    JSON.stringify(response)
-  );
-
-  this.router.navigate(['/matches']);
-},
+     next: () => {
+        this.router.navigate(['/matches']);
+      },
 
       error: (err) => {
 
@@ -91,7 +97,6 @@ export class LoginComponent {
   requestRecovery() {
     this.error = '';
     this.message = '';
-    this.devToken = '';
     this.isLoading = true;
 
     this.authService.forgotPassword(this.recoveryEmail || this.email)
@@ -99,7 +104,6 @@ export class LoginComponent {
         next: (res) => {
           this.isLoading = false;
           this.message = res.message;
-          this.devToken = res.developmentResetToken ?? '';
           try { this.cdr.detectChanges(); } catch {}
         },
         error: (err) => {

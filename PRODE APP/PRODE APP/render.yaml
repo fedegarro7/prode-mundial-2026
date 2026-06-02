@@ -15,5 +15,25 @@ services:
         sync: false
       - key: Jwt__Key
         generateValue: true
+      - key: Jwt__Issuer
+        value: ProdeApi
+      - key: Jwt__Audience
+        value: ProdeUsers
       - key: Cors__AllowedOrigins__0
         value: https://prode-mundial-2026-ecru.vercel.app
+      - key: PasswordReset__ResetUrl
+        value: https://prode-mundial-2026-ecru.vercel.app/login
+      - key: Email__Smtp__Host
+        sync: false
+      - key: Email__Smtp__Port
+        value: "587"
+      - key: Email__Smtp__Username
+        sync: false
+      - key: Email__Smtp__Password
+        sync: false
+      - key: Email__Smtp__FromEmail
+        sync: false
+      - key: Email__Smtp__FromName
+        value: Prode Mundial 2026
+      - key: Email__Smtp__EnableSsl
+        value: "true"
