@@ -28,6 +28,58 @@ public class NewsController : ControllerBase
 
     public NewsController(ILogger<NewsController> logger) => _logger = logger;
 
+    [HttpGet("image")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ProxyImage([FromQuery] string? url, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return BadRequest("Missing image url.");
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var imageUri))
+            return BadRequest("Invalid image url.");
+
+        if (imageUri.Scheme is not ("http" or "https"))
+            return BadRequest("Invalid image scheme.");
+
+        if (!IsAllowedImageHost(imageUri.Host))
+            return BadRequest("Image host not allowed.");
+
+        using var handler = new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
+        };
+
+        using var client = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromSeconds(12)
+        };
+
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+        );
+        client.DefaultRequestHeaders.Referrer = new Uri("https://as.com/");
+        client.DefaultRequestHeaders.Accept.ParseAdd("image/avif,image/webp,image/*,*/*;q=0.8");
+        client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("es-AR,es;q=0.9");
+
+        using var response = await client.GetAsync(imageUri, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning(
+                "Image proxy failed. Status: {Status}, Host: {Host}",
+                (int)response.StatusCode,
+                imageUri.Host
+            );
+            return NotFound();
+        }
+
+        var contentType = response.Content.Headers.ContentType?.ToString() ?? "image/jpeg";
+        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+
+        Response.Headers.CacheControl = "public,max-age=900";
+        return File(bytes, contentType);
+    }
+
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetNews()
@@ -180,28 +232,40 @@ public class NewsController : ControllerBase
                 DateTime.TryParse(pubDateStr, out var pubDate);
                 if (pubDate == default) pubDate = DateTime.UtcNow;
 
-                var image = item.Element("enclosure")?.Attribute("url")?.Value
-                       ?? item.Element(media + "content")?.Attribute("url")?.Value
-                       ?? item.Element(media + "thumbnail")?.Attribute("url")?.Value
-                       ?? item.Elements(media + "content")
-                              .FirstOrDefault(e => e.Attribute("medium")?.Value == "image")
-                              ?.Attribute("url")?.Value
-                       ?? item.Elements()
-                              .FirstOrDefault(e => e.Name.LocalName == "thumbnail")
-                              ?.Attribute("url")?.Value
-                       ?? item.Descendants(media + "content")
-                              .FirstOrDefault(e => e.Attribute("url") != null)
-                              ?.Attribute("url")?.Value
-                       ?? item.Descendants(media + "thumbnail")
-                              .FirstOrDefault(e => e.Attribute("url") != null)
-                              ?.Attribute("url")?.Value
-                          ?? item.Descendants()
-                              .FirstOrDefault(e => e.Name.LocalName == "content" && e.Attribute("url") != null)
-                              ?.Attribute("url")?.Value
-                          ?? ExtractImageFromHtml(item.Element("description")?.Value ?? "")
-                          ?? ExtractImageFromHtml(item.Element(content + "encoded")?.Value ?? "");
+                // 1. media:content con type image (más fiable, AS usa img.asmedia.epimg.net)
+                var image =
+                    item.Elements(media + "content")
+                        .FirstOrDefault(e =>
+                            e.Attribute("url") != null &&
+                            (e.Attribute("medium")?.Value == "image" ||
+                             e.Attribute("type")?.Value?.StartsWith("image/") == true))
+                        ?.Attribute("url")?.Value
+                    // 2. media:thumbnail anidado dentro de media:content de video (patrón AS)
+                    ?? item.Descendants(media + "content")
+                           .SelectMany(e => e.Elements(media + "thumbnail"))
+                           .Select(e => e.Attribute("url")?.Value)
+                           .FirstOrDefault(u => !string.IsNullOrWhiteSpace(u))
+                    // 3. media:thumbnail directo
+                    ?? item.Element(media + "thumbnail")?.Attribute("url")?.Value
+                    ?? item.Descendants(media + "thumbnail")
+                           .FirstOrDefault(e => e.Attribute("url") != null)
+                           ?.Attribute("url")?.Value
+                    // 4. otros elementos thumbnail
+                    ?? item.Elements()
+                           .FirstOrDefault(e => e.Name.LocalName == "thumbnail")
+                           ?.Attribute("url")?.Value
+                    // 5. imagen del HTML de la descripción
+                    ?? ExtractImageFromHtml(item.Element("description")?.Value ?? "")
+                    ?? ExtractImageFromHtml(item.Element(content + "encoded")?.Value ?? "")
+                    // 6. enclosure como último recurso
+                    ?? item.Element("enclosure")?.Attribute("url")?.Value;
 
                 image = NormalizeUrl(image, sourceUrl, link);
+
+                if (sourceName == "AS" && !string.IsNullOrWhiteSpace(image))
+                {
+                    image = BuildProxyImagePath(image);
+                }
 
                 return new NewsItemDto(title, desc, link, sourceName, sourceUrl, sourceColor, pubDate, image ?? "");
             })
@@ -220,8 +284,15 @@ public class NewsController : ControllerBase
     private static string? ExtractImageFromHtml(string html)
     {
         if (string.IsNullOrWhiteSpace(html)) return null;
+        
+        // Try extracting from src/data-src attributes
         var match = ImgSrcRx.Match(html);
-        if (match.Success) return match.Groups[1].Value;
+        if (match.Success) 
+        {
+            var url = match.Groups[1].Value;
+            if (!url.ToLowerInvariant().Contains(".mp4") && !url.Contains("youtube"))
+                return url;
+        }
 
         var srcSetMatch = ImgSrcSetRx.Match(html);
         if (!srcSetMatch.Success) return null;
@@ -231,7 +302,17 @@ public class NewsController : ControllerBase
             .FirstOrDefault();
 
         if (string.IsNullOrWhiteSpace(firstCandidate)) return null;
-        return firstCandidate.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[0];
+        
+        var url2 = firstCandidate.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[0];
+        if (!url2.ToLowerInvariant().Contains(".mp4") && !url2.Contains("youtube"))
+            return url2;
+            
+        return null;
+    }
+
+    private static string BuildProxyImagePath(string absoluteImageUrl)
+    {
+        return $"/api/news/image?url={Uri.EscapeDataString(absoluteImageUrl)}";
     }
 
     private static string NormalizeUrl(string? url, string sourceUrl, string? fallbackAbsoluteBase)
@@ -255,6 +336,18 @@ public class NewsController : ControllerBase
             return fromSourceUri.ToString();
 
         return string.Empty;
+    }
+
+    private static bool IsAllowedImageHost(string host)
+    {
+        var normalized = host.ToLowerInvariant();
+
+        // AS images are usually served from as.com subdomains or epimg.net CDN.
+        return normalized == "as.com"
+            || normalized.EndsWith(".as.com")
+               || normalized.EndsWith(".epimg.net")
+               || normalized == "vdmedia.as.com"
+               || normalized.EndsWith(".vdmedia.as.com");
     }
 
     // ── Title-only keywords (broad terms, only match in title) ────────────────

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, inject, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewsService, NewsItem } from '../../services/news.service';
+import { environment } from '../../../environments/environment';
 
 export interface StatCard {
   icon: string;
@@ -38,6 +39,7 @@ const STATS: StatCard[] = [
 })
 export class NewsComponent implements OnInit, OnDestroy {
   private svc = inject(NewsService);
+  private readonly apiBaseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
 
   news     = signal<NewsItem[]>([]);
   loading  = signal(true);
@@ -45,6 +47,7 @@ export class NewsComponent implements OnInit, OnDestroy {
   readonly portals      = this.svc.portals;
   readonly skeletons    = [1, 2, 3, 4, 5, 6];
   readonly brokenImages = new Set<string>();
+  installGuideOpen      = signal(false);
 
   readonly stats       = STATS;
   currentStat          = signal(0);
@@ -117,6 +120,18 @@ export class NewsComponent implements OnInit, OnDestroy {
 
   onImageError(url: string): void {
     this.brokenImages.add(url);
+  }
+
+  toggleInstallGuide(): void {
+    this.installGuideOpen.update((value) => !value);
+  }
+
+  resolveImageUrl(url: string): string {
+    if (url.startsWith('/api/')) {
+      return `${this.apiBaseUrl}${url}`;
+    }
+
+    return url;
   }
 
   load(): void {

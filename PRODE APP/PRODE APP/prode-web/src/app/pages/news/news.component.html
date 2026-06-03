@@ -8,6 +8,42 @@
   <header class="page-header">
     <p class="header-eyebrow">📰 MUNDIAL 2026</p>
     <h1>NOVEDADES</h1>
+
+    <!-- ── Install guide (collapsible) ──────────────────────────────────────── -->
+    <section class="install-guide" aria-label="Instalar app móvil">
+      <button
+        class="install-toggle"
+        type="button"
+        (click)="toggleInstallGuide()"
+        [attr.aria-expanded]="installGuideOpen()"
+        aria-controls="install-guide-content"
+      >
+        <span class="install-toggle-title">Agregá la app a tu dispositivo móvil</span>
+        <span class="install-toggle-icon" aria-hidden="true">{{ installGuideOpen() ? '−' : '+' }}</span>
+      </button>
+
+      @if (installGuideOpen()) {
+        <div id="install-guide-content" class="install-content">
+          <p class="install-message">
+            Puedes instalar la app en el teléfono desde tu navegador, busca en las opciones de tu navegador la opción "Agregar a la pantalla principal" o similar dependiendo del navegador que uses y dale a instalar, así ya te queda el ícono agregado como cualquier otra app.
+          </p>
+
+          <div class="install-images" role="group" aria-label="Guía visual de instalación Android e iOS">
+            <figure class="install-image-card">
+              <img src="/assets/images/android.jpg" alt="Guía de instalación en Android" title="Android" loading="lazy" />
+              <figcaption>Android</figcaption>
+            </figure>
+
+            <figure class="install-image-card">
+              <img src="/assets/images/ios.jpg" alt="Guía de instalación en iOS" title="iOS" loading="lazy" />
+              <figcaption>iOS</figcaption>
+            </figure>
+          </div>
+        </div>
+      }
+    </section>
+
+    <h2 class="news-title">NOTICIAS</h2>
     <p class="header-sub">
       Mantenete informado para hacer los mejores pronósticos del Mundial 2026.
     </p>
@@ -73,7 +109,7 @@
             <!-- Image -->
             @if (item.imageUrl && !brokenImages.has(item.imageUrl)) {
               <div class="card-image">
-                 <img [src]="item.imageUrl" [alt]="item.title" title="Imagen de noticia" loading="lazy"
+                <img [src]="resolveImageUrl(item.imageUrl)" [alt]="item.title" title="Imagen de noticia" loading="lazy"
                      (error)="onImageError(item.imageUrl!)" />
                 <div class="card-image-overlay"></div>
               </div>
