@@ -12,6 +12,7 @@ import { startWith, switchMap, takeUntil, filter } from 'rxjs/operators';
 
 import { StandingsService } from '../../services/standings.service';
 import { GroupStanding } from '../../models/standing.model';
+import { EsNamePipe } from '../../pipes/es-name.pipe';
 
 /** Refresh interval in milliseconds (60 s). */
 const POLL_INTERVAL_MS = 60_000;
@@ -24,7 +25,7 @@ const POLL_INTERVAL_MS = 60_000;
 @Component({
   selector: 'app-standings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EsNamePipe],
   templateUrl: './standings.component.html',
   styleUrls: ['./standings.component.scss']
 })

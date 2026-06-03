@@ -87,24 +87,48 @@ public class NewsController : ControllerBase
         xml = Regex.Replace(xml, @"&(aacute|eacute|iacute|oacute|uacute|ntilde|Aacute|Eacute|Iacute|Oacute|Uacute|Ntilde|uuml|Uuml|iquest|iexcl|nbsp|mdash|ndash|laquo|raquo|ldquo|rdquo|lsquo|rsquo|hellip|copy|reg|trade|euro|pound|yen|cent|deg|middot|bull|times|divide|plusmn|frac12|frac14|frac34);",
             m => m.Groups[1].Value switch
             {
-                "aacute" => "&#225;", "eacute" => "&#233;", "iacute" => "&#237;",
-                "oacute" => "&#243;", "uacute" => "&#250;", "ntilde" => "&#241;",
-                "Aacute" => "&#193;", "Eacute" => "&#201;", "Iacute" => "&#205;",
-                "Oacute" => "&#211;", "Uacute" => "&#218;", "Ntilde" => "&#209;",
-                "uuml" => "&#252;", "Uuml" => "&#220;",
-                "iquest" => "&#191;", "iexcl" => "&#161;",
-                "nbsp" => "&#160;", "mdash" => "&#8212;", "ndash" => "&#8211;",
-                "laquo" => "&#171;", "raquo" => "&#187;",
-                "ldquo" => "&#8220;", "rdquo" => "&#8221;",
-                "lsquo" => "&#8216;", "rsquo" => "&#8217;",
-                "hellip" => "&#8230;", "copy" => "&#169;",
-                "reg" => "&#174;", "trade" => "&#8482;",
-                "euro" => "&#8364;", "pound" => "&#163;",
-                "yen" => "&#165;", "cent" => "&#162;",
-                "deg" => "&#176;", "middot" => "&#183;",
-                "bull" => "&#8226;", "times" => "&#215;",
-                "divide" => "&#247;", "plusmn" => "&#177;",
-                "frac12" => "&#189;", "frac14" => "&#188;", "frac34" => "&#190;",
+                "aacute" => "&#225;",
+                "eacute" => "&#233;",
+                "iacute" => "&#237;",
+                "oacute" => "&#243;",
+                "uacute" => "&#250;",
+                "ntilde" => "&#241;",
+                "Aacute" => "&#193;",
+                "Eacute" => "&#201;",
+                "Iacute" => "&#205;",
+                "Oacute" => "&#211;",
+                "Uacute" => "&#218;",
+                "Ntilde" => "&#209;",
+                "uuml" => "&#252;",
+                "Uuml" => "&#220;",
+                "iquest" => "&#191;",
+                "iexcl" => "&#161;",
+                "nbsp" => "&#160;",
+                "mdash" => "&#8212;",
+                "ndash" => "&#8211;",
+                "laquo" => "&#171;",
+                "raquo" => "&#187;",
+                "ldquo" => "&#8220;",
+                "rdquo" => "&#8221;",
+                "lsquo" => "&#8216;",
+                "rsquo" => "&#8217;",
+                "hellip" => "&#8230;",
+                "copy" => "&#169;",
+                "reg" => "&#174;",
+                "trade" => "&#8482;",
+                "euro" => "&#8364;",
+                "pound" => "&#163;",
+                "yen" => "&#165;",
+                "cent" => "&#162;",
+                "deg" => "&#176;",
+                "middot" => "&#183;",
+                "bull" => "&#8226;",
+                "times" => "&#215;",
+                "divide" => "&#247;",
+                "plusmn" => "&#177;",
+                "frac12" => "&#189;",
+                "frac14" => "&#188;",
+                "frac34" => "&#190;",
                 _ => m.Value
             });
 
@@ -165,6 +189,15 @@ public class NewsController : ControllerBase
                                 ?.Attribute("url")?.Value
                          ?? item.Elements()
                                 .FirstOrDefault(e => e.Name.LocalName == "thumbnail")
+                                ?.Attribute("url")?.Value
+                         ?? item.Descendants(media + "content")
+                                .FirstOrDefault(e => e.Attribute("url") != null)
+                                ?.Attribute("url")?.Value
+                         ?? item.Descendants(media + "thumbnail")
+                                .FirstOrDefault(e => e.Attribute("url") != null)
+                                ?.Attribute("url")?.Value
+                         ?? item.Descendants()
+                                .FirstOrDefault(e => e.Name.LocalName == "content" && e.Attribute("url") != null)
                                 ?.Attribute("url")?.Value
                          ?? ExtractImageFromHtml(item.Element("description")?.Value ?? "")
                          ?? ExtractImageFromHtml(item.Element(content + "encoded")?.Value ?? "");

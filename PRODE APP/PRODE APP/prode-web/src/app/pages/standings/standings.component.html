@@ -45,7 +45,7 @@
     <div class="groups-grid">
       @for (group of groups; track group.groupName) {
         <section class="group-card" [attr.aria-label]="group.groupName">
-          <h2 class="group-title">{{ group.groupName }}</h2>
+          <h2 class="group-title">{{ group.groupName | esName }}</h2>
 
           <div class="table-wrapper">
             <table>
@@ -84,7 +84,7 @@
                           height="18"
                           loading="lazy"
                         />
-                        <span class="team-name">{{ entry.teamName }}</span>
+                        <span class="team-name">{{ entry.teamName | esName }}</span>
                       </div>
                     </td>
                     <td>{{ entry.played }}</td>

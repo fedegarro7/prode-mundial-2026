@@ -6,6 +6,7 @@ import { filter } from 'rxjs';
 import { Match } from '../../models/match.model';
 import { MatchService } from '../../services/match.service';
 import { PredictionService } from '../../services/prediction.service';
+import { EsNamePipe } from '../../pipes/es-name.pipe';
 
 export interface DayGroup {
   label: string;
@@ -16,7 +17,7 @@ export interface DayGroup {
 @Component({
   selector: 'app-my-predictions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EsNamePipe],
   templateUrl: './my-predictions.component.html',
   styleUrls: ['./my-predictions.component.scss']
 })

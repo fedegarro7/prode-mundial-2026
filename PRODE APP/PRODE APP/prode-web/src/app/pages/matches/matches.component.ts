@@ -6,6 +6,7 @@ import { filter } from 'rxjs';
 import { Match } from '../../models/match.model';
 import { MatchService } from '../../services/match.service';
 import { PredictionService } from '../../services/prediction.service';
+import { EsNamePipe } from '../../pipes/es-name.pipe';
 
 interface MatchTab {
   key: string;
@@ -18,7 +19,7 @@ interface MatchTab {
 @Component({
   selector: 'app-matches',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EsNamePipe],
   templateUrl: './matches.component.html',
   styleUrls: ['./matches.component.scss']
 })

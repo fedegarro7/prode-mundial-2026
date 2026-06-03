@@ -128,7 +128,7 @@
                 } @else {
                   <div class="flag-ph" aria-hidden="true">{{ getTeamCode(match, 'home') }}</div>
                 }
-                <span class="team-name">{{ getTeamName(match, 'home') }}</span>
+                <span class="team-name">{{ getTeamName(match, 'home') | esName }}</span>
               </div>
 
               <div class="mid-col">
@@ -156,7 +156,7 @@
                 } @else {
                   <div class="flag-ph" aria-hidden="true">{{ getTeamCode(match, 'away') }}</div>
                 }
-                <span class="team-name">{{ getTeamName(match, 'away') }}</span>
+                <span class="team-name">{{ getTeamName(match, 'away') | esName }}</span>
               </div>
 
             </div>
@@ -304,7 +304,7 @@
                         } @else {
                           <div class="flag-ph">{{ getTeamCode(match, 'home') }}</div>
                         }
-                        <span class="team-name">{{ getTeamName(match, 'home') }}</span>
+                        <span class="team-name">{{ getTeamName(match, 'home') | esName }}</span>
                       </div>
 
                       <div class="mid-col">
@@ -320,7 +320,7 @@
                         } @else {
                           <div class="flag-ph">{{ getTeamCode(match, 'away') }}</div>
                         }
-                        <span class="team-name">{{ getTeamName(match, 'away') }}</span>
+                        <span class="team-name">{{ getTeamName(match, 'away') | esName }}</span>
                       </div>
 
                     </div>

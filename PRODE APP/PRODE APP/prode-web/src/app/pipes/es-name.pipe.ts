@@ -1,0 +1,142 @@
+import { Pipe, PipeTransform } from '@angular/core';
+
+/** Maps English team names (as stored by FIFA fixture sync) to Spanish. */
+const TEAM_NAMES: Record<string, string> = {
+  // UEFA
+  Germany: 'Alemania',
+  France: 'Francia',
+  England: 'Inglaterra',
+  Netherlands: 'Países Bajos',
+  Belgium: 'Bélgica',
+  Croatia: 'Croacia',
+  Switzerland: 'Suiza',
+  Denmark: 'Dinamarca',
+  Poland: 'Polonia',
+  Serbia: 'Serbia',
+  Austria: 'Austria',
+  Turkey: 'Turquía',
+  Türkiye: 'Turquía',
+  Romania: 'Rumania',
+  'Czech Republic': 'República Checa',
+  Czechia: 'República Checa',
+  Slovakia: 'Eslovaquia',
+  Slovenia: 'Eslovenia',
+  Albania: 'Albania',
+  Hungary: 'Hungría',
+  Ukraine: 'Ucrania',
+  Iceland: 'Islandia',
+  Norway: 'Noruega',
+  Sweden: 'Suecia',
+  Scotland: 'Escocia',
+  Wales: 'Gales',
+  Greece: 'Grecia',
+  Finland: 'Finlandia',
+  'North Macedonia': 'Macedonia del Norte',
+  'Bosnia and Herzegovina': 'Bosnia y Herzegovina',
+  Georgia: 'Georgia',
+  Luxembourg: 'Luxemburgo',
+  'Republic of Ireland': 'Irlanda',
+  Ireland: 'Irlanda',
+  // CONMEBOL
+  Brazil: 'Brasil',
+  Colombia: 'Colombia',
+  Venezuela: 'Venezuela',
+  Chile: 'Chile',
+  Paraguay: 'Paraguay',
+  Bolivia: 'Bolivia',
+  Peru: 'Perú',
+  Ecuador: 'Ecuador',
+  // CONCACAF
+  'United States': 'Estados Unidos',
+  USA: 'Estados Unidos',
+  Mexico: 'México',
+  Canada: 'Canadá',
+  Panama: 'Panamá',
+  Honduras: 'Honduras',
+  'Costa Rica': 'Costa Rica',
+  Jamaica: 'Jamaica',
+  'El Salvador': 'El Salvador',
+  Guatemala: 'Guatemala',
+  Cuba: 'Cuba',
+  'Trinidad and Tobago': 'Trinidad y Tobago',
+  Haiti: 'Haití',
+  'Dominican Republic': 'República Dominicana',
+  Curaçao: 'Curazao',
+  // CAF
+  Morocco: 'Marruecos',
+  Senegal: 'Senegal',
+  Nigeria: 'Nigeria',
+  'South Africa': 'Sudáfrica',
+  'DR Congo': 'Congo DR',
+  'Democratic Republic of Congo': 'Congo DR',
+  'Congo DR': 'Congo DR',
+  Algeria: 'Argelia',
+  Egypt: 'Egipto',
+  Cameroon: 'Camerún',
+  "Côte d'Ivoire": 'Costa de Marfil',
+  "Cote d'Ivoire": 'Costa de Marfil',
+  'Ivory Coast': 'Costa de Marfil',
+  Mali: 'Malí',
+  'Cape Verde': 'Cabo Verde',
+  Tunisia: 'Túnez',
+  Ghana: 'Ghana',
+  Tanzania: 'Tanzania',
+  Zambia: 'Zambia',
+  Ethiopia: 'Etiopía',
+  Kenya: 'Kenia',
+  Angola: 'Angola',
+  Mozambique: 'Mozambique',
+  // AFC
+  'South Korea': 'Corea del Sur',
+  'Korea Republic': 'Corea del Sur',
+  Iran: 'Irán',
+  'Saudi Arabia': 'Arabia Saudita',
+  Australia: 'Australia',
+  Iraq: 'Irak',
+  Uzbekistan: 'Uzbekistán',
+  Jordan: 'Jordania',
+  Qatar: 'Catar',
+  Bahrain: 'Baréin',
+  Oman: 'Omán',
+  'United Arab Emirates': 'Emiratos Árabes',
+  Kuwait: 'Kuwait',
+  Indonesia: 'Indonesia',
+  China: 'China',
+  Thailand: 'Tailandia',
+  Philippines: 'Filipinas',
+  Malaysia: 'Malasia',
+  Lebanon: 'Líbano',
+  Palestine: 'Palestina',
+  Syria: 'Siria',
+  Kazakhstan: 'Kazajistán',
+  Kyrgyzstan: 'Kirguistán',
+  Tajikistan: 'Tayikistán',
+  Pakistan: 'Pakistán',
+  Singapore: 'Singapur',
+  // OFC
+  'New Zealand': 'Nueva Zelanda',
+  'New Caledonia': 'Nueva Caledonia',
+  Fiji: 'Fiyi',
+};
+
+/** Maps English group names to Spanish. */
+const GROUP_NAMES: Record<string, string> = {
+  'Group A': 'Grupo A', 'Group B': 'Grupo B', 'Group C': 'Grupo C',
+  'Group D': 'Grupo D', 'Group E': 'Grupo E', 'Group F': 'Grupo F',
+  'Group G': 'Grupo G', 'Group H': 'Grupo H', 'Group I': 'Grupo I',
+  'Group J': 'Grupo J', 'Group K': 'Grupo K', 'Group L': 'Grupo L',
+  'Group M': 'Grupo M', 'Group N': 'Grupo N', 'Group O': 'Grupo O',
+  'Group P': 'Grupo P',
+};
+
+/**
+ * Translates English team names, group names to Spanish.
+ * Falls back to the original value when no translation is found.
+ */
+@Pipe({ name: 'esName', standalone: true })
+export class EsNamePipe implements PipeTransform {
+  transform(value: string | null | undefined): string {
+    if (!value) return value ?? '';
+    return GROUP_NAMES[value] ?? TEAM_NAMES[value] ?? value;
+  }
+}
