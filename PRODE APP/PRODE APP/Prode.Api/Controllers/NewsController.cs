@@ -284,10 +284,10 @@ public class NewsController : ControllerBase
     private static string? ExtractImageFromHtml(string html)
     {
         if (string.IsNullOrWhiteSpace(html)) return null;
-        
+
         // Try extracting from src/data-src attributes
         var match = ImgSrcRx.Match(html);
-        if (match.Success) 
+        if (match.Success)
         {
             var url = match.Groups[1].Value;
             if (!url.ToLowerInvariant().Contains(".mp4") && !url.Contains("youtube"))
@@ -302,11 +302,11 @@ public class NewsController : ControllerBase
             .FirstOrDefault();
 
         if (string.IsNullOrWhiteSpace(firstCandidate)) return null;
-        
+
         var url2 = firstCandidate.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[0];
         if (!url2.ToLowerInvariant().Contains(".mp4") && !url2.Contains("youtube"))
             return url2;
-            
+
         return null;
     }
 
