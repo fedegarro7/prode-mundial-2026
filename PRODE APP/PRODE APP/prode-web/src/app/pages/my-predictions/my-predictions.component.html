@@ -85,7 +85,7 @@
                 @if (match.homeTeam?.flagUrl) {
                   <img [src]="match.homeTeam!.flagUrl"
                        [alt]="match.homeTeam!.name"
-                       [title]="match.homeTeam!.name"
+                    title="{{ match.homeTeam!.name }}"
                        class="flag-img" loading="lazy" />
                 } @else {
                   <div class="flag-ph">?</div>
@@ -153,7 +153,7 @@
                 @if (match.awayTeam?.flagUrl) {
                   <img [src]="match.awayTeam!.flagUrl"
                        [alt]="match.awayTeam!.name"
-                       [title]="match.awayTeam!.name"
+                    title="{{ match.awayTeam!.name }}"
                        class="flag-img" loading="lazy" />
                 } @else {
                   <div class="flag-ph">?</div>

@@ -73,7 +73,7 @@
             <!-- Image -->
             @if (item.imageUrl && !brokenImages.has(item.imageUrl)) {
               <div class="card-image">
-                <img [src]="item.imageUrl" [alt]="item.title" [title]="item.title" loading="lazy"
+                 <img [src]="item.imageUrl" [alt]="item.title" title="Imagen de noticia" loading="lazy"
                      (error)="onImageError(item.imageUrl!)" />
                 <div class="card-image-overlay"></div>
               </div>
@@ -123,7 +123,11 @@
     <div class="carousel-wrapper">
       <button class="carousel-nav carousel-prev" (click)="prevStat()" aria-label="Estadística anterior">&#8249;</button>
 
-      <div class="carousel-viewport">
+      <div
+        class="carousel-viewport"
+        (touchstart)="onCarouselTouchStart($event)"
+        (touchend)="onCarouselTouchEnd($event)"
+      >
         @for (stat of stats; track stat.label; let i = $index) {
           <div class="stat-card"
                [class.active]="i === currentStat()"
@@ -153,6 +157,7 @@
                 role="tab"
                 [attr.aria-selected]="i === currentStat()"
                 [attr.aria-label]="'Estadística ' + (i + 1)">
+          <span class="sr-only">{{ 'Estadística ' + (i + 1) }}</span>
         </button>
       }
     </div>

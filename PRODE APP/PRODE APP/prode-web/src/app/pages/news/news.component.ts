@@ -49,6 +49,8 @@ export class NewsComponent implements OnInit, OnDestroy {
   readonly stats       = STATS;
   currentStat          = signal(0);
   private carouselTimer?: ReturnType<typeof setInterval>;
+  private touchStartX: number | null = null;
+  private touchStartY: number | null = null;
 
   constructor() {
     afterNextRender(() => {
@@ -77,6 +79,29 @@ export class NewsComponent implements OnInit, OnDestroy {
   goToStat(index: number): void {
     this.currentStat.set(index);
     this.resetCarousel();
+  }
+
+  onCarouselTouchStart(event: TouchEvent): void {
+    const touch = event.touches[0];
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+  }
+
+  onCarouselTouchEnd(event: TouchEvent): void {
+    if (this.touchStartX === null || this.touchStartY === null) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - this.touchStartX;
+    const deltaY = touch.clientY - this.touchStartY;
+
+    // Trigger swipe only for intentional horizontal gestures.
+    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) this.nextStat();
+      else this.prevStat();
+    }
+
+    this.touchStartX = null;
+    this.touchStartY = null;
   }
 
   private startCarousel(): void {

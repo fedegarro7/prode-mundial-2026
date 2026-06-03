@@ -401,6 +401,15 @@ $border: rgba(255, 255, 255, 0.10);
   position: relative;
   height: 260px;
   overflow: hidden;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .carousel-viewport {
+    cursor: grab;
+  }
 }
 
 // ── Stat card ─────────────────────────────────────────────────────────────────
@@ -535,5 +544,17 @@ $border: rgba(255, 255, 255, 0.10);
   &:hover:not(.active) {
     background: rgba(255, 255, 255, 0.45);
   }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 

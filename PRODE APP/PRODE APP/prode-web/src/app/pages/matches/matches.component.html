@@ -123,6 +123,7 @@
                     class="flag-img"
                     [src]="match.homeTeam!.flagUrl"
                     [alt]="match.homeTeam!.name + ' flag'"
+                    title="{{ match.homeTeam!.name }}"
                     loading="lazy"
                   />
                 } @else {
@@ -151,6 +152,7 @@
                     class="flag-img"
                     [src]="match.awayTeam!.flagUrl"
                     [alt]="match.awayTeam!.name + ' flag'"
+                    title="{{ match.awayTeam!.name }}"
                     loading="lazy"
                   />
                 } @else {
@@ -300,7 +302,7 @@
 
                       <div class="team">
                         @if (match.homeTeam?.flagUrl) {
-                          <img class="flag-img" [src]="match.homeTeam!.flagUrl" [alt]="match.homeTeam!.name" loading="lazy" />
+                          <img class="flag-img" [src]="match.homeTeam!.flagUrl" [alt]="match.homeTeam!.name" title="{{ match.homeTeam!.name }}" loading="lazy" />
                         } @else {
                           <div class="flag-ph">{{ getTeamCode(match, 'home') }}</div>
                         }
@@ -316,7 +318,7 @@
 
                       <div class="team">
                         @if (match.awayTeam?.flagUrl) {
-                          <img class="flag-img" [src]="match.awayTeam!.flagUrl" [alt]="match.awayTeam!.name" loading="lazy" />
+                          <img class="flag-img" [src]="match.awayTeam!.flagUrl" [alt]="match.awayTeam!.name" title="{{ match.awayTeam!.name }}" loading="lazy" />
                         } @else {
                           <div class="flag-ph">{{ getTeamCode(match, 'away') }}</div>
                         }

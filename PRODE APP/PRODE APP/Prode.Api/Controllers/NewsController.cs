@@ -165,13 +165,12 @@ public class NewsController : ControllerBase
                 var title = item.Element("title")?.Value?.Trim() ?? "";
 
                 var link = (item.Element("link")?.Value?.Trim()
-                         ?? item.Elements()
-                                .FirstOrDefault(e => e.Name.LocalName == "link")
-                                ?.Attribute("href")?.Value
-                         ?? "").Trim();
+                      ?? item.Elements()
+                          .FirstOrDefault(e => e.Name.LocalName == "link")
+                          ?.Attribute("href")?.Value
+                      ?? "").Trim();
 
-                if (!string.IsNullOrEmpty(link) && !link.StartsWith("http"))
-                    link = sourceUrl;
+                link = NormalizeUrl(link, sourceUrl, sourceUrl);
 
                 var rawDesc = item.Element("description")?.Value ?? "";
                 var desc = StripHtml(rawDesc);
@@ -182,25 +181,27 @@ public class NewsController : ControllerBase
                 if (pubDate == default) pubDate = DateTime.UtcNow;
 
                 var image = item.Element("enclosure")?.Attribute("url")?.Value
-                         ?? item.Element(media + "content")?.Attribute("url")?.Value
-                         ?? item.Element(media + "thumbnail")?.Attribute("url")?.Value
-                         ?? item.Elements(media + "content")
-                                .FirstOrDefault(e => e.Attribute("medium")?.Value == "image")
-                                ?.Attribute("url")?.Value
-                         ?? item.Elements()
-                                .FirstOrDefault(e => e.Name.LocalName == "thumbnail")
-                                ?.Attribute("url")?.Value
-                         ?? item.Descendants(media + "content")
-                                .FirstOrDefault(e => e.Attribute("url") != null)
-                                ?.Attribute("url")?.Value
-                         ?? item.Descendants(media + "thumbnail")
-                                .FirstOrDefault(e => e.Attribute("url") != null)
-                                ?.Attribute("url")?.Value
-                         ?? item.Descendants()
-                                .FirstOrDefault(e => e.Name.LocalName == "content" && e.Attribute("url") != null)
-                                ?.Attribute("url")?.Value
-                         ?? ExtractImageFromHtml(item.Element("description")?.Value ?? "")
-                         ?? ExtractImageFromHtml(item.Element(content + "encoded")?.Value ?? "");
+                       ?? item.Element(media + "content")?.Attribute("url")?.Value
+                       ?? item.Element(media + "thumbnail")?.Attribute("url")?.Value
+                       ?? item.Elements(media + "content")
+                              .FirstOrDefault(e => e.Attribute("medium")?.Value == "image")
+                              ?.Attribute("url")?.Value
+                       ?? item.Elements()
+                              .FirstOrDefault(e => e.Name.LocalName == "thumbnail")
+                              ?.Attribute("url")?.Value
+                       ?? item.Descendants(media + "content")
+                              .FirstOrDefault(e => e.Attribute("url") != null)
+                              ?.Attribute("url")?.Value
+                       ?? item.Descendants(media + "thumbnail")
+                              .FirstOrDefault(e => e.Attribute("url") != null)
+                              ?.Attribute("url")?.Value
+                          ?? item.Descendants()
+                              .FirstOrDefault(e => e.Name.LocalName == "content" && e.Attribute("url") != null)
+                              ?.Attribute("url")?.Value
+                          ?? ExtractImageFromHtml(item.Element("description")?.Value ?? "")
+                          ?? ExtractImageFromHtml(item.Element(content + "encoded")?.Value ?? "");
+
+                image = NormalizeUrl(image, sourceUrl, link);
 
                 return new NewsItemDto(title, desc, link, sourceName, sourceUrl, sourceColor, pubDate, image ?? "");
             })
@@ -211,13 +212,49 @@ public class NewsController : ControllerBase
     }
 
     private static readonly Regex ImgSrcRx = new(
-        @"<img[^>]+src=[""']([^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        @"<img[^>]+(?:src|data-src)=[""']([^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex ImgSrcSetRx = new(
+        @"<img[^>]+(?:srcset|data-srcset)=[""']([^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private static string? ExtractImageFromHtml(string html)
     {
         if (string.IsNullOrWhiteSpace(html)) return null;
         var match = ImgSrcRx.Match(html);
-        return match.Success ? match.Groups[1].Value : null;
+        if (match.Success) return match.Groups[1].Value;
+
+        var srcSetMatch = ImgSrcSetRx.Match(html);
+        if (!srcSetMatch.Success) return null;
+
+        var firstCandidate = srcSetMatch.Groups[1].Value
+            .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(firstCandidate)) return null;
+        return firstCandidate.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[0];
+    }
+
+    private static string NormalizeUrl(string? url, string sourceUrl, string? fallbackAbsoluteBase)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return string.Empty;
+
+        var value = WebUtility.HtmlDecode(url.Trim());
+
+        if (value.StartsWith("//"))
+            return $"https:{value}";
+
+        if (Uri.TryCreate(value, UriKind.Absolute, out var absoluteUri))
+            return absoluteUri.ToString();
+
+        if (Uri.TryCreate(fallbackAbsoluteBase, UriKind.Absolute, out var articleBase)
+            && Uri.TryCreate(articleBase, value, out var fromArticleUri))
+            return fromArticleUri.ToString();
+
+        if (Uri.TryCreate(sourceUrl, UriKind.Absolute, out var sourceBase)
+            && Uri.TryCreate(sourceBase, value, out var fromSourceUri))
+            return fromSourceUri.ToString();
+
+        return string.Empty;
     }
 
     // ── Title-only keywords (broad terms, only match in title) ────────────────
