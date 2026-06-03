@@ -4,4 +4,6 @@ export interface AuthResponse {
   email: string;
 
   isAdmin: boolean;
+
+  token: string;
 }

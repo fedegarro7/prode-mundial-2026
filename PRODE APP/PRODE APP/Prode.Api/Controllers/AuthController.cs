@@ -83,9 +83,7 @@ public class AuthController : ControllerBase
 
         var token = _jwtService.GenerateToken(user);
 
-        SetAuthCookie(token);
-
-        return Ok(CreateAuthResponse(user));
+        return Ok(CreateAuthResponse(user, token));
     }
 
     [HttpPost("login")]
@@ -114,9 +112,7 @@ public class AuthController : ControllerBase
 
         var token = _jwtService.GenerateToken(user);
 
-        SetAuthCookie(token);
-
-        return Ok(CreateAuthResponse(user));
+        return Ok(CreateAuthResponse(user, token));
     }
 
     [Authorize]
@@ -287,9 +283,8 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         var token = _jwtService.GenerateToken(user);
-        SetAuthCookie(token);
 
-        return Ok(CreateAuthResponse(user));
+        return Ok(CreateAuthResponse(user, token));
     }
 
     [Authorize]
@@ -302,9 +297,11 @@ public class AuthController : ControllerBase
 
         var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
-        return user is null
-            ? Unauthorized()
-            : Ok(CreateAuthResponse(user));
+        if (user is null) return Unauthorized();
+
+        var token = _jwtService.GenerateToken(user);
+
+        return Ok(CreateAuthResponse(user, token));
     }
 
     private static string NormalizeEmail(string email)
@@ -325,13 +322,14 @@ public class AuthController : ControllerBase
             .Replace('/', '_');
     }
 
-    private static AuthResponseDto CreateAuthResponse(User user)
+    private static AuthResponseDto CreateAuthResponse(User user, string token)
     {
         return new AuthResponseDto
         {
             Name = user.Name,
             Email = user.Email,
-            IsAdmin = user.IsAdmin
+            IsAdmin = user.IsAdmin,
+            Token = token
         };
     }
 

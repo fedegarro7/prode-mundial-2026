@@ -9,11 +9,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const auth = inject(AuthService);
 
-  const credentialedRequest = req.clone({
-    withCredentials: true
-  });
+  const token = auth.getUser()?.token;
+  const outgoingReq = token
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
 
-  return next(credentialedRequest).pipe(
+  return next(outgoingReq).pipe(
     catchError((err: unknown) => {
       if (err instanceof HttpErrorResponse && err.status === 401) {
         auth.clearUser();
