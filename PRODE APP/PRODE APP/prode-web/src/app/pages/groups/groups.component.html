@@ -363,36 +363,33 @@
               [attr.aria-labelledby]="'admin-group-header-' + g.id"
               role="region">
 
-              @if (g.members.length === 0) {
-                <p class="tab-empty">Sin miembros.</p>
+              <p class="admin-section-title">Tabla de posiciones</p>
+              @if (g.rankings.length === 0) {
+                <p class="tab-empty">Todavía no hay miembros con puntaje.</p>
               } @else {
-                <div class="ranking-list" role="table" aria-label="Miembros del grupo">
+                <div class="ranking-list" role="table" aria-label="Ranking del grupo en vista admin">
                   <div class="ranking-head" role="row">
+                    <span role="columnheader">#</span>
                     <span role="columnheader">Usuario</span>
-                    <span role="columnheader" class="pts-head">Estado</span>
+                    <span role="columnheader" class="pts-head">Pts</span>
                   </div>
-                  @for (m of g.members; track m.userId) {
+                  @for (entry of g.rankings; track entry.userId) {
                     <div class="ranking-row" role="row">
-                      <span class="rank-name" role="cell">{{ m.userName }}</span>
-                      <span class="rank-pts" role="cell"
-                            [style.color]="m.status === 'Pending' ? '#fbbf24' : '#4ade80'">
-                        {{ m.status === 'Approved' ? '✓ Aprobado' : '⏳ Pendiente' }}
+                      <span class="rank-pos" role="cell">{{ entry.position }}</span>
+                      <span class="rank-name" role="cell">
+                        {{ entry.userName }}
+                        @if (entry.isCurrentUser) {
+                          <span class="you-label">vos</span>
+                        }
+                        @if (titleFor(entry, g.rankings); as title) {
+                          <span class="rank-title">{{ title }}</span>
+                        }
                       </span>
+                      <span class="rank-pts" role="cell">{{ entry.totalPoints }}</span>
                     </div>
                   }
                 </div>
               }
-
-              <div class="invite-panel">
-                <p class="invite-label">Código de invitación</p>
-                <div class="invite-code-row">
-                  <span class="invite-code" aria-label="Código de invitación">{{ g.inviteCode }}</span>
-                  <button class="btn btn-outline btn-sm" (click)="copyCode(g.inviteCode)"
-                          aria-label="Copiar código al portapapeles">
-                    📋 Copiar
-                  </button>
-                </div>
-              </div>
 
             </div>
           }

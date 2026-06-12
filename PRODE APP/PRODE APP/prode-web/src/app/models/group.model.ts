@@ -45,5 +45,6 @@ export interface AdminGroup {
   memberCount: number;
   pendingRequestCount: number;
   createdAt: string;
+  rankings: GroupRanking[];
   members: AdminGroupMember[];
 }

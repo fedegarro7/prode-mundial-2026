@@ -62,6 +62,42 @@ public class GroupsController : ControllerBase
         };
     }
 
+    private async Task<List<GroupRankingDto>> BuildRankingsAsync(PrivateGroup group, Guid callerId)
+    {
+        // Include the owner in rankings even if they have no explicit membership row.
+        var approvedUserIds = group.Memberships
+            .Where(m => m.Status == MembershipStatus.Approved)
+            .Select(m => m.UserId)
+            .Append(group.OwnerId)
+            .Distinct()
+            .ToList();
+
+        var rankings = await _context.Users
+            .Where(u => approvedUserIds.Contains(u.Id))
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                Points = u.Predictions
+                    .Where(p => p.Match.IsFinished)
+                    .Sum(p => p.PointsEarned)
+            })
+            .ToListAsync();
+
+        return rankings
+            .OrderByDescending(r => r.Points)
+            .ThenBy(r => r.Name)
+            .Select((r, i) => new GroupRankingDto
+            {
+                UserId = r.Id,
+                UserName = r.Name,
+                TotalPoints = r.Points,
+                Position = i + 1,
+                IsCurrentUser = r.Id == callerId
+            })
+            .ToList();
+    }
+
     // ── GET /api/groups ────────────────────────────────────────────────────────
 
     /// <summary>
@@ -117,7 +153,9 @@ public class GroupsController : ControllerBase
         var isOwner = group.OwnerId == userId;
         var membership = group.Memberships.FirstOrDefault(m => m.UserId == userId);
 
-        if (!isOwner && (membership is null || membership.Status != MembershipStatus.Approved))
+        var isAdmin = User.IsInRole("Admin");
+
+        if (!isAdmin && !isOwner && (membership is null || membership.Status != MembershipStatus.Approved))
             return Forbid();
 
         return Ok(MapGroup(group, userId));
@@ -143,40 +181,7 @@ public class GroupsController : ControllerBase
         if (!isOwner && (membership is null || membership.Status != MembershipStatus.Approved))
             return Forbid();
 
-        // Include the owner in rankings even if they have no explicit membership row.
-        var approvedUserIds = group.Memberships
-            .Where(m => m.Status == MembershipStatus.Approved)
-            .Select(m => m.UserId)
-            .Append(group.OwnerId)
-            .Distinct()
-            .ToList();
-
-        var rankings = await _context.Users
-            .Where(u => approvedUserIds.Contains(u.Id))
-            .Select(u => new
-            {
-                u.Id,
-                u.Name,
-                Points = u.Predictions
-                    .Where(p => p.Match.IsFinished)
-                    .Sum(p => p.PointsEarned)
-            })
-            .ToListAsync();
-
-        var result = rankings
-            .OrderByDescending(r => r.Points)
-            .ThenBy(r => r.Name)
-            .Select((r, i) => new GroupRankingDto
-            {
-                UserId = r.Id,
-                UserName = r.Name,
-                TotalPoints = r.Points,
-                Position = i + 1,
-                IsCurrentUser = r.Id == userId
-            })
-            .ToList();
-
-        return Ok(result);
+        return Ok(await BuildRankingsAsync(group, userId));
     }
 
     // ── GET /api/groups/{id}/requests ──────────────────────────────────────────
@@ -401,6 +406,8 @@ public class GroupsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllGroupsAdmin()
     {
+        var userId = CurrentUserId;
+
         var groups = await _context.PrivateGroups
             .Include(g => g.Owner)
             .Include(g => g.Memberships)
@@ -408,7 +415,9 @@ public class GroupsController : ControllerBase
             .OrderBy(g => g.Name)
             .ToListAsync();
 
-        var result = groups.Select(g =>
+        var result = new List<AdminGroupDto>();
+
+        foreach (var g in groups)
         {
             var approved = g.Memberships.Where(m => m.Status == MembershipStatus.Approved).ToList();
             var pending = g.Memberships.Where(m => m.Status == MembershipStatus.Pending).ToList();
@@ -420,7 +429,7 @@ public class GroupsController : ControllerBase
                 .OrderBy(m => m.UserName)
                 .ToList();
 
-            return new AdminGroupDto
+            result.Add(new AdminGroupDto
             {
                 Id = g.Id,
                 Name = g.Name,
@@ -429,9 +438,10 @@ public class GroupsController : ControllerBase
                 MemberCount = approved.Count,
                 PendingRequestCount = pending.Count,
                 CreatedAt = g.CreatedAt,
+                Rankings = await BuildRankingsAsync(g, userId),
                 Members = members
-            };
-        }).ToList();
+            });
+        }
 
         return Ok(result);
     }

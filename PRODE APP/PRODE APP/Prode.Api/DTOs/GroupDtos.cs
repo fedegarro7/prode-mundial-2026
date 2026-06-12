@@ -47,6 +47,7 @@ public class AdminGroupDto
     public int MemberCount { get; set; }
     public int PendingRequestCount { get; set; }
     public DateTime CreatedAt { get; set; }
+    public List<GroupRankingDto> Rankings { get; set; } = [];
     public List<AdminGroupMemberDto> Members { get; set; } = [];
 }
 
