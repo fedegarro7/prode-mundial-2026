@@ -287,7 +287,7 @@ public class MatchesController : ControllerBase
                                 p.AwayScorePrediction,
 
                             PointsEarned =
-                                p.PointsEarned
+                                match.IsFinished ? p.PointsEarned : 0
                         })
                         .FirstOrDefault()
             })
@@ -375,7 +375,7 @@ public class MatchesController : ControllerBase
                         myPrediction.AwayScorePrediction,
 
                     PointsEarned =
-                        myPrediction.PointsEarned
+                        match.IsFinished ? myPrediction.PointsEarned : 0
                 }
         };
     }

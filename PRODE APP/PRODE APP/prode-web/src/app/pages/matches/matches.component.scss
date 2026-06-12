@@ -351,6 +351,12 @@ $border:     rgba(255, 255, 255, 0.12);
   border: 1px solid rgba($amber, 0.3);
 }
 
+.badge-live {
+  background: rgba($green, 0.16);
+  color: #86efac;
+  border: 1px solid rgba($green, 0.36);
+}
+
 // ── Teams row ─────────────────────────────────────────────────────────────────
 .teams-row {
   display: flex;
@@ -438,6 +444,19 @@ $border:     rgba(255, 255, 255, 0.12);
 .final-lbl {
   font-size: 0.6rem;
   color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.live-score {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #86efac;
+}
+
+.live-lbl {
+  font-size: 0.6rem;
+  color: rgba(134,239,172,0.78);
   text-transform: uppercase;
   letter-spacing: 1px;
 }

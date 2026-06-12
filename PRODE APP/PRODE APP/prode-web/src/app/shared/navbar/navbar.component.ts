@@ -6,9 +6,8 @@ import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NavigationService } from '../../services/navigation.service';
 import { GroupsService } from '../../services/groups.service';
-
-// Partido inaugural: 11 jun 2026 a las 21:00 UTC
-const FIRST_MATCH = new Date('2026-06-11T21:00:00Z');
+import { MatchService } from '../../services/match.service';
+import { Match, Team } from '../../models/match.model';
 
 @Component({
   selector: 'app-navbar',
@@ -25,6 +24,7 @@ export class NavbarComponent implements OnDestroy {
   private ngZone            = inject(NgZone);
   private cdr               = inject(ChangeDetectorRef);
   private platformId        = inject(PLATFORM_ID);
+  private matchService      = inject(MatchService);
   groupsService             = inject(GroupsService);
 
   user: any = null;
@@ -34,6 +34,9 @@ export class NavbarComponent implements OnDestroy {
   countdown = '';
   matchStarted = false;
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
+  private fixtureRefreshInterval: ReturnType<typeof setInterval> | null = null;
+  private argentinaMatches: Match[] = [];
+  private fixturesLoaded = false;
 
   constructor() {
     this.loadUser();
@@ -46,56 +49,108 @@ export class NavbarComponent implements OnDestroy {
       });
 
     if (isPlatformBrowser(this.platformId)) {
-      this.updateCountdown();
+      this.loadArgentinaFixtures();
       this.ngZone.runOutsideAngular(() => {
         this.countdownInterval = setInterval(() => {
           this.updateCountdown();
           this.cdr.detectChanges();
         }, 1000);
+        this.fixtureRefreshInterval = setInterval(() => {
+          this.loadArgentinaFixtures();
+        }, 300_000);
       });
     }
   }
 
   private updateCountdown(): void {
-    const diff = FIRST_MATCH.getTime() - Date.now();
-    if (diff <= 0) {
-      this.matchStarted = true;
-      this.countdown = '¡Arrancó el Mundial!';
-      if (this.countdownInterval) {
-        clearInterval(this.countdownInterval);
-        this.countdownInterval = null;
-      }
+    if (!this.fixturesLoaded) return;
+
+    const now = Date.now();
+    const nextMatch = this.argentinaMatches.find(match =>
+      new Date(match.matchDate).getTime() > now
+    );
+
+    if (!nextMatch) {
+      const liveMatch = this.argentinaMatches.find(match => {
+        const kickoff = new Date(match.matchDate).getTime();
+        return !match.isFinished && kickoff <= now && now - kickoff <= 18_000_000;
+      });
+
+      this.matchStarted = !!liveMatch;
+      this.countdown = liveMatch ? 'En juego' : 'Fixture a confirmar';
       return;
     }
+
+    this.matchStarted = false;
+
+    const diff = new Date(nextMatch.matchDate).getTime() - now;
     const d = Math.floor(diff / 86_400_000);
     const h = Math.floor((diff % 86_400_000) / 3_600_000);
     const m = Math.floor((diff % 3_600_000) / 60_000);
     const s = Math.floor((diff % 60_000) / 1_000);
-    this.countdown = `${d}d · ${this.pad(h)}h · ${this.pad(m)}m · ${this.pad(s)}s`;
+    const separator = '\u00b7';
+    this.countdown = `${d}d ${separator} ${this.pad(h)}h ${separator} ${this.pad(m)}m ${separator} ${this.pad(s)}s`;
+  }
+
+  private loadArgentinaFixtures(): void {
+    this.matchService.getMatches().subscribe({
+      next: matches => {
+        this.argentinaMatches = matches
+          .filter(match => this.isArgentinaMatch(match))
+          .sort((a, b) =>
+            new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()
+          );
+        this.fixturesLoaded = true;
+        this.updateCountdown();
+        try { this.cdr.detectChanges(); } catch { /* SSR */ }
+      },
+      error: () => {
+        this.fixturesLoaded = true;
+        this.matchStarted = false;
+        this.countdown = 'Fixture a confirmar';
+        try { this.cdr.detectChanges(); } catch { /* SSR */ }
+      }
+    });
+  }
+
+  private isArgentinaMatch(match: Match): boolean {
+    return (
+      this.isArgentinaTeam(match.homeTeam) ||
+      this.isArgentinaTeam(match.awayTeam)
+    );
+  }
+
+  private isArgentinaTeam(team?: Team | null): boolean {
+    return (
+      team?.code?.toUpperCase() === 'ARG' ||
+      team?.name?.toLowerCase().includes('argentina') ||
+      false
+    );
   }
 
   private pad(n: number): string { return n.toString().padStart(2, '0'); }
 
   ngOnDestroy(): void {
     if (this.countdownInterval) clearInterval(this.countdownInterval);
+    if (this.fixtureRefreshInterval) clearInterval(this.fixtureRefreshInterval);
   }
 
   loadUser() { this.user = this.authService.currentUser(); }
 
   logout() {
     this.authService.logout();
-    this.user        = null;
-    this.menuOpen    = false;
+    this.user         = null;
+    this.menuOpen     = false;
     this.dropdownOpen = false;
     this.router.navigate(['/login']);
   }
 
   notifyRoute(route: string) { this.navigationService.notify(route); }
 
-  toggleMenu()    { this.menuOpen     = !this.menuOpen; }
-  closeMenu()     { this.menuOpen     = false; }
-  toggleDropdown(){ this.dropdownOpen = !this.dropdownOpen; }
-  closeDropdown() { this.dropdownOpen = false; }
+  toggleMenu()     { this.menuOpen     = !this.menuOpen; }
+  closeMenu()      { this.menuOpen     = false; }
+  toggleDropdown() { this.dropdownOpen = !this.dropdownOpen; }
+  closeDropdown()  { this.dropdownOpen = false; }
 
   get userInitials(): string {
     const name = this.authService.currentUser()?.name;
@@ -119,4 +174,3 @@ export class NavbarComponent implements OnDestroy {
     }
   }
 }
-

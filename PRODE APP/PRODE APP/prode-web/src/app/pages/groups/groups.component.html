@@ -209,20 +209,21 @@
                       <span role="columnheader" class="pts-head">Pts</span>
                     </div>
                     @for (entry of rankingsFor(group.id); track entry.userId) {
+                      @let realPos = calculateRealPosition(entry, rankingsFor(group.id));
                       <div class="ranking-row" [class.me]="entry.isCurrentUser"
-                           [class.top1]="entry.position === 1"
-                           [class.top2]="entry.position === 2"
-                           [class.top3]="entry.position === 3"
+                           [class.top1]="realPos === 1"
+                           [class.top2]="realPos === 2"
+                           [class.top3]="realPos === 3"
                            role="row">
-                        <span class="rank-pos" role="cell" [attr.aria-label]="'Posición ' + entry.position">
-                          {{ medalFor(entry.position) }}
+                        <span class="rank-pos" role="cell" [attr.aria-label]="'Posición ' + realPos">
+                          {{ medalFor(realPos) }}
                         </span>
                         <span class="rank-name" role="cell">
                           {{ entry.userName }}
                           @if (entry.isCurrentUser) {
                             <span class="you-label">vos</span>
                           }
-                          @if (titleFor(entry.position, rankingsFor(group.id).length, rankingsFor(group.id)[0]?.totalPoints ?? 0); as title) {
+                          @if (titleFor(entry, rankingsFor(group.id)); as title) {
                             <span class="rank-title">{{ title }}</span>
                           }
                         </span>

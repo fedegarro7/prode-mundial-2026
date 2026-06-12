@@ -264,13 +264,55 @@ export class GroupsComponent implements OnInit, OnDestroy {
   trackById(_: number, item: { id: number }) { return item.id; }
   medalFor(pos: number): string { return pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : String(pos); }
 
-  titleFor(pos: number, total: number, topPoints: number): string {
-    if (total <= 1 || topPoints === 0) return '';
-    if (pos === 1)                           return '👑 El Messi del grupo';
-    if (pos === 2 && total > 2)             return '🥈 Casi campeón';
-    if (pos === 3 && total > 3)             return '🥉 Tercer tiempo';
-    if (pos === total && total > 3)         return '🪣 La madera del grupo';
-    if (pos === total - 1 && total > 4)     return '😬 Penúltimo y con frío';
+  /**
+   * Calcula la posición real considerando empates.
+   * Si múltiples jugadores tienen la misma puntuación, todos comparten la misma posición.
+   * La siguiente posición se calcula como si todos los empatados ocuparan el mismo rango.
+   * 
+   * Ejemplo: [100, 100, 100, 95, 95, 90] → posiciones reales: [1, 1, 1, 4, 4, 6]
+   */
+  calculateRealPosition(entry: GroupRanking, rankings: GroupRanking[]): number {
+    let realPos = 1;
+    for (const ranking of rankings) {
+      if (ranking.totalPoints > entry.totalPoints) {
+        realPos++;
+      }
+    }
+    return realPos;
+  }
+
+  /**
+   * Determina si es la última posición (considerando empates).
+   * Todos los jugadores con igual puntuación mínima son considerados últimos.
+   */
+  isLastPosition(entry: GroupRanking, rankings: GroupRanking[]): boolean {
+    const minPoints = Math.min(...rankings.map(r => r.totalPoints));
+    return entry.totalPoints === minPoints;
+  }
+
+  /**
+   * Determina si es la primera posición (considerando empates).
+   * Todos los jugadores con igual puntuación máxima son considerados primeros.
+   */
+  isFirstPosition(entry: GroupRanking, rankings: GroupRanking[]): boolean {
+    const maxPoints = Math.max(...rankings.map(r => r.totalPoints));
+    return entry.totalPoints === maxPoints;
+  }
+
+  titleFor(entry: GroupRanking, rankings: GroupRanking[]): string {
+    if (rankings.length <= 1) return '';
+    
+    const realPos = this.calculateRealPosition(entry, rankings);
+    const total = rankings.length;
+    const isFirst = this.isFirstPosition(entry, rankings);
+    const isLast = this.isLastPosition(entry, rankings);
+    
+    if (isFirst)                            return '👑 El Messi del grupo';
+    if (realPos === 2 && total > 2)        return '🥈 Casi campeón';
+    if (realPos === 3 && total > 3)        return '🥉 Tercer tiempo';
+    if (realPos === 4 && total > 4)        return '😬 Casi podio';
+    if (isLast && total > 3)               return '🪣 La madera del grupo';
+    if (realPos === total - 1 && total > 4) return '😬 Penúltimo y con frío';
     return '';
   }
 }

@@ -10,6 +10,7 @@ public class ScoringService
     )
     {
         if (
+            !match.IsFinished ||
             match.HomeScore == null ||
             match.AwayScore == null
         )

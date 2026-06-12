@@ -27,10 +27,8 @@
 
     <!-- ── Countdown ─────────────────────────────────────────────────────── -->
     @if (countdown) {
-      <div class="countdown-badge" [class.started]="matchStarted" aria-label="Tiempo hasta el primer partido">
-        @if (!matchStarted) {
-          <span class="countdown-label">⚽ Primer partido</span>
-        }
+      <div class="countdown-badge" [class.started]="matchStarted" aria-label="Tiempo hasta el próximo partido de Argentina">
+        <span class="countdown-label">Próximo partido de Argentina</span>
         <span class="countdown-time">{{ countdown }}</span>
       </div>
     }
@@ -121,4 +119,3 @@
     </div>
   }
 </nav>
-

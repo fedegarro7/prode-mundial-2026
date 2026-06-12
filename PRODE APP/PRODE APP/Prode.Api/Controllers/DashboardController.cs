@@ -39,6 +39,7 @@ public class DashboardController : ControllerBase
 
             AveragePoints =
                 await _context.Predictions
+                    .Where(x => x.Match.IsFinished)
                     .AverageAsync(x =>
                         (double?)x.PointsEarned
                     ) ?? 0
@@ -61,7 +62,10 @@ public class DashboardController : ControllerBase
             .CountAsync(p => p.UserId == userId);
 
         var totalPoints = await _context.Predictions
-            .Where(p => p.UserId == userId)
+            .Where(p =>
+                p.UserId == userId &&
+                p.Match.IsFinished
+            )
             .SumAsync(p => p.PointsEarned);
 
         var pendingPredictions = await _context.Matches
@@ -84,7 +88,9 @@ public class DashboardController : ControllerBase
             .Select(u => new
             {
                 u.Id,
-                Points = u.Predictions.Sum(p => p.PointsEarned),
+                Points = u.Predictions
+                    .Where(p => p.Match.IsFinished)
+                    .Sum(p => p.PointsEarned),
                 u.Name
             })
             .OrderByDescending(u => u.Points)

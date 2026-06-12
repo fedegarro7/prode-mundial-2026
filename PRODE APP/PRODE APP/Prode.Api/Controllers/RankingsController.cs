@@ -25,7 +25,9 @@ public class RankingsController : ControllerBase
                 UserId = x.Id,
                 Name = x.Name,
                 TotalPoints =
-                    x.Predictions.Sum(p => p.PointsEarned)
+                    x.Predictions
+                        .Where(p => p.Match.IsFinished)
+                        .Sum(p => p.PointsEarned)
             })
             .OrderByDescending(x => x.TotalPoints)
             .ToListAsync();

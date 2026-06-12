@@ -23,7 +23,8 @@ public class ScoringServiceTests
         var match = new Match
         {
             HomeScore = realHome,
-            AwayScore = realAway
+            AwayScore = realAway,
+            IsFinished = true
         };
 
         var result = _sut.CalculatePoints(prediction, match);
@@ -47,7 +48,8 @@ public class ScoringServiceTests
         var match = new Match
         {
             HomeScore = realHome,
-            AwayScore = realAway
+            AwayScore = realAway,
+            IsFinished = true
         };
 
         var result = _sut.CalculatePoints(prediction, match);
@@ -71,7 +73,8 @@ public class ScoringServiceTests
         var match = new Match
         {
             HomeScore = realHome,
-            AwayScore = realAway
+            AwayScore = realAway,
+            IsFinished = true
         };
 
         var result = _sut.CalculatePoints(prediction, match);
@@ -90,7 +93,8 @@ public class ScoringServiceTests
         var match = new Match
         {
             HomeScore = null,
-            AwayScore = null
+            AwayScore = null,
+            IsFinished = true
         };
 
         var result = _sut.CalculatePoints(prediction, match);
@@ -109,7 +113,28 @@ public class ScoringServiceTests
         var match = new Match
         {
             HomeScore = 2,
-            AwayScore = null
+            AwayScore = null,
+            IsFinished = true
+        };
+
+        var result = _sut.CalculatePoints(prediction, match);
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void CalculatePoints_UnfinishedMatchWithScore_Returns0()
+    {
+        var prediction = new Prediction
+        {
+            HomeScorePrediction = 1,
+            AwayScorePrediction = 0
+        };
+        var match = new Match
+        {
+            HomeScore = 1,
+            AwayScore = 0,
+            IsFinished = false
         };
 
         var result = _sut.CalculatePoints(prediction, match);

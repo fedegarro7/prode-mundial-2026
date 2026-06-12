@@ -8,6 +8,8 @@ namespace Prode.Api.Services;
 
 public class FifaFixtureSyncService
 {
+    private const int FifaMatchStatusFinished = 0;
+
     private const string WorldCup2026MatchesUrl =
         "https://api.fifa.com/api/v3/calendar/matches?language=en&count=200&idCompetition=17&idSeason=285023";
 
@@ -214,18 +216,44 @@ public class FifaFixtureSyncService
             match.GroupName = data.GroupName;
             match.StadiumId = stadiumsByFifaId[data.StadiumFifaId].Id;
 
+            var isFinalScore =
+                data.IsFinished &&
+                data.HomeScore.HasValue &&
+                data.AwayScore.HasValue;
+
+            var wasFinished = match.IsFinished;
+            var previousHomeScore = match.HomeScore;
+            var previousAwayScore = match.AwayScore;
+
             if (data.HomeScore.HasValue && data.AwayScore.HasValue)
             {
-                bool scoreChanged = !match.IsFinished
-                    || match.HomeScore != data.HomeScore
-                    || match.AwayScore != data.AwayScore;
-
                 match.HomeScore = data.HomeScore;
                 match.AwayScore = data.AwayScore;
-                match.IsFinished = true;
+            }
+            else if (!data.IsFinished)
+            {
+                match.HomeScore = null;
+                match.AwayScore = null;
+            }
+
+            match.IsFinished = isFinalScore;
+
+            if (isFinalScore)
+            {
+                var scoreChanged =
+                    !wasFinished ||
+                    previousHomeScore != data.HomeScore ||
+                    previousAwayScore != data.AwayScore;
 
                 if (scoreChanged && match.Predictions.Count > 0)
                     toRescore.Add(match);
+            }
+            else if (wasFinished && match.Predictions.Count > 0)
+            {
+                foreach (var prediction in match.Predictions)
+                {
+                    prediction.PointsEarned = 0;
+                }
             }
 
             match.PredictionsLocked =
@@ -331,9 +359,15 @@ public class FifaFixtureSyncService
             GetLocalizedDescription(match, "StageName"),
             groupName,
             stadiumFifaId,
+            IsFifaFinal(match),
             GetInt32(match, "HomeTeamScore"),
             GetInt32(match, "AwayTeamScore")
         );
+    }
+
+    private static bool IsFifaFinal(JsonElement match)
+    {
+        return GetInt32(match, "MatchStatus") == FifaMatchStatusFinished;
     }
 
     private static string BuildFlagUrl(JsonElement team)
@@ -449,6 +483,7 @@ public class FifaFixtureSyncService
         string Stage,
         string GroupName,
         string StadiumFifaId,
+        bool IsFinished,
         int? HomeScore,
         int? AwayScore
     );

@@ -232,6 +232,20 @@ export class MatchesComponent implements OnInit, OnDestroy {
     return !this.isMatchLocked(match);
   }
 
+  isMatchInProgress(match: Match): boolean {
+    return !match.isFinished &&
+      !!match.homeTeam &&
+      !!match.awayTeam &&
+      new Date(match.matchDate).getTime() <= Date.now();
+  }
+
+  hasMatchScore(match: Match): boolean {
+    return match.homeScore !== null &&
+      match.homeScore !== undefined &&
+      match.awayScore !== null &&
+      match.awayScore !== undefined;
+  }
+
   isMatchLocked(match: Match): boolean {
     return match.predictionsLocked ||
       match.isFinished ||
@@ -242,6 +256,7 @@ export class MatchesComponent implements OnInit, OnDestroy {
 
   lockReason(match: Match): string {
     if (!match.homeTeam || !match.awayTeam) return 'Equipos por definir';
+    if (this.isMatchInProgress(match)) return 'En juego';
     if (match.isFinished) return 'Partido finalizado';
     return 'Pronosticos cerrados';
   }

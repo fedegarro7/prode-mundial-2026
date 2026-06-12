@@ -14,6 +14,13 @@ export class MatchService {
   private apiUrl =
     `${environment.apiUrl}/matches`;
 
+  getMatches(): Observable<Match[]> {
+
+    return this.http.get<Match[]>(
+      this.apiUrl
+    );
+  }
+
   getUpcomingMatches(): Observable<Match[]> {
 
     return this.http.get<Match[]>(

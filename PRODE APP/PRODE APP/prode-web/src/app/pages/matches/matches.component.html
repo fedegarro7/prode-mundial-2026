@@ -100,7 +100,9 @@
                 <span class="match-date">{{ match.matchDate | date:'EEE dd/MM · HH:mm' }}</span>
                 <span class="match-venue">📍 {{ match.stadium.city }}</span>
               </div>
-              @if (isArgentina(match)) {
+              @if (isMatchInProgress(match)) {
+                <span class="badge badge-live">En juego</span>
+              } @else if (isArgentina(match)) {
                 <span class="badge badge-arg">⭐ ARG</span>
               } @else if (canPredict(match)) {
                 <span class="badge badge-open">{{ closingLabel(match) }}</span>
@@ -136,6 +138,13 @@
                 @if (match.isFinished) {
                   <div class="final-score">{{ match.homeScore }} : {{ match.awayScore }}</div>
                   <div class="final-lbl">Final</div>
+                } @else if (isMatchInProgress(match)) {
+                  @if (hasMatchScore(match)) {
+                    <div class="live-score">{{ match.homeScore }} : {{ match.awayScore }}</div>
+                  } @else {
+                    <div class="vs-text">VS</div>
+                  }
+                  <div class="live-lbl">En juego</div>
                 } @else {
                   <div class="vs-text">VS</div>
                   @if (isSaved(match)) {
@@ -285,6 +294,8 @@
                       </div>
                       @if (isUnknownKnockout(match)) {
                         <span class="badge badge-pending">⏳ Por definir</span>
+                      } @else if (isMatchInProgress(match)) {
+                        <span class="badge badge-live">En juego</span>
                       } @else if (isArgentina(match)) {
                         <span class="badge badge-arg">⭐ ARG</span>
                       } @else if (canPredict(match)) {
@@ -310,9 +321,21 @@
                       </div>
 
                       <div class="mid-col">
-                        <div class="vs-text">VS</div>
-                        @if (isSaved(match) && !isUnknownKnockout(match)) {
-                          <div class="saved-preview">{{ match.homePrediction }} – {{ match.awayPrediction }}</div>
+                        @if (match.isFinished) {
+                          <div class="final-score">{{ match.homeScore }} : {{ match.awayScore }}</div>
+                          <div class="final-lbl">Final</div>
+                        } @else if (isMatchInProgress(match)) {
+                          @if (hasMatchScore(match)) {
+                            <div class="live-score">{{ match.homeScore }} : {{ match.awayScore }}</div>
+                          } @else {
+                            <div class="vs-text">VS</div>
+                          }
+                          <div class="live-lbl">En juego</div>
+                        } @else {
+                          <div class="vs-text">VS</div>
+                          @if (isSaved(match) && !isUnknownKnockout(match)) {
+                            <div class="saved-preview">{{ match.homePrediction }} – {{ match.awayPrediction }}</div>
+                          }
                         }
                       </div>
 

@@ -157,7 +157,9 @@ public class GroupsController : ControllerBase
             {
                 u.Id,
                 u.Name,
-                Points = u.Predictions.Sum(p => p.PointsEarned)
+                Points = u.Predictions
+                    .Where(p => p.Match.IsFinished)
+                    .Sum(p => p.PointsEarned)
             })
             .ToListAsync();
 
