@@ -3919,11 +3919,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+      "projectUniqueName": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
       "projectName": "Prode.Api",
-      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
       "packagesPath": "C:\\Users\\federico.garro\\.nuget\\packages\\",
-      "outputPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\obj\\",
+      "outputPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

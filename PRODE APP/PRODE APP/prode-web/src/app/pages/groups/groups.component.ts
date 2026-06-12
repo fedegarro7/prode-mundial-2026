@@ -31,7 +31,96 @@ export class GroupsComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
+ private readonly rankTitles = [
+  // Muy cerca de la cima
+  '🚀 Keep pushing',
+  '⭐ Más cerca de la cima que del fondo',
+  '🔥 Metele que se te van',
+  '💪 Luchador digno',
+  '🎯 Vas afinando la puntería',
+  '⚡ A un paso de sorprender',
+  '📈 En clara recuperación',
+  '🥊 Nunca bajás los brazos',
+  '🌱 Hay potencial escondido',
+  '🚦 Todavía estás en carrera',
 
+  // Mitad superior
+  '🧩 Te falta una pieza',
+  '🛠️ Ajustando la estrategia',
+  '⚽ Todavía no le encontraste la vuelta',
+  '😅 La próxima metele ganas',
+  '🎺 Haciendo ruido desde abajo',
+  '🧱 Construyendo la remontada',
+  '🏕️ Acampando en mitad de tabla',
+  '🧉 Ruido de mate',
+  '🧭 Buscando el rumbo',
+  '🌊 A contracorriente',
+  '🎭 Impredecible hasta para vos',
+  '🎯 Encontrando el ritmo',
+  '📊 Más consistente que la fecha pasada',
+  '⚙️ Ajustando los últimos detalles',
+  '🥾 Todavía queda campeonato',
+  '📣 No te descuides que venís ahí',
+  '🚂 Agarrando impulso',
+
+  // Mitad inferior
+  '🤦 El VAR tampoco te ayudó',
+  '🌧️ Día complicado',
+  '🫠 Te faltó VAR',
+  '📉 Hoy no era tu día',
+  '📡 Señal perdida con los resultados',
+  '🔍 El resultado estaba en otro partido',
+  '📚 Mucho por aprender del fixture',
+  '🎢 Más irregular que la fase de grupos',
+  '🤷 Inexplicable',
+  '📺 ¿Viste los partidos?',
+
+  // Fondo de tabla
+  '🎲 Apostaste a cualquier cosa',
+  '🥵 Fecha para olvidar',
+  '😬 Mejor olvidemos esta fecha',
+  '🚑 Necesitás una remontada',
+  '🏃 Corriendo desde atrás',
+  '🕳️ Cerca del sótano',
+  '🎰 Te jugaste todo al azar',
+  '🎪 Espectáculo garantizado, aciertos opcionales',
+  '🆘 Situación crítica'
+];
+private readonly championTitles = [
+  '👑 El Messi del grupo',
+  '🐐 GOAT de los pronósticos',
+  '🏆 Dueño absoluto de la tabla',
+  '🧠 Oráculo del fútbol',
+  '⚡ Maestro de las predicciones',
+  '🎯 Francotirador del resultado',
+  '🚀 Imparable esta fecha',
+  '🌟 Leyenda del prode',
+  '🔥 En modo campeón',
+  '📖 Escribiendo la historia del grupo'
+];
+
+private readonly lastPlaceTitles = [
+  '💀 Experto en errarle',
+  '🪵 La madera del grupo',
+  '🫥 Desaparecido en acción',
+  '🚨 Emergencia futbolística',
+  '🕯️ Que alguien rece por tus pronósticos',
+  '📉 Caída libre sin escalas',
+  '🌋 Todo salió mal',
+  '🛟 Necesitás un milagro mundialista',
+  '🚑 Pidieron asistencia desde el fondo',
+  '☠️ Prohibido mostrar esta tabla'
+];
+private hash(value: string): number {
+  let hash = 0;
+
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i);
+    hash |= 0;
+  }
+
+  return Math.abs(hash);
+}
   // ── Page state ──────────────────────────────────────────────────────────────
   groups   = signal<Group[]>([]);
   loading  = signal(true);
@@ -268,7 +357,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * Calcula la posición real considerando empates.
    * Si múltiples jugadores tienen la misma puntuación, todos comparten la misma posición.
    * La siguiente posición se calcula como si todos los empatados ocuparan el mismo rango.
-   * 
+   *
    * Ejemplo: [100, 100, 100, 95, 95, 90] → posiciones reales: [1, 1, 1, 4, 4, 6]
    */
   calculateRealPosition(entry: GroupRanking, rankings: GroupRanking[]): number {
@@ -298,22 +387,118 @@ export class GroupsComponent implements OnInit, OnDestroy {
     const maxPoints = Math.max(...rankings.map(r => r.totalPoints));
     return entry.totalPoints === maxPoints;
   }
+  private getTieIndex(
+  entry: GroupRanking,
+  rankings: GroupRanking[]
+): number {
 
-  titleFor(entry: GroupRanking, rankings: GroupRanking[]): string {
-    if (rankings.length <= 1) return '';
-    
-    const realPos = this.calculateRealPosition(entry, rankings);
-    const total = rankings.length;
-    const isFirst = this.isFirstPosition(entry, rankings);
-    const isLast = this.isLastPosition(entry, rankings);
-    
-    if (isFirst)                            return '👑 El Messi del grupo';
-    if (realPos === 2 && total > 2)        return '🥈 Casi campeón';
-    if (realPos === 3 && total > 3)        return '🥉 Tercer tiempo';
-    if (realPos === 4 && total > 4)        return '😬 Casi podio';
-    if (isLast && total > 3)               return '🪣 La madera del grupo';
-    if (realPos === total - 1 && total > 4) return '😬 Penúltimo y con frío';
-    return '';
+  const tiedPlayers = rankings
+    .filter(r => r.totalPoints === entry.totalPoints)
+    .sort((a, b) => a.userId.localeCompare(b.userId));
+
+  return tiedPlayers.findIndex(
+    r => r.userId === entry.userId
+  );
+}
+
+titleFor(entry: GroupRanking, rankings: GroupRanking[]): string {
+  if (rankings.length <= 1) return '';
+
+  const realPos = this.calculateRealPosition(entry, rankings);
+  const total = rankings.length;
+
+  const seed = rankings.reduce(
+    (sum, r) => sum + r.totalPoints,
+    0
+  );
+
+  // ─────────────────────────────────────────────
+  // Campeones
+  // ─────────────────────────────────────────────
+
+  if (this.isFirstPosition(entry, rankings)) {
+    const tieIndex = this.getTieIndex(
+  entry,
+  rankings
+);
+
+const championIndex =
+  (seed + tieIndex)
+  % this.championTitles.length;
+
+    return this.championTitles[championIndex];
   }
+
+  // ─────────────────────────────────────────────
+  // Últimos
+  // ─────────────────────────────────────────────
+
+  if (this.isLastPosition(entry, rankings)) {
+   const tieIndex = this.getTieIndex(
+  entry,
+  rankings
+);
+
+const lastIndex =
+  (seed + tieIndex)
+  % this.lastPlaceTitles.length;
+
+    return this.lastPlaceTitles[lastIndex];
+  }
+
+  // ─────────────────────────────────────────────
+  // Intermedios
+  // ─────────────────────────────────────────────
+
+  const middlePositions = total - 2;
+
+  // Grupo de 3 personas
+  if (middlePositions === 1) {
+    const idx =
+      (seed + this.hash(entry.userId))
+      % this.rankTitles.length;
+
+    return this.rankTitles[idx];
+  }
+
+  const variation = seed % 5;
+
+  const middleRank = realPos - 2;
+
+  const baseIndex =
+    (middleRank * (this.rankTitles.length - 1))
+    / (middlePositions - 1);
+
+  const adjustedIndex = Math.round(
+    Math.max(
+      0,
+      Math.min(
+        this.rankTitles.length - 1,
+        baseIndex + variation
+      )
+    )
+  );
+
+  const tiedPlayers = rankings.filter(
+  r => r.totalPoints === entry.totalPoints
+);
+
+const tieIndex = this.getTieIndex(
+  entry,
+  rankings
+);
+
+const jitter =
+  tiedPlayers.length > 1
+    ? tieIndex
+    : this.hash(entry.userId) % 3;
+
+const finalIndex = Math.min(
+  this.rankTitles.length - 1,
+  adjustedIndex + jitter
+);
+
+  return this.rankTitles[finalIndex];
+}
 }
 
