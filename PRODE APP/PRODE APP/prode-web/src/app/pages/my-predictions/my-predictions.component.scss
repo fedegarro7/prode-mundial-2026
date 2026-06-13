@@ -254,13 +254,34 @@ $accent:     #818cf8;  // indigo suave
 .lock-pill {
   margin-left: auto;
   font-size: .68rem;
-  color: #f87171;
-  background: rgba(239,68,68,.1);
-  border: 1px solid rgba(239,68,68,.2);
   border-radius: 20px;
   padding: 2px 8px;
   font-weight: 600;
   white-space: nowrap;
+
+  &.lock-pill-live {
+    color: #86efac;
+    background: rgba(34,197,94,.12);
+    border: 1px solid rgba(34,197,94,.26);
+  }
+
+  &.lock-pill-open {
+    color: #93c5fd;
+    background: rgba(59,130,246,.12);
+    border: 1px solid rgba(59,130,246,.26);
+  }
+
+  &.lock-pill-final {
+    color: #fbbf24;
+    background: rgba(245,158,11,.12);
+    border: 1px solid rgba(245,158,11,.24);
+  }
+
+  &.lock-pill-locked {
+    color: #f87171;
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.2);
+  }
 }
 
 // ── Matchup ───────────────────────────────────────────────────────────────────
@@ -606,5 +627,6 @@ $accent:     #818cf8;  // indigo suave
   .step-val            { min-width: 26px; font-size: 1rem; }
   .locked-result       { font-size: 1.35rem; }
   .match-city          { display: none; }
+  .lock-pill           { font-size: .62rem; padding: 2px 7px; }
 }
 

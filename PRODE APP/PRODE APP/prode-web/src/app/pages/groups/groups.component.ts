@@ -43,6 +43,17 @@ export class GroupsComponent implements OnInit, OnDestroy {
   '🥊 Nunca bajás los brazos',
   '🌱 Hay potencial escondido',
   '🚦 Todavía estás en carrera',
+  '🤌 Surge valentía',
+  '🕺 Fulbo champagne',
+  '😎 Perfil bajo, puntos altos',
+'👀 La estás viendo',
+'📈 Paso a paso, como Mostaza',
+'🚶 Sin hacer ruido',
+'🛣️ Por la banquina, pero avanzando',
+'🧠 Hay método en la locura',
+'🎯 No será lindo, pero suma',
+'🥐 Facturando puntitos',
+'🚂 Despacito y sin frenos',
 
   // Mitad superior
   '🧩 Te falta una pieza',
@@ -62,6 +73,17 @@ export class GroupsComponent implements OnInit, OnDestroy {
   '🥾 Todavía queda campeonato',
   '📣 No te descuides que venís ahí',
   '🚂 Agarrando impulso',
+  '🚬 No era penal',
+'🧉 Tomando mate y especulando',
+'📺 Lo vi por TikTok',
+'🕺 Fulbo champagne',
+'🏃 Corriendo de atrás',
+'🤌 Falta picardía',
+
+'🎤 Muchachos, ahora nos volvimos a ilusionar',
+'🧾 Haciendo cuentas como contador de barrio',
+'🏕️ Modo camping en mitad de tabla',
+'🥟 Hoy jugaste para el empate',
 
   // Mitad inferior
   '🤦 El VAR tampoco te ayudó',
@@ -74,6 +96,16 @@ export class GroupsComponent implements OnInit, OnDestroy {
   '🎢 Más irregular que la fase de grupos',
   '🤷 Inexplicable',
   '📺 ¿Viste los partidos?',
+  '🫣 Anulo mufa',
+'🚨 Entraste dormido al partido',
+'📡 Señal perdida',
+'🤷 Elijo creer',
+'🪄 Fe le sobra, aciertos no tanto',
+'📉 Se cayó el sistema',
+'😶 Hoy no conectaste una',
+'🚧 Obra en construcción',
+'🥵 Fecha para archivar',
+'🪫 Te quedaste sin batería',
 
   // Fondo de tabla
   '🎲 Apostaste a cualquier cosa',
@@ -96,7 +128,17 @@ private readonly championTitles = [
   '🚀 Imparable esta fecha',
   '🌟 Leyenda del prode',
   '🔥 En modo campeón',
-  '📖 Escribiendo la historia del grupo'
+  '📖 Escribiendo la historia del grupo',
+  '🐐 El Diego te mira orgulloso',
+'🏆 Fulbo champagne',
+'🧠 La Scaloneta de los pronósticos',
+'⭐ Campeón del pueblo',
+'🔥 Modo Qatar 2022',
+'🎯 Más preciso que Julián',
+'⚽ Tocá de primera, fenómeno',
+'🚀 Elijo creer... y acertar',
+'👑 Dueño de la redonda',
+'🧉 Cebando mates desde la punta'
 ];
 
 private readonly lastPlaceTitles = [
@@ -109,7 +151,15 @@ private readonly lastPlaceTitles = [
   '🌋 Todo salió mal',
   '🛟 Necesitás un milagro mundialista',
   '🚑 Pidieron asistencia desde el fondo',
-  '☠️ Prohibido mostrar esta tabla'
+  '☠️ Prohibido mostrar esta tabla',
+  '🫠 Masterclass de errarle',
+'🎰 Jugaste al azar y salió mal',
+'📉 Más perdido que turco en la neblina',
+'🛟 Necesitás una épica',
+'📺 Estabas viendo otro deporte',
+'🚑 Llamen al DT',
+'🪦 Acá yace una fecha',
+'☠️ Viniste a participar'
 ];
 private hash(value: string): number {
   let hash = 0;

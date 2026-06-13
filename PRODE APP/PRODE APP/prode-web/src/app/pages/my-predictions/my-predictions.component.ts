@@ -142,6 +142,25 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
       new Date(match.matchDate).getTime() > Date.now();
   }
 
+  isMatchInProgress(match: Match): boolean {
+    return !match.isFinished &&
+      !!match.homeTeam &&
+      !!match.awayTeam &&
+      new Date(match.matchDate).getTime() <= Date.now();
+  }
+
+  closingLabel(match: Match): string {
+    const diff = new Date(match.matchDate).getTime() - Date.now();
+    if (diff <= 0) return 'Cerrado';
+
+    const hours = Math.floor(diff / 36e5);
+    const minutes = Math.floor((diff % 36e5) / 6e4);
+
+    if (hours >= 24) return `Cierra en ${Math.floor(hours / 24)}d`;
+    if (hours >= 1) return `Cierra en ${hours}h ${minutes}m`;
+    return `Cierra en ${minutes}m`;
+  }
+
   isSaved(match: Match): boolean { return this.savedIds.has(match.id); }
   isSaving(match: Match): boolean { return this.savingIds.has(match.id); }
 

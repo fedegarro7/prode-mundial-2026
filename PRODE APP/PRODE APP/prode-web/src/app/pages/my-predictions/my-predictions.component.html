@@ -72,8 +72,14 @@
               @if (match.stadium.city) {
                 <span class="match-city">📍 {{ match.stadium.city }}</span>
               }
-              @if (!canPredict(match)) {
-                <span class="lock-pill">🔒 Cerrado</span>
+              @if (match.isFinished) {
+                <span class="lock-pill lock-pill-final">Finalizado</span>
+              } @else if (isMatchInProgress(match)) {
+                <span class="lock-pill lock-pill-live">En juego</span>
+              } @else if (canPredict(match)) {
+                <span class="lock-pill lock-pill-open">{{ closingLabel(match) }}</span>
+              } @else {
+                <span class="lock-pill lock-pill-locked">Pronósticos cerrados</span>
               }
             </div>
 
