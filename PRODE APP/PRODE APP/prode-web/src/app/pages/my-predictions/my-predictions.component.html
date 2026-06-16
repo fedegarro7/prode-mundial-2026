@@ -169,6 +169,65 @@
 
             </div>
 
+            @if (hasGroupPredictions(match)) {
+              <div class="group-predictions">
+                @for (group of match.groupPredictions ?? []; track group.groupId) {
+                  <div class="group-predictions-item">
+                    <button
+                      type="button"
+                      class="group-predictions-toggle"
+                      (click)="toggleGroupPredictions(match.id, group.groupId)"
+                      [attr.aria-expanded]="isGroupPredictionsExpanded(match.id, group.groupId)"
+                    >
+                      <span class="group-predictions-name">{{ group.groupName }}</span>
+                      <span class="group-predictions-meta">
+                        {{ group.participants.length }} participante{{ group.participants.length === 1 ? '' : 's' }}
+                      </span>
+                      <span class="group-predictions-chevron" aria-hidden="true">
+                        {{ isGroupPredictionsExpanded(match.id, group.groupId) ? '⌃' : '›' }}
+                      </span>
+                    </button>
+
+                    @if (isGroupPredictionsExpanded(match.id, group.groupId)) {
+                      <div class="group-predictions-list">
+                        @for (participant of group.participants; track participant.userId) {
+                          <div
+                            class="group-predictions-row"
+                            [class.is-me]="participant.isCurrentUser"
+                            [class.no-prediction]="!participant.hasPrediction"
+                          >
+                            <span class="participant-name">
+                              {{ participant.userName }}
+                              @if (participant.isCurrentUser) {
+                                <span class="you-chip">vos</span>
+                              }
+                            </span>
+
+                            @if (participant.hasPrediction) {
+                              <span class="participant-score">
+                                {{ participant.homeScorePrediction }} - {{ participant.awayScorePrediction }}
+                              </span>
+                            } @else {
+                              <span class="participant-score muted">Sin pronóstico</span>
+                            }
+
+                            @if (match.isFinished) {
+                              <span
+                                class="participant-points"
+                                [class.points-earned]="participant.pointsEarned > 0"
+                              >
+                                {{ participant.pointsEarned > 0 ? '+' : '' }}{{ participant.pointsEarned }} pts
+                              </span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
             <!-- Save button -->
             @if (canPredict(match)) {
               <div class="card-footer">

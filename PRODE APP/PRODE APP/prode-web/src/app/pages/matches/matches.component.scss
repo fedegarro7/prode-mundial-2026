@@ -468,6 +468,54 @@ $border:     rgba(255, 255, 255, 0.12);
 }
 
 // ── Prediction section ────────────────────────────────────────────────────────
+.my-prediction-note {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: -6px 0 14px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.055);
+  color: rgba(255,255,255,0.72);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-align: center;
+
+  &.muted {
+    color: rgba(255,255,255,0.35);
+    font-style: italic;
+  }
+}
+
+.my-prediction-label {
+  color: rgba(255,255,255,0.48);
+  font-weight: 600;
+}
+
+.my-prediction-score {
+  color: #fff;
+  font-weight: 800;
+}
+
+.my-prediction-points {
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  padding: 1px 7px;
+  color: rgba(255,255,255,0.48);
+  font-size: 0.66rem;
+  font-weight: 800;
+
+  &.points-earned {
+    border-color: rgba($green, 0.35);
+    background: rgba($green, 0.14);
+    color: #86efac;
+  }
+}
+
 .prediction-section {
   display: flex;
   flex-direction: column;

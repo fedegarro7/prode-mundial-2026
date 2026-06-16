@@ -36,6 +36,7 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
   savedIds = new Set<number>();
   savingIds = new Set<number>();
   collapsedDays = new Set<string>();
+  expandedGroupPredictionKeys = new Set<string>();
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
   toastVisible = false;
@@ -126,6 +127,28 @@ export class MyPredictionsComponent implements OnInit, OnDestroy {
       this.collapsedDays.add(label);
     }
     try { this.cdr.detectChanges(); } catch {}
+  }
+
+  hasGroupPredictions(match: Match): boolean {
+    return (match.groupPredictions?.length ?? 0) > 0;
+  }
+
+  isGroupPredictionsExpanded(matchId: number, groupId: number): boolean {
+    return this.expandedGroupPredictionKeys.has(this.groupPredictionKey(matchId, groupId));
+  }
+
+  toggleGroupPredictions(matchId: number, groupId: number): void {
+    const key = this.groupPredictionKey(matchId, groupId);
+    if (this.expandedGroupPredictionKeys.has(key)) {
+      this.expandedGroupPredictionKeys.delete(key);
+    } else {
+      this.expandedGroupPredictionKeys.add(key);
+    }
+    try { this.cdr.detectChanges(); } catch {}
+  }
+
+  private groupPredictionKey(matchId: number, groupId: number): string {
+    return `${matchId}:${groupId}`;
   }
 
   getTeamName(match: Match, side: 'home' | 'away'): string {

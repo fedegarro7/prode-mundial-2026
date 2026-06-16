@@ -234,11 +234,27 @@ public class MatchesController : ControllerBase
 
         var matches = await _context.Matches
             .Include(x => x.Predictions)
+                .ThenInclude(x => x.User)
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
             .Include(x => x.Stadium)
             .Where(x => x.IsFinished || x.MatchDate > DateTime.UtcNow.AddHours(-3))
             .OrderBy(x => x.MatchDate)
+            .ToListAsync();
+
+        var userGroups = await _context.PrivateGroups
+            .AsNoTracking()
+            .Include(g => g.Owner)
+            .Include(g => g.Memberships.Where(m => m.Status == MembershipStatus.Approved))
+                .ThenInclude(m => m.User)
+            .Where(g =>
+                g.OwnerId == userId ||
+                g.Memberships.Any(m =>
+                    m.UserId == userId &&
+                    m.Status == MembershipStatus.Approved
+                )
+            )
+            .OrderBy(g => g.Name)
             .ToListAsync();
 
         var response = matches
@@ -289,7 +305,10 @@ public class MatchesController : ControllerBase
                             PointsEarned =
                                 match.IsFinished ? p.PointsEarned : 0
                         })
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+
+                GroupPredictions =
+                    BuildGroupPredictions(match, userGroups, userId)
             })
             .ToList();
 
@@ -376,8 +395,75 @@ public class MatchesController : ControllerBase
 
                     PointsEarned =
                         match.IsFinished ? myPrediction.PointsEarned : 0
-                }
+            }
         };
+    }
+
+    private static List<MatchGroupPredictionsDto> BuildGroupPredictions(
+        Match match,
+        List<PrivateGroup> userGroups,
+        Guid currentUserId
+    )
+    {
+        var canRevealPredictions =
+            match.IsFinished ||
+            match.PredictionsLocked ||
+            match.MatchDate <= DateTime.UtcNow;
+
+        if (!canRevealPredictions)
+        {
+            return [];
+        }
+
+        var predictionsByUser = match.Predictions
+            .GroupBy(p => p.UserId)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(p => p.Id).First());
+
+        return userGroups
+            .Select(group =>
+            {
+                var members = group.Memberships
+                    .Where(m => m.Status == MembershipStatus.Approved)
+                    .Select(m => m.User)
+                    .Append(group.Owner)
+                    .Where(u => u != null)
+                    .DistinctBy(u => u.Id)
+                    .Select(user =>
+                    {
+                        predictionsByUser.TryGetValue(user.Id, out var prediction);
+
+                        return new GroupPredictionParticipantDto
+                        {
+                            UserId = user.Id,
+                            UserName = user.Name,
+                            IsCurrentUser = user.Id == currentUserId,
+                            HasPrediction = prediction != null,
+                            HomeScorePrediction = prediction?.HomeScorePrediction,
+                            AwayScorePrediction = prediction?.AwayScorePrediction,
+                            PointsEarned =
+                                match.IsFinished && prediction != null
+                                    ? prediction.PointsEarned
+                                    : 0
+                        };
+                    });
+
+                var orderedMembers = match.IsFinished
+                    ? members
+                        .OrderByDescending(x => x.PointsEarned)
+                        .ThenBy(x => x.UserName)
+                        .ToList()
+                    : members
+                        .OrderBy(x => x.UserName)
+                        .ToList();
+
+                return new MatchGroupPredictionsDto
+                {
+                    GroupId = group.Id,
+                    GroupName = group.Name,
+                    Participants = orderedMembers
+                };
+            })
+            .ToList();
     }
 
     private static TeamDto? ToTeamDto(Team? team)

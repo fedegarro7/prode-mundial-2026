@@ -593,6 +593,145 @@ $accent:     #818cf8;  // indigo suave
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
+.group-predictions {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  margin-top: .85rem;
+}
+
+.group-predictions-item {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 10px;
+  background: rgba(255,255,255,.045);
+}
+
+.group-predictions-toggle {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .45rem .6rem;
+  border: 0;
+  background: transparent;
+  color: $text;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s;
+
+  &:hover {
+    background: rgba(255,255,255,.06);
+  }
+}
+
+.group-predictions-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .75rem;
+  font-weight: 800;
+  color: rgba(255,255,255,.86);
+}
+
+.group-predictions-meta {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: .63rem;
+  font-weight: 700;
+  color: $text-muted;
+}
+
+.group-predictions-chevron {
+  width: 16px;
+  flex-shrink: 0;
+  color: $accent;
+  text-align: center;
+  font-size: .9rem;
+  line-height: 1;
+}
+
+.group-predictions-list {
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.group-predictions-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .6rem;
+  font-size: .72rem;
+  color: rgba(255,255,255,.78);
+
+  & + & {
+    border-top: 1px solid rgba(255,255,255,.055);
+  }
+
+  &.is-me {
+    background: rgba($accent, .09);
+  }
+
+  &.no-prediction {
+    color: $text-muted;
+  }
+}
+
+.participant-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.you-chip {
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba($accent, .16);
+  color: #c7d2fe;
+  font-size: .58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.participant-score {
+  min-width: 44px;
+  text-align: center;
+  font-weight: 800;
+  color: #fff;
+
+  &.muted {
+    min-width: 86px;
+    color: $text-muted;
+    font-weight: 600;
+    font-style: italic;
+  }
+}
+
+.participant-points {
+  min-width: 48px;
+  justify-self: end;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  padding: 1px 7px;
+  text-align: center;
+  color: $text-muted;
+  font-size: .64rem;
+  font-weight: 800;
+
+  &.points-earned {
+    border-color: rgba($green, .35);
+    background: rgba($green, .14);
+    color: #86efac;
+  }
+}
+
 .toast {
   position: fixed;
   bottom: 1.5rem;

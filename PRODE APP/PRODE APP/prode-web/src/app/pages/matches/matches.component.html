@@ -172,6 +172,25 @@
 
             </div>
 
+            @if (match.myPrediction) {
+              <div class="my-prediction-note">
+                <span class="my-prediction-label">Mi pronóstico:</span>
+                <span class="my-prediction-score">
+                  {{ match.myPrediction.homeScorePrediction }} - {{ match.myPrediction.awayScorePrediction }}
+                </span>
+                @if (match.isFinished) {
+                  <span
+                    class="my-prediction-points"
+                    [class.points-earned]="match.myPrediction.pointsEarned > 0"
+                  >
+                    {{ match.myPrediction.pointsEarned > 0 ? '+' : '' }}{{ match.myPrediction.pointsEarned }} pts
+                  </span>
+                }
+              </div>
+            } @else if (!canPredict(match)) {
+              <div class="my-prediction-note muted">Sin pronóstico</div>
+            }
+
             <!-- Prediction area -->
             @if (canPredict(match)) {
               <div class="prediction-section">
@@ -349,6 +368,27 @@
                       </div>
 
                     </div>
+
+                    @if (!isUnknownKnockout(match)) {
+                      @if (match.myPrediction) {
+                        <div class="my-prediction-note">
+                          <span class="my-prediction-label">Mi pronóstico:</span>
+                          <span class="my-prediction-score">
+                            {{ match.myPrediction.homeScorePrediction }} - {{ match.myPrediction.awayScorePrediction }}
+                          </span>
+                          @if (match.isFinished) {
+                            <span
+                              class="my-prediction-points"
+                              [class.points-earned]="match.myPrediction.pointsEarned > 0"
+                            >
+                              {{ match.myPrediction.pointsEarned > 0 ? '+' : '' }}{{ match.myPrediction.pointsEarned }} pts
+                            </span>
+                          }
+                        </div>
+                      } @else if (!canPredict(match)) {
+                        <div class="my-prediction-note muted">Sin pronóstico</div>
+                      }
+                    }
 
                     @if (isUnknownKnockout(match)) {
                       <div class="pending-footer" role="status">⏳ Clasificados por definir</div>

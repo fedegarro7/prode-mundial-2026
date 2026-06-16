@@ -21,6 +21,22 @@ export interface MyPrediction {
   pointsEarned: number;
 }
 
+export interface GroupPredictionParticipant {
+  userId: string;
+  userName: string;
+  isCurrentUser: boolean;
+  hasPrediction: boolean;
+  homeScorePrediction?: number | null;
+  awayScorePrediction?: number | null;
+  pointsEarned: number;
+}
+
+export interface MatchGroupPredictions {
+  groupId: number;
+  groupName: string;
+  participants: GroupPredictionParticipant[];
+}
+
 export interface Match {
   id: number;
   fifaId: string;
@@ -38,6 +54,7 @@ export interface Match {
   isFinished: boolean;
   predictionsLocked: boolean;
   myPrediction?: MyPrediction | null;
+  groupPredictions?: MatchGroupPredictions[];
   homePrediction?: number | null;
   awayPrediction?: number | null;
 }
