@@ -206,6 +206,9 @@
                     <div class="ranking-head" role="row">
                       <span role="columnheader">#</span>
                       <span role="columnheader">Usuario</span>
+                      <span role="columnheader" class="stat-head pleno-head" title="Resultado exacto (3 pts)">🎯</span>
+                      <span role="columnheader" class="stat-head parcial-head" title="Resultado correcto (1 pt)">🟡</span>
+                      <span role="columnheader" class="stat-head cero-head" title="Sin puntos (0 pts)">⚫</span>
                       <span role="columnheader" class="pts-head">Pts</span>
                     </div>
                     @for (entry of rankingsFor(group.id); track entry.userId) {
@@ -227,6 +230,9 @@
                             <span class="rank-title">{{ title }}</span>
                           }
                         </span>
+                        <span class="rank-stat pleno-stat" role="cell" [attr.aria-label]="entry.plenos + ' plenos'">{{ entry.plenos }}</span>
+                        <span class="rank-stat parcial-stat" role="cell" [attr.aria-label]="entry.parciales + ' parciales'">{{ entry.parciales }}</span>
+                        <span class="rank-stat cero-stat" role="cell" [attr.aria-label]="entry.ceros + ' sin puntos'">{{ entry.ceros }}</span>
                         <span class="rank-pts" role="cell">{{ entry.totalPoints }}</span>
                       </div>
                     }

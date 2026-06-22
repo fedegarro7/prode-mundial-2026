@@ -80,7 +80,13 @@ public class GroupsController : ControllerBase
                 u.Name,
                 Points = u.Predictions
                     .Where(p => p.Match.IsFinished)
-                    .Sum(p => p.PointsEarned)
+                    .Sum(p => p.PointsEarned),
+                Plenos = u.Predictions
+                    .Count(p => p.Match.IsFinished && p.PointsEarned == 3),
+                Parciales = u.Predictions
+                    .Count(p => p.Match.IsFinished && p.PointsEarned == 1),
+                Ceros = u.Predictions
+                    .Count(p => p.Match.IsFinished && p.PointsEarned == 0)
             })
             .ToListAsync();
 
@@ -93,7 +99,10 @@ public class GroupsController : ControllerBase
                 UserName = r.Name,
                 TotalPoints = r.Points,
                 Position = i + 1,
-                IsCurrentUser = r.Id == callerId
+                IsCurrentUser = r.Id == callerId,
+                Plenos = r.Plenos,
+                Parciales = r.Parciales,
+                Ceros = r.Ceros
             })
             .ToList();
     }

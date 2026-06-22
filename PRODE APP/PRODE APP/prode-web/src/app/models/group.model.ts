@@ -26,6 +26,9 @@ export interface GroupRanking {
   totalPoints: number;
   position: number;
   isCurrentUser: boolean;
+  plenos: number;
+  parciales: number;
+  ceros: number;
 }
 
 /** Member entry in the admin group view. */

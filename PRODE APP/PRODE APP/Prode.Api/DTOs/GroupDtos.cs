@@ -59,4 +59,10 @@ public class GroupRankingDto
     public int TotalPoints { get; set; }
     public int Position { get; set; }
     public bool IsCurrentUser { get; set; }
+    /// <summary>Predictions with exact score (3 points).</summary>
+    public int Plenos { get; set; }
+    /// <summary>Predictions with correct result but wrong score (1 point).</summary>
+    public int Parciales { get; set; }
+    /// <summary>Finished matches where the prediction earned 0 points.</summary>
+    public int Ceros { get; set; }
 }

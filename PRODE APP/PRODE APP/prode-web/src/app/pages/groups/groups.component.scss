@@ -401,7 +401,7 @@ $whatsapp:  #25d366;
 
 .ranking-head {
   display: grid;
-  grid-template-columns: 48px 1fr 56px;
+  grid-template-columns: 48px 1fr 38px 38px 38px 52px;
   padding: .35rem .5rem;
   font-size: .72rem;
   font-weight: 700;
@@ -412,11 +412,12 @@ $whatsapp:  #25d366;
   margin-bottom: .4rem;
 
   .pts-head { text-align: right; color: $gold; }
+  .stat-head { text-align: center; font-size: .82rem; cursor: default; }
 }
 
 .ranking-row {
   display: grid;
-  grid-template-columns: 48px 1fr 56px;
+  grid-template-columns: 48px 1fr 38px 38px 38px 52px;
   align-items: center;
   padding: .55rem .5rem;
   border-radius: 8px;
@@ -457,6 +458,15 @@ $whatsapp:  #25d366;
   white-space: nowrap;
   flex-shrink: 0;
 }
+.rank-stat {
+  font-weight: 700;
+  font-size: .82rem;
+  text-align: center;
+}
+.pleno-stat   { color: #4ade80; }   // verde
+.parcial-stat { color: #fbbf24; }   // amarillo
+.cero-stat    { color: rgba($muted, .7); }
+
 .rank-pts {
   font-weight: 800;
   font-size: .95rem;
@@ -619,7 +629,7 @@ $whatsapp:  #25d366;
 
   .ranking-head,
   .ranking-row {
-    grid-template-columns: 40px minmax(0, 1fr) 44px;
+    grid-template-columns: 40px minmax(0, 1fr) 30px 30px 30px 44px;
   }
 
   .rank-name {
