@@ -15,7 +15,7 @@ import { GroupStanding } from '../../models/standing.model';
 import { EsNamePipe } from '../../pipes/es-name.pipe';
 
 /** Fast refresh during live matches (60 s). */
-const POLL_LIVE_MS   = 60_000;
+const POLL_LIVE_MS   = 300_000;
 /** Slow refresh when no match is in progress (5 min). */
 const POLL_IDLE_MS   = 300_000;
 

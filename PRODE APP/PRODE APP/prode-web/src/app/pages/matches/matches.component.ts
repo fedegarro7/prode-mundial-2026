@@ -88,8 +88,32 @@ export class MatchesComponent implements OnInit, OnDestroy {
       });
   }
 
+  private liveRefreshTimer?: ReturnType<typeof setTimeout>;
+
+  /** Polls every 5 min while at least one match is in progress; stops when all done. */
+  private scheduleLiveRefresh(matches: Match[]): void {
+    if (this.liveRefreshTimer) clearTimeout(this.liveRefreshTimer);
+    const hasLive = matches.some(m => this.isMatchInProgress(m));
+    if (!hasLive) return;
+    this.liveRefreshTimer = setTimeout(() => {
+      this.matchService.getUpcomingMatches().subscribe({
+        next: (res) => {
+          const mapped = res.map(m => ({
+            ...m,
+            homePrediction: m.myPrediction?.homeScorePrediction ?? 0,
+            awayPrediction: m.myPrediction?.awayScorePrediction ?? 0
+          }));
+          this.buildGroups(mapped);
+          try { this.cdr.detectChanges(); } catch { /* SSR */ }
+          this.scheduleLiveRefresh(mapped);
+        }
+      });
+    }, 5 * 60 * 1000);
+  }
+
   ngOnDestroy(): void {
     if (this.toastTimer) clearTimeout(this.toastTimer);
+    if (this.liveRefreshTimer) clearTimeout(this.liveRefreshTimer);
   }
 
   loadMatches(): void {
@@ -110,6 +134,7 @@ export class MatchesComponent implements OnInit, OnDestroy {
         this.buildGroups(mapped);
         this.loading = false;
         try { this.cdr.detectChanges(); } catch { /* SSR */ }
+        this.scheduleLiveRefresh(mapped);
       },
       error: () => { this.loading = false; }
     });

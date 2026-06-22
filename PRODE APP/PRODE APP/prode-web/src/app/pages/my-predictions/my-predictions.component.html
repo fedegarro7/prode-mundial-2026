@@ -131,32 +131,42 @@
                         <div class="pred-comparison">
                           <span class="pred-small">Pronóstico: {{ match.myPrediction.homeScorePrediction }}–{{ match.myPrediction.awayScorePrediction }}</span>
                         </div>
-                        <!-- Points breakdown -->
-                        @if (match.myPrediction.pointsEarned > 0 || match.myPrediction.basePointsEarned! > 0) {
-                          <div class="pts-breakdown">
-                            <div class="pts-row">
-                              <span class="pts-lbl">🪜 Escaloneta</span>
-                              <span class="pts-val">{{ match.myPrediction.basePointsEarned }}</span>
-                            </div>
-                            @if ((match.myPrediction.multiplierBonusPoints ?? 0) > 0) {
-                              <div class="pts-row pts-bonus">
-                                <span class="pts-lbl">💣🥇 Multiplicadores</span>
-                                <span class="pts-val pts-plus">+{{ match.myPrediction.multiplierBonusPoints }}</span>
+                        <!-- Points breakdown: full detail for knockout, simple pill for groups -->
+                        @if (!match.groupName) {
+                          <!-- Knockout: full breakdown -->
+                          @if (match.myPrediction.pointsEarned > 0 || (match.myPrediction.basePointsEarned ?? 0) > 0) {
+                            <div class="pts-breakdown">
+                              <div class="pts-row">
+                                <span class="pts-lbl">🪜 Escaloneta</span>
+                                <span class="pts-val">{{ match.myPrediction.basePointsEarned ?? 0 }} pts</span>
                               </div>
-                            }
-                            @if ((match.myPrediction.captainBonusPoints ?? 0) > 0) {
-                              <div class="pts-row pts-bonus">
-                                <span class="pts-lbl">🧢 Capitán</span>
-                                <span class="pts-val pts-plus">+{{ match.myPrediction.captainBonusPoints }}</span>
+                              @if ((match.myPrediction.multiplierBonusPoints ?? 0) > 0) {
+                                <div class="pts-row pts-bonus">
+                                  <span class="pts-lbl">💣🥇 Multiplicadores</span>
+                                  <span class="pts-val pts-plus">+{{ match.myPrediction.multiplierBonusPoints }}</span>
+                                </div>
+                              }
+                              @if ((match.myPrediction.captainBonusPoints ?? 0) > 0) {
+                                <div class="pts-row pts-bonus">
+                                  <span class="pts-lbl">🧢 Capitán</span>
+                                  <span class="pts-val pts-plus">+{{ match.myPrediction.captainBonusPoints }}</span>
+                                </div>
+                              }
+                              <div class="pts-row pts-total-row">
+                                <span class="pts-lbl pts-total-lbl">TOTAL</span>
+                                <span class="pts-val pts-total">{{ match.myPrediction.pointsEarned }} pts</span>
                               </div>
-                            }
-                            <div class="pts-row pts-total-row">
-                              <span class="pts-lbl">TOTAL</span>
-                              <span class="pts-val pts-total">{{ match.myPrediction.pointsEarned }} pts</span>
                             </div>
-                          </div>
+                          } @else {
+                            <span class="pts-pill pts-zero">0 pts</span>
+                          }
                         } @else {
-                          <span class="pts-pill pts-zero">0 pts</span>
+                          <!-- Group stage: simple pill only -->
+                          @if (match.myPrediction.pointsEarned > 0) {
+                            <span class="pts-pill pts-earned">+{{ match.myPrediction.pointsEarned }} pts</span>
+                          } @else {
+                            <span class="pts-pill pts-zero">0 pts</span>
+                          }
                         }
                       } @else {
                         <span class="no-pred-lbl">Sin pronóstico</span>
