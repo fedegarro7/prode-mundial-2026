@@ -15,9 +15,20 @@ public class HealthController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// Lightweight ping used by Render health checks and UptimeRobot.
+    /// Does NOT touch the database so Neon can scale to zero when idle.
+    /// </summary>
     [HttpGet]
     [HttpHead]
-    public async Task<IActionResult> Get()
+    public IActionResult Get() =>
+        Ok(new { status = "ok", utc = DateTime.UtcNow });
+
+    /// <summary>
+    /// Deep health check that verifies DB connectivity. Call manually when needed.
+    /// </summary>
+    [HttpGet("db")]
+    public async Task<IActionResult> GetDb()
     {
         var canConnect = await _context.Database.CanConnectAsync();
 
