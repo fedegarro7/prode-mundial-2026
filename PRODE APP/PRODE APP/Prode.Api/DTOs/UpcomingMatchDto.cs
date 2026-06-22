@@ -32,6 +32,8 @@ public class UpcomingMatchDto
 
     public bool IsFinished { get; set; }
 
+    public bool IsBombMatch { get; set; }
+
     public MyPredictionDto? MyPrediction { get; set; }
 
     public List<MatchGroupPredictionsDto> GroupPredictions { get; set; } = [];

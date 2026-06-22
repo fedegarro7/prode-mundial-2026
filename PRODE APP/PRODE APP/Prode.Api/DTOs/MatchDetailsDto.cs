@@ -32,5 +32,7 @@ public class MatchDetailsDto
 
     public bool PredictionsLocked { get; set; }
 
+    public bool IsBombMatch { get; set; }
+
     public MyPredictionDto? MyPrediction { get; set; }
 }

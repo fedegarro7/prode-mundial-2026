@@ -19,8 +19,6 @@ C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\ne
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\out\web.config
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\appsettings.Development.json
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\appsettings.json
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\out\appsettings.Development.json
-C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\out\appsettings.json
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\out\Prode.Api.deps.json
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\out\Prode.Api.runtimeconfig.json
 C:\MMP\Repos\prode-mundial-2026\PRODE APP\PRODE APP\Prode.Api.Tests\bin\Debug\net10.0\out\Prode.Api.staticwebassets.endpoints.json

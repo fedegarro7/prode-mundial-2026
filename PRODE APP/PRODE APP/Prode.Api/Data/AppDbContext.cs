@@ -24,6 +24,18 @@ public class AppDbContext : DbContext
 
     public DbSet<GroupMembership> GroupMemberships => Set<GroupMembership>();
 
+    public DbSet<GoldenGoalPick> GoldenGoalPicks => Set<GoldenGoalPick>();
+
+    public DbSet<BombMatch> BombMatches => Set<BombMatch>();
+
+    public DbSet<CaptainPick> CaptainPicks => Set<CaptainPick>();
+
+    public DbSet<SharpShooterPrediction> SharpShooterPredictions => Set<SharpShooterPrediction>();
+
+    public DbSet<OraclePrediction> OraclePredictions => Set<OraclePrediction>();
+
+    public DbSet<RoundAward> RoundAwards => Set<RoundAward>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -104,5 +116,75 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<GroupMembership>()
             .HasIndex(m => new { m.GroupId, m.UserId })
             .IsUnique();
+
+        modelBuilder.Entity<GoldenGoalPick>()
+            .HasOne(p => p.User)
+            .WithMany(u => u.GoldenGoalPicks)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<GoldenGoalPick>()
+            .HasOne(p => p.Match)
+            .WithMany(m => m.GoldenGoalPicks)
+            .HasForeignKey(p => p.MatchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<GoldenGoalPick>()
+            .HasIndex(p => new { p.UserId, p.RoundKey })
+            .IsUnique();
+
+        modelBuilder.Entity<BombMatch>()
+            .HasOne(b => b.Match)
+            .WithOne(m => m.BombMatch)
+            .HasForeignKey<BombMatch>(b => b.MatchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BombMatch>()
+            .HasIndex(b => b.RoundKey)
+            .IsUnique();
+
+        modelBuilder.Entity<CaptainPick>()
+            .HasOne(p => p.User)
+            .WithOne(u => u.CaptainPick)
+            .HasForeignKey<CaptainPick>(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CaptainPick>()
+            .HasOne(p => p.Team)
+            .WithMany()
+            .HasForeignKey(p => p.TeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<SharpShooterPrediction>()
+            .HasOne(p => p.User)
+            .WithMany(u => u.SharpShooterPredictions)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SharpShooterPrediction>()
+            .HasOne(p => p.Match)
+            .WithMany(m => m.SharpShooterPredictions)
+            .HasForeignKey(p => p.MatchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SharpShooterPrediction>()
+            .HasIndex(p => new { p.UserId, p.RoundKey })
+            .IsUnique();
+
+        modelBuilder.Entity<OraclePrediction>()
+            .HasOne(p => p.User)
+            .WithMany(u => u.OraclePredictions)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<OraclePrediction>()
+            .HasIndex(p => new { p.UserId, p.RoundKey })
+            .IsUnique();
+
+        modelBuilder.Entity<RoundAward>()
+            .HasOne(a => a.User)
+            .WithMany(u => u.RoundAwards)
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

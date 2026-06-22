@@ -6,6 +6,7 @@ import { filter } from 'rxjs';
 import { Match } from '../../models/match.model';
 import { MatchService } from '../../services/match.service';
 import { PredictionService } from '../../services/prediction.service';
+import { MechanicsService } from '../../services/mechanics.service';
 import { EsNamePipe } from '../../pipes/es-name.pipe';
 
 interface MatchTab {
@@ -27,6 +28,7 @@ export class MatchesComponent implements OnInit, OnDestroy {
 
   private matchService = inject(MatchService);
   private predictionService = inject(PredictionService);
+  readonly mechanics = inject(MechanicsService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
@@ -57,24 +59,32 @@ export class MatchesComponent implements OnInit, OnDestroy {
   ];
 
   private readonly KNOCKOUT_ORDER = [
-    'Round of 16', 'Quarter-finals',
-    'Semi-finals', 'Match for third place', 'Final'
+    'Round of 32', 'Round of 16', 'Quarter-final',
+    'Semi-final', 'Play-off for third place', 'Final'
   ];
 
   private readonly KNOCKOUT_LABELS: Record<string, string> = {
-    'Round of 16': 'Octavos de Final',
-    'Quarter-finals': 'Cuartos de Final',
-    'Semi-finals': 'Semifinales',
-    'Match for third place': '3er y 4to Puesto',
-    'Final': 'Gran Final 🏆'
+    'Round of 32': 'Dieciseisavos de final',
+    'Round of 16': 'Octavos de final',
+    'Quarter-final': 'Cuartos de final',
+    'Quarter-finals': 'Cuartos de final',
+    'Semi-final': 'Semifinal',
+    'Semi-finals': 'Semifinal',
+    'Play-off for third place': 'Tercer puesto',
+    'Match for third place': 'Tercer puesto',
+    'Final': 'Gran Final'
   };
 
   ngOnInit(): void {
     this.loadMatches();
+    this.mechanics.load().subscribe();
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
-        if (e.urlAfterRedirects === '/matches') this.loadMatches();
+        if (e.urlAfterRedirects === '/matches') {
+          this.loadMatches();
+          this.mechanics.load().subscribe();
+        }
       });
   }
 
@@ -111,7 +121,7 @@ export class MatchesComponent implements OnInit, OnDestroy {
 
     for (const m of matches) {
       const isGroup = !!(m.groupName?.trim());
-      const key = isGroup ? m.groupName : (m.stage || 'Final');
+      const key = isGroup ? m.groupName : this.normalizeKnockoutStage(m.stage || 'Final');
       const map = isGroup ? this.groupMatches : this.knockoutMatches;
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(m);
@@ -190,6 +200,26 @@ export class MatchesComponent implements OnInit, OnDestroy {
     if (allGroupsDone && this.knockoutPhases.length) {
       this.activePhase = 'knockout';
     }
+  }
+
+  private normalizeKnockoutStage(stage: string): string {
+    const value = stage.trim();
+
+    if (
+      value === 'Round of 32' ||
+      value === 'Round of 16' ||
+      value === 'Quarter-final' ||
+      value === 'Quarter-finals' ||
+      value === 'Semi-final' ||
+      value === 'Semi-finals' ||
+      value === 'Play-off for third place' ||
+      value === 'Match for third place' ||
+      value === 'Final'
+    ) {
+      return value;
+    }
+
+    return value || 'Final';
   }
 
   get visibleGroupMatches(): Match[] {
@@ -333,6 +363,71 @@ export class MatchesComponent implements OnInit, OnDestroy {
       try { this.cdr.detectChanges(); } catch { /* SSR */ }
     }, 2500);
     try { this.cdr.detectChanges(); } catch { /* SSR */ }
+  }
+
+  // ── Mechanics badge helpers ──────────────────────────────────────────
+
+  private readonly STAGE_TO_ROUND_KEY: Record<string, string> = {
+    'Round of 32': 'ROUND_OF_32',
+    'Round of 16': 'ROUND_OF_16',
+    'Quarter-final': 'QUARTER_FINALS',
+    'Quarter-finals': 'QUARTER_FINALS',
+    'Semi-final': 'SEMI_FINALS',
+    'Semi-finals': 'SEMI_FINALS',
+    'Play-off for third place': 'FINAL_ROUND',
+    'Match for third place': 'FINAL_ROUND',
+    'Final': 'FINAL_ROUND',
+  };
+
+  private readonly BASE_PTS_BY_ROUND: Record<string, number> = {
+    GROUP_STAGE: 3,
+    ROUND_OF_32: 4,
+    ROUND_OF_16: 5,
+    QUARTER_FINALS: 7,
+    SEMI_FINALS: 10,
+    FINAL_ROUND: 12,
+  };
+
+  roundKeyFor(match: Match): string {
+    if (match.groupName?.trim()) return 'GROUP_STAGE';
+    const norm = this.normalizeKnockoutStage(match.stage || 'Final');
+    return this.STAGE_TO_ROUND_KEY[norm] ?? 'FINAL_ROUND';
+  }
+
+  escalonetaPts(match: Match): number {
+    return this.BASE_PTS_BY_ROUND[this.roundKeyFor(match)] ?? 3;
+  }
+
+  isBomb(match: Match): boolean {
+    return !!match.isBombMatch;
+  }
+
+  /** Returns the bomb match for a given knockout phase key (only if the round is fully finished) */
+  getBombReveal(phaseKey: string): Match | null {
+    const matches = this.knockoutMatches.get(phaseKey) ?? [];
+    const allFinished = matches.length > 0 && matches.every(m => m.isFinished);
+    if (!allFinished) return null;
+    return matches.find(m => m.isBombMatch) ?? null;
+  }
+
+  /** Whether the round is fully finished (all matches played) */
+  isRoundFinished(phaseKey: string): boolean {
+    const matches = this.knockoutMatches.get(phaseKey) ?? [];
+    return matches.length > 0 && matches.every(m => m.isFinished);
+  }
+
+  isGoldenGoal(match: Match): boolean {
+    return this.mechanics.goldenGoalMatchFor(this.roundKeyFor(match)) === match.id;
+  }
+
+  isSharpShooter(match: Match): boolean {
+    return this.mechanics.sharpShooterMatchFor(this.roundKeyFor(match)) === match.id;
+  }
+
+  isCaptainMatch(match: Match): boolean {
+    const captain = this.mechanics.state()?.captain;
+    if (!captain) return false;
+    return match.homeTeam?.id === captain.teamId || match.awayTeam?.id === captain.teamId;
   }
 
   getTeamName(match: Match, side: 'home' | 'away'): string {

@@ -115,6 +115,9 @@ builder.Services.Configure<PasswordResetOptions>(
 );
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 builder.Services.AddScoped<ScoringService>();
+builder.Services.AddScoped<BombMatchService>();
+builder.Services.AddScoped<ScoreRecalculationService>();
+builder.Services.AddScoped<MechanicsService>();
 builder.Services.AddScoped<PredictionService>();
 builder.Services.AddHttpClient<FifaFixtureSyncService>(client =>
 {

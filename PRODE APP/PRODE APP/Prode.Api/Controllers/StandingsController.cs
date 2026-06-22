@@ -48,6 +48,16 @@ public class StandingsController : ControllerBase
                 m.AwayTeamId.HasValue)
             .ToListAsync();
 
+        // Check for any currently-active match across all stages
+        var allActiveMatches = await _context.Matches
+            .AsNoTracking()
+            .Where(m => !m.IsFinished)
+            .Select(m => m.MatchDate)
+            .ToListAsync();
+
+        var now = DateTime.UtcNow;
+        var hasActive = allActiveMatches.Any(d => d <= now && now - d <= TimeSpan.FromMinutes(150));
+
         // Build a stat accumulator keyed by (group, teamId)
         var stats = new Dictionary<(string Group, int TeamId), TeamStats>();
 
@@ -126,7 +136,7 @@ public class StandingsController : ControllerBase
             result.Add(new GroupStandingDto { GroupName = groupName, Entries = entries });
         }
 
-        return Ok(result);
+        return Ok(new { standings = result, hasActiveMatches = hasActive });
     }
 
     // -------------------------------------------------------------------------

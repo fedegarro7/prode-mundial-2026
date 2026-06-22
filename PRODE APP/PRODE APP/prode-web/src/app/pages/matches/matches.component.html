@@ -172,6 +172,21 @@
 
             </div>
 
+            <!-- Mechanic badges (group stage: no mechanics apply) -->
+            @if (isBomb(match) || isGoldenGoal(match) || isSharpShooter(match)) {
+              <div class="mechanic-badges" aria-label="Mecánicas activas">
+                @if (isBomb(match)) {
+                  <span class="m-badge badge-bomb" title="Partido Bomba: puntos dobles por resultado exacto">💣 BOMBA</span>
+                }
+                @if (isGoldenGoal(match)) {
+                  <span class="m-badge badge-golden" title="Gol de Oro aplicado a este partido">🥇 GOL DE ORO</span>
+                }
+                @if (isSharpShooter(match)) {
+                  <span class="m-badge badge-sharp" title="Francotirador: puntos extra por este partido">🎯 FRANCOTIRADOR</span>
+                }
+              </div>
+            }
+
             @if (match.myPrediction) {
               <div class="my-prediction-note">
                 <span class="my-prediction-label">Mi pronóstico:</span>
@@ -297,6 +312,32 @@
                 [id]="'phase-' + phase.key"
                 role="region"
               >
+
+                <!-- 💣 Bomb reveal (shown only when all round matches are finished) -->
+                @let bombReveal = getBombReveal(phase.key);
+                @if (bombReveal) {
+                  <div class="bomb-reveal-card" role="status" aria-label="Partido Bomba revelado">
+                    <div class="bomb-reveal-explosion" aria-hidden="true">💥</div>
+                    <div class="bomb-reveal-body">
+                      <p class="bomb-reveal-eyebrow">PARTIDO BOMBA DE LA RONDA</p>
+                      <p class="bomb-reveal-match">
+                        {{ getTeamName(bombReveal, 'home') | esName }}
+                        <span class="bomb-reveal-vs">vs</span>
+                        {{ getTeamName(bombReveal, 'away') | esName }}
+                      </p>
+                      @if (bombReveal.isFinished) {
+                        <p class="bomb-reveal-result">
+                          {{ bombReveal.homeScore }} – {{ bombReveal.awayScore }}
+                          @if (bombReveal.myPrediction && (bombReveal.myPrediction.multiplierBonusPoints ?? 0) > 0) {
+                            <span class="bomb-reveal-pts">¡+{{ bombReveal.myPrediction.multiplierBonusPoints }} pts bomba!</span>
+                          }
+                        </p>
+                      }
+                    </div>
+                    <div class="bomb-reveal-bomb" aria-hidden="true">💣</div>
+                  </div>
+                }
+
                 @for (match of knockoutMatches.get(phase.key) || []; track match.id; let idx = $index) {
 
                   <article
@@ -367,6 +408,34 @@
                         <span class="team-name">{{ getTeamName(match, 'away') | esName }}</span>
                       </div>
 
+                    </div>
+
+                    <!-- Mechanic badges (knockout) -->
+                    @let koBomb = isBomb(match);
+                    @let koGolden = isGoldenGoal(match);
+                    @let koCaptain = isCaptainMatch(match);
+                    @let koSharp = isSharpShooter(match);
+                    @if (koBomb || koGolden || koCaptain || koSharp) {
+                      <div class="mechanic-badges" aria-label="Mecánicas activas">
+                        @if (koBomb) {
+                          <span class="m-badge badge-bomb" title="Partido Bomba">💣 BOMBA</span>
+                        }
+                        @if (koGolden) {
+                          <span class="m-badge badge-golden" title="Gol de Oro">🥇 GOL DE ORO</span>
+                        }
+                        @if (koCaptain) {
+                          <span class="m-badge badge-captain" title="Tu capitán juega">🧢 CAPITÁN</span>
+                        }
+                        @if (koSharp) {
+                          <span class="m-badge badge-sharp" title="Francotirador">🎯 FRANCOTIRADOR</span>
+                        }
+                      </div>
+                    }
+
+                    <!-- Escaloneta pts indicator (knockout only) -->
+                    <div class="escaloneta-row" aria-label="Puntos base">
+                      <span class="esc-label">🪜 Escaloneta</span>
+                      <span class="esc-pts">{{ escalonetaPts(match) }} pts</span>
                     </div>
 
                     @if (!isUnknownKnockout(match)) {

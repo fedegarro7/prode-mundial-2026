@@ -15,7 +15,7 @@ export interface StatCard {
 const STATS: StatCard[] = [
   { icon: '🌍', category: 'Historia',      value: '23',        label: 'Ediciones del Mundial',           detail: 'Desde Uruguay 1930 hasta el próximo USA-Canadá-México 2026', accent: '#d4af37' },
   { icon: '🏆', category: 'Campeones',     value: 'Brasil',    label: 'Selección más ganadora',          detail: '5 copas del mundo: 1958, 1962, 1970, 1994 y 2002', accent: '#22C55E' },
-  { icon: '⚽', category: 'Goleadores',    value: '16',        label: 'Goles de Miroslav Klose',         detail: 'Máximo goleador histórico de los mundiales en 4 torneos (2002-2014)', accent: '#3B82F6' },
+  { icon: '⚽', category: 'Goleadores',    value: '18',        label: 'Goles de Lionel Andres Messi',         detail: 'Máximo goleador histórico de los mundiales en 6 torneos (2006-2026)', accent: '#3B82F6' },
   { icon: '🥇', category: 'Actualidad',    value: 'Argentina', label: 'Actual campeona del mundo',       detail: 'Tercer título en Qatar 2022, capitaneada por Lionel Messi', accent: '#60A5FA' },
   { icon: '📊', category: 'Récords',       value: '5.38',      label: 'Goles por partido (récord)',      detail: 'Suiza 1954: 140 goles en 26 partidos — el mundial más goleador de la historia', accent: '#F97316' },
   { icon: '👑', category: 'Leyendas',      value: 'Messi',     label: '6 mundiales jugados',             detail: '13 goles en 26 partidos — uno de los máximos goleadores históricos', accent: '#FACC15' },

@@ -5,6 +5,80 @@
     <p>La tabla general de todos los usuarios. Los grupos privados mantienen su propio ranking.</p>
   </header>
 
+  <!-- ── Resumen de Ronda ───────────────────────────────────────────────── -->
+  @if (roundSummary) {
+    <section class="round-summary-card" aria-label="Resumen de ronda actual">
+      <button
+        class="round-summary-toggle"
+        type="button"
+        (click)="toggleRoundSummary()"
+        [attr.aria-expanded]="roundSummaryOpen"
+      >
+        <div class="rsc-left">
+          <span class="rsc-eyebrow">Ronda en curso</span>
+          <span class="rsc-title">{{ roundSummary.roundLabel }}</span>
+        </div>
+        <div class="rsc-right">
+          <span class="rsc-pts-badge">🪜 {{ roundSummary.basePoints }} pts</span>
+          <span class="rsc-chevron" aria-hidden="true">{{ roundSummaryOpen ? '▲' : '▼' }}</span>
+        </div>
+      </button>
+
+      @if (roundSummaryOpen) {
+        <div class="round-summary-body">
+
+          <!-- Bomb match -->
+          <div class="rs-row">
+            <span class="rs-label">💣 Partido Bomba</span>
+            @if (roundSummary.bombMatch) {
+              <span class="rs-value rs-bomb">{{ roundSummary.bombMatch.homeTeam }} vs {{ roundSummary.bombMatch.awayTeam }}</span>
+            } @else {
+              <span class="rs-value rs-pending">A ser asignado</span>
+            }
+          </div>
+
+          <!-- User's captain -->
+          @if (captainName) {
+            <div class="rs-row">
+              <span class="rs-label">🧢 Mi Capitán</span>
+              <span class="rs-value">{{ captainName }}</span>
+            </div>
+          }
+
+          <!-- User's golden goal for this round -->
+          @if (goldenGoalRound) {
+            <div class="rs-row">
+              <span class="rs-label">🥇 Gol de Oro</span>
+              <span class="rs-value">{{ goldenGoalRound }}</span>
+            </div>
+          }
+
+          <!-- Oracle -->
+          @if (hasOracle) {
+            <div class="rs-row">
+              <span class="rs-label">🔮 Oráculo</span>
+              <span class="rs-value rs-oracle">Predicción registrada</span>
+            </div>
+          }
+
+          <!-- Awards -->
+          @if (roundSummary.awards.length > 0) {
+            <div class="rs-awards-section">
+              <p class="rs-awards-title">Premios de la ronda</p>
+              @for (award of roundSummary.awards; track award.awardType) {
+                <div class="rs-award-row">
+                  <span class="rs-award-label">{{ award.awardLabel }}</span>
+                  <span class="rs-award-winners">{{ award.winners.join(', ') }} <em>+{{ award.pointsAwarded }} pts</em></span>
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+      }
+    </section>
+  }
+
   @if (loading) {
     <section class="ranking-list" aria-busy="true">
       @for (row of [1,2,3,4,5]; track row) {

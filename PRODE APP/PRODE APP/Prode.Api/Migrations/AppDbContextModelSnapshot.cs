@@ -22,6 +22,96 @@ namespace Prode.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Prode.Api.Entities.BombMatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoundKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId")
+                        .IsUnique();
+
+                    b.HasIndex("RoundKey")
+                        .IsUnique();
+
+                    b.ToTable("BombMatches");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.CaptainPick", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LockedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("CaptainPicks");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.GoldenGoalPick", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoundKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("UserId", "RoundKey")
+                        .IsUnique();
+
+                    b.ToTable("GoldenGoalPicks");
+                });
+
             modelBuilder.Entity("Prode.Api.Entities.GroupMembership", b =>
                 {
                     b.Property<int>("Id")
@@ -109,6 +199,9 @@ namespace Prode.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("WasDecidedByPenalties")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AwayTeamId");
@@ -126,6 +219,38 @@ namespace Prode.Api.Migrations
                     b.ToTable("Matches");
                 });
 
+            modelBuilder.Entity("Prode.Api.Entities.OraclePrediction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DrawsAfterNinetyPrediction")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PenaltyShootoutsPrediction")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoundKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "RoundKey")
+                        .IsUnique();
+
+                    b.ToTable("OraclePredictions");
+                });
+
             modelBuilder.Entity("Prode.Api.Entities.Prediction", b =>
                 {
                     b.Property<int>("Id")
@@ -137,10 +262,19 @@ namespace Prode.Api.Migrations
                     b.Property<int>("AwayScorePrediction")
                         .HasColumnType("integer");
 
+                    b.Property<int>("BasePointsEarned")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CaptainBonusPoints")
+                        .HasColumnType("integer");
+
                     b.Property<int>("HomeScorePrediction")
                         .HasColumnType("integer");
 
                     b.Property<int>("MatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MultiplierBonusPoints")
                         .HasColumnType("integer");
 
                     b.Property<int>("PointsEarned")
@@ -188,6 +322,72 @@ namespace Prode.Api.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("PrivateGroups");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.RoundAward", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AwardType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("AwardedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PointsAwarded")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoundKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RoundAwards");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.SharpShooterPrediction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PointsAwarded")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoundKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("UserId", "RoundKey")
+                        .IsUnique();
+
+                    b.ToTable("SharpShooterPredictions");
                 });
 
             modelBuilder.Entity("Prode.Api.Entities.Stadium", b =>
@@ -303,6 +503,55 @@ namespace Prode.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Prode.Api.Entities.BombMatch", b =>
+                {
+                    b.HasOne("Prode.Api.Entities.Match", "Match")
+                        .WithOne("BombMatch")
+                        .HasForeignKey("Prode.Api.Entities.BombMatch", "MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.CaptainPick", b =>
+                {
+                    b.HasOne("Prode.Api.Entities.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Prode.Api.Entities.User", "User")
+                        .WithOne("CaptainPick")
+                        .HasForeignKey("Prode.Api.Entities.CaptainPick", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.GoldenGoalPick", b =>
+                {
+                    b.HasOne("Prode.Api.Entities.Match", "Match")
+                        .WithMany("GoldenGoalPicks")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Prode.Api.Entities.User", "User")
+                        .WithMany("GoldenGoalPicks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Prode.Api.Entities.GroupMembership", b =>
                 {
                     b.HasOne("Prode.Api.Entities.PrivateGroup", "Group")
@@ -347,6 +596,17 @@ namespace Prode.Api.Migrations
                     b.Navigation("Stadium");
                 });
 
+            modelBuilder.Entity("Prode.Api.Entities.OraclePrediction", b =>
+                {
+                    b.HasOne("Prode.Api.Entities.User", "User")
+                        .WithMany("OraclePredictions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Prode.Api.Entities.Prediction", b =>
                 {
                     b.HasOne("Prode.Api.Entities.Match", "Match")
@@ -377,9 +637,45 @@ namespace Prode.Api.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("Prode.Api.Entities.RoundAward", b =>
+                {
+                    b.HasOne("Prode.Api.Entities.User", "User")
+                        .WithMany("RoundAwards")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Prode.Api.Entities.SharpShooterPrediction", b =>
+                {
+                    b.HasOne("Prode.Api.Entities.Match", "Match")
+                        .WithMany("SharpShooterPredictions")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Prode.Api.Entities.User", "User")
+                        .WithMany("SharpShooterPredictions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Prode.Api.Entities.Match", b =>
                 {
+                    b.Navigation("BombMatch");
+
+                    b.Navigation("GoldenGoalPicks");
+
                     b.Navigation("Predictions");
+
+                    b.Navigation("SharpShooterPredictions");
                 });
 
             modelBuilder.Entity("Prode.Api.Entities.PrivateGroup", b =>
@@ -401,11 +697,21 @@ namespace Prode.Api.Migrations
 
             modelBuilder.Entity("Prode.Api.Entities.User", b =>
                 {
+                    b.Navigation("CaptainPick");
+
+                    b.Navigation("GoldenGoalPicks");
+
                     b.Navigation("GroupMemberships");
+
+                    b.Navigation("OraclePredictions");
 
                     b.Navigation("OwnedGroups");
 
                     b.Navigation("Predictions");
+
+                    b.Navigation("RoundAwards");
+
+                    b.Navigation("SharpShooterPredictions");
                 });
 #pragma warning restore 612, 618
         }

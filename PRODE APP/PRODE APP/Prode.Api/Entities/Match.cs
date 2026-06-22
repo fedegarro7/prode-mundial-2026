@@ -34,10 +34,20 @@ public class Match
 
     public int? AwayScore { get; set; }
 
+    public bool WasDecidedByPenalties { get; set; }
+
     public bool IsFinished { get; set; }
 
     public bool PredictionsLocked { get; set; }
 
     public ICollection<Prediction> Predictions { get; set; }
         = new List<Prediction>();
+
+    public BombMatch? BombMatch { get; set; }
+
+    public ICollection<GoldenGoalPick> GoldenGoalPicks { get; set; }
+        = new List<GoldenGoalPick>();
+
+    public ICollection<SharpShooterPrediction> SharpShooterPredictions { get; set; }
+        = new List<SharpShooterPrediction>();
 }

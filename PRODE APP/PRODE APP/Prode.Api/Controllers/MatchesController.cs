@@ -15,16 +15,19 @@ public class MatchesController : ControllerBase
 {
     private readonly AppDbContext _context;
 
-    private readonly ScoringService _scoringService;
+    private readonly ScoreRecalculationService _scoreRecalculationService;
+
+    private readonly BombMatchService _bombMatchService;
 
     public MatchesController(
-    AppDbContext context,
-    ScoringService scoringService
-)
+        AppDbContext context,
+        ScoreRecalculationService scoreRecalculationService,
+        BombMatchService bombMatchService
+    )
     {
         _context = context;
-
-        _scoringService = scoringService;
+        _scoreRecalculationService = scoreRecalculationService;
+        _bombMatchService = bombMatchService;
     }
 
     [HttpGet]
@@ -134,7 +137,7 @@ public class MatchesController : ControllerBase
             .Include(x => x.Stadium)
             .FirstAsync(x => x.Id == match.Id);
 
-        return Ok(ToMatchDetailsDto(createdMatch, null));
+        return Ok(ToMatchDetailsDto(createdMatch, null, false));
     }
     [HttpPut("{id}/result")]
     [Authorize(Roles = "Admin")]
@@ -156,20 +159,13 @@ public class MatchesController : ControllerBase
 
         match.AwayScore = result.AwayScore;
 
+        match.WasDecidedByPenalties = result.WasDecidedByPenalties;
+
         match.IsFinished = true;
 
         match.PredictionsLocked = true;
 
-        foreach (var prediction in match.Predictions)
-        {
-            prediction.PointsEarned =
-                _scoringService.CalculatePoints(
-                    prediction,
-                    match
-                );
-        }
-
-        await _context.SaveChangesAsync();
+        await _scoreRecalculationService.RecalculateForMatchAsync(match);
 
         return Ok(new
         {
@@ -212,7 +208,8 @@ public class MatchesController : ControllerBase
                 .FirstOrDefault(x => x.UserId == userId.Value);
         }
 
-        var response = ToMatchDetailsDto(match, myPrediction);
+        var visibleBombMatches = await _bombMatchService.GetVisibleBombMatchesAsync(DateTime.UtcNow);
+        var response = ToMatchDetailsDto(match, myPrediction, visibleBombMatches.ContainsKey(match.Id));
 
         return Ok(response);
     }
@@ -256,6 +253,8 @@ public class MatchesController : ControllerBase
             )
             .OrderBy(g => g.Name)
             .ToListAsync();
+
+        var visibleBombMatches = await _bombMatchService.GetVisibleBombMatchesAsync(DateTime.UtcNow);
 
         var response = matches
             .Select(match => new UpcomingMatchDto
@@ -303,17 +302,29 @@ public class MatchesController : ControllerBase
                                 p.AwayScorePrediction,
 
                             PointsEarned =
-                                match.IsFinished ? p.PointsEarned : 0
+                                match.IsFinished ? p.PointsEarned : 0,
+
+                            BasePointsEarned =
+                                match.IsFinished ? p.BasePointsEarned : 0,
+
+                            MultiplierBonusPoints =
+                                match.IsFinished ? p.MultiplierBonusPoints : 0,
+
+                            CaptainBonusPoints =
+                                match.IsFinished ? p.CaptainBonusPoints : 0
                         })
                         .FirstOrDefault(),
 
                 GroupPredictions =
-                    BuildGroupPredictions(match, userGroups, userId)
+                    BuildGroupPredictions(match, userGroups, userId),
+
+                IsBombMatch = visibleBombMatches.ContainsKey(match.Id)
             })
             .ToList();
 
         return Ok(response);
     }
+
     [HttpGet("finished")]
     [AllowAnonymous]
     public async Task<IActionResult> Finished()
@@ -362,7 +373,8 @@ public class MatchesController : ControllerBase
 
     private static MatchDetailsDto ToMatchDetailsDto(
         Match match,
-        Prediction? myPrediction
+        Prediction? myPrediction,
+        bool isBombMatch = false
     )
     {
         return new MatchDetailsDto
@@ -382,6 +394,7 @@ public class MatchesController : ControllerBase
             AwayScore = match.AwayScore,
             IsFinished = match.IsFinished,
             PredictionsLocked = match.PredictionsLocked,
+            IsBombMatch = isBombMatch,
 
             MyPrediction = myPrediction == null
                 ? null
@@ -394,7 +407,16 @@ public class MatchesController : ControllerBase
                         myPrediction.AwayScorePrediction,
 
                     PointsEarned =
-                        match.IsFinished ? myPrediction.PointsEarned : 0
+                        match.IsFinished ? myPrediction.PointsEarned : 0,
+
+                    BasePointsEarned =
+                        match.IsFinished ? myPrediction.BasePointsEarned : 0,
+
+                    MultiplierBonusPoints =
+                        match.IsFinished ? myPrediction.MultiplierBonusPoints : 0,
+
+                    CaptainBonusPoints =
+                        match.IsFinished ? myPrediction.CaptainBonusPoints : 0
             }
         };
     }

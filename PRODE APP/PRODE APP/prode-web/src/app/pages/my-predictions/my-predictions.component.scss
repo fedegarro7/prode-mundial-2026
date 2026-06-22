@@ -527,7 +527,20 @@ $accent:     #818cf8;  // indigo suave
   gap: 4px;
 }
 
+.live-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
 .final-result-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.live-result-row {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -546,10 +559,31 @@ $accent:     #818cf8;  // indigo suave
   line-height: 1.4;
 }
 
+.live-badge {
+  font-size: .58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #93c5fd;
+  background: rgba(#3b82f6, .14);
+  border: 1px solid rgba(#3b82f6, .32);
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+}
+
 .final-score {
   font-size: 1.6rem;
   font-weight: 800;
   color: #fff;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+
+.live-score {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #bfdbfe;
   letter-spacing: .04em;
   line-height: 1;
 }
@@ -590,6 +624,51 @@ $accent:     #818cf8;  // indigo suave
   font-size: .63rem;
   color: rgba(255,255,255,.2);
   font-style: italic;
+}
+
+// ── Points breakdown ──────────────────────────────────────────────────────────
+.pts-breakdown {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pts-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pts-lbl {
+  font-size: .66rem;
+  color: rgba(255,255,255,.55);
+  font-weight: 600;
+}
+
+.pts-val {
+  font-size: .66rem;
+  font-weight: 800;
+  color: rgba(255,255,255,.75);
+
+  &.pts-plus { color: #86efac; }
+}
+
+.pts-bonus .pts-lbl { color: rgba(255,255,255,.45); }
+
+.pts-total-row {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+
+.pts-total {
+  color: #fde68a;
+  font-size: .72rem;
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────

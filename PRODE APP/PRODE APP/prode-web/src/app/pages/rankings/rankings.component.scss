@@ -114,6 +114,151 @@
   to { background-position: -220% 0; }
 }
 
+// ── Round Summary card ────────────────────────────────────────────────────────
+.round-summary-card {
+  margin-bottom: 22px;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: 12px;
+  background: rgba(7, 17, 34, 0.78);
+  overflow: hidden;
+}
+
+.round-summary-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  gap: 12px;
+  text-align: left;
+
+  &:hover { background: rgba(255,255,255,0.04); }
+}
+
+.rsc-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rsc-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #818cf8;
+}
+
+.rsc-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.rsc-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.rsc-pts-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(253, 230, 138, 0.14);
+  border: 1px solid rgba(253, 230, 138, 0.3);
+  color: #fde68a;
+}
+
+.rsc-chevron {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+}
+
+.round-summary-body {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rs-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.52);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.rs-value {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  text-align: right;
+
+  &.rs-bomb  { color: #fca5a5; }
+  &.rs-pending { color: rgba(255,255,255,0.35); font-style: italic; }
+  &.rs-oracle { color: #99f6e4; }
+}
+
+.rs-awards-section {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rs-awards-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 2px;
+}
+
+.rs-award-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rs-award-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 600;
+}
+
+.rs-award-winners {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fde68a;
+  text-align: right;
+
+  em {
+    font-style: normal;
+    color: #86efac;
+    margin-left: 4px;
+  }
+}
+
 @media (max-width: 760px) {
   .podium {
     grid-template-columns: 1fr;

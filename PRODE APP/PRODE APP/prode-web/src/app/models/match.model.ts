@@ -19,6 +19,9 @@ export interface MyPrediction {
   homeScorePrediction: number;
   awayScorePrediction: number;
   pointsEarned: number;
+  basePointsEarned?: number;
+  multiplierBonusPoints?: number;
+  captainBonusPoints?: number;
 }
 
 export interface GroupPredictionParticipant {
@@ -57,4 +60,6 @@ export interface Match {
   groupPredictions?: MatchGroupPredictions[];
   homePrediction?: number | null;
   awayPrediction?: number | null;
+  isBombMatch?: boolean;
+  wasDecidedByPenalties?: boolean;
 }

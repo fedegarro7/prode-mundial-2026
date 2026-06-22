@@ -7,20 +7,21 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
-import { Subject, interval } from 'rxjs';
-import { startWith, switchMap, takeUntil, filter } from 'rxjs/operators';
+import { Subject, timer } from 'rxjs';
+import { takeUntil, filter, switchMap } from 'rxjs/operators';
 
 import { StandingsService } from '../../services/standings.service';
 import { GroupStanding } from '../../models/standing.model';
 import { EsNamePipe } from '../../pipes/es-name.pipe';
 
-/** Refresh interval in milliseconds (60 s). */
-const POLL_INTERVAL_MS = 60_000;
+/** Fast refresh during live matches (60 s). */
+const POLL_LIVE_MS   = 60_000;
+/** Slow refresh when no match is in progress (5 min). */
+const POLL_IDLE_MS   = 300_000;
 
 /**
  * Displays the FIFA 2026 World Cup group-stage standings as tables.
- * Data is computed server-side from finished match results and auto-refreshes
- * every 60 seconds so standings stay current as matches progress.
+ * Polling adapts automatically: 60 s while a match is live, 5 min otherwise.
  */
 @Component({
   selector: 'app-standings',
@@ -35,6 +36,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
+  private nextPoll$ = new Subject<void>();
 
   groups: GroupStanding[] = [];
   loading = true;
@@ -42,7 +44,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
   lastUpdated: Date | null = null;
 
   ngOnInit(): void {
-    this.loadStandings();
+    this.schedulePoll(0);
 
     // Re-load whenever the user navigates back to this route.
     this.router.events
@@ -52,35 +54,37 @@ export class StandingsComponent implements OnInit, OnDestroy {
       )
       .subscribe((e) => {
         if (e.urlAfterRedirects === '/standings') {
-          this.loadStandings();
+          this.nextPoll$.next();
+          this.schedulePoll(0);
         }
       });
   }
 
-  loadStandings(): void {
-    this.loading = true;
-    this.error = false;
-    this.cdr.detectChanges();
-
-    // Fetch immediately, then poll every POLL_INTERVAL_MS.
-    interval(POLL_INTERVAL_MS)
+  /** Schedules one fetch after `delayMs`, then re-schedules based on response. */
+  private schedulePoll(delayMs: number): void {
+    timer(delayMs)
       .pipe(
-        startWith(0),
         switchMap(() => this.standingsService.getStandings()),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
+        takeUntil(this.nextPoll$)
       )
       .subscribe({
-        next: (data) => {
-          this.groups = data;
+        next: ({ standings, hasActiveMatches }) => {
+          this.groups = standings;
           this.loading = false;
           this.error = false;
           this.lastUpdated = new Date();
           this.cdr.detectChanges();
+
+          const next = hasActiveMatches ? POLL_LIVE_MS : POLL_IDLE_MS;
+          this.schedulePoll(next);
         },
         error: () => {
           this.loading = false;
           this.error = true;
           this.cdr.detectChanges();
+          // On error, retry after idle interval.
+          this.schedulePoll(POLL_IDLE_MS);
         }
       });
   }
@@ -88,7 +92,9 @@ export class StandingsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.nextPoll$.complete();
   }
 }
+
 
 
