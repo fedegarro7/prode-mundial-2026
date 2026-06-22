@@ -20,22 +20,22 @@ public class RankingsController : ControllerBase
 
     private static readonly Dictionary<string, string> RoundLabels = new()
     {
-        [WorldCupRoundService.GroupStage]    = "Fase de Grupos",
-        [WorldCupRoundService.RoundOf32]     = "Dieciseisavos de Final",
-        [WorldCupRoundService.RoundOf16]     = "Octavos de Final",
+        [WorldCupRoundService.GroupStage] = "Fase de Grupos",
+        [WorldCupRoundService.RoundOf32] = "Dieciseisavos de Final",
+        [WorldCupRoundService.RoundOf16] = "Octavos de Final",
         [WorldCupRoundService.QuarterFinals] = "Cuartos de Final",
-        [WorldCupRoundService.SemiFinals]    = "Semifinales",
-        [WorldCupRoundService.FinalRound]    = "Ronda Final",
+        [WorldCupRoundService.SemiFinals] = "Semifinales",
+        [WorldCupRoundService.FinalRound] = "Ronda Final",
     };
 
     private static readonly Dictionary<string, int> RoundBasePoints = new()
     {
-        [WorldCupRoundService.GroupStage]    = 3,
-        [WorldCupRoundService.RoundOf32]     = 4,
-        [WorldCupRoundService.RoundOf16]     = 5,
+        [WorldCupRoundService.GroupStage] = 3,
+        [WorldCupRoundService.RoundOf32] = 4,
+        [WorldCupRoundService.RoundOf16] = 5,
         [WorldCupRoundService.QuarterFinals] = 7,
-        [WorldCupRoundService.SemiFinals]    = 10,
-        [WorldCupRoundService.FinalRound]    = 12,
+        [WorldCupRoundService.SemiFinals] = 10,
+        [WorldCupRoundService.FinalRound] = 12,
     };
 
     [HttpGet]
@@ -116,8 +116,8 @@ public class RankingsController : ControllerBase
 
         var awardLabels = new Dictionary<string, string>
         {
-            ["ROUND_KING"]       = "👑 Rey de la Fecha",
-            ["ORACLE_DRAWS"]     = "🔮 Oráculo (Empates)",
+            ["ROUND_KING"] = "👑 Rey de la Fecha",
+            ["ORACLE_DRAWS"] = "🔮 Oráculo (Empates)",
             ["ORACLE_PENALTIES"] = "🔮 Oráculo (Penales)",
         };
 
@@ -125,20 +125,20 @@ public class RankingsController : ControllerBase
             .GroupBy(a => a.AwardType)
             .Select(g => new AwardWinnerDto
             {
-                AwardType    = g.Key,
-                AwardLabel   = awardLabels.GetValueOrDefault(g.Key, g.Key),
-                Winners      = g.Select(a => a.User.Name).Distinct().ToList(),
+                AwardType = g.Key,
+                AwardLabel = awardLabels.GetValueOrDefault(g.Key, g.Key),
+                Winners = g.Select(a => a.User.Name).Distinct().ToList(),
                 PointsAwarded = g.First().PointsAwarded,
             })
             .ToList();
 
         return Ok(new RoundSummaryDto
         {
-            RoundKey   = roundKey,
+            RoundKey = roundKey,
             RoundLabel = roundLabel,
             BasePoints = basePoints,
-            BombMatch  = bombInfo,
-            Awards     = awards,
+            BombMatch = bombInfo,
+            Awards = awards,
         });
     }
 }

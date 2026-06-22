@@ -417,7 +417,7 @@ public class MatchesController : ControllerBase
 
                     CaptainBonusPoints =
                         match.IsFinished ? myPrediction.CaptainBonusPoints : 0
-            }
+                }
         };
     }
 
