@@ -1,6 +1,6 @@
 # Mecánicas Prode Mundial 2026 — Changelog
 
-> Última actualización: 2026-06-22
+> Última actualización: 2026-06-23
 
 ---
 
@@ -13,14 +13,15 @@ La Fase de Grupos mantiene el sistema clásico sin cambios.
 
 ## Sistema de puntos por fase
 
-| Fase                   | Resultado correcto | Marcador exacto | Mecánicas extra |
-| ---------------------- | ------------------ | --------------- | --------------- |
-| **Grupos**             | 1 pt               | 3 pts           | ❌ Ninguna      |
-| **Dieciseisavos**      | 1 pt               | 4 pts           | ✅ Todas        |
-| **Octavos**            | 1 pt               | 5 pts           | ✅ Todas        |
-| **Cuartos**            | 1 pt               | 7 pts           | ✅ Todas        |
-| **Semifinal**          | 1 pt               | 10 pts          | ✅ Todas        |
-| **Final / 3er puesto** | 1 pt               | 15 pts          | ✅ Todas        |
+| Fase              | Resultado correcto | Marcador exacto | Mecánicas extra |
+| ----------------- | ------------------ | --------------- | --------------- |
+| **Grupos**        | 1 pt               | 3 pts           | ❌ Ninguna      |
+| **Dieciseisavos** | 1 pt               | 4 pts           | ✅ Todas        |
+| **Octavos**       | 1 pt               | 5 pts           | ✅ Todas        |
+| **Cuartos**       | 1 pt               | 7 pts           | ✅ Todas        |
+| **Semifinal**     | 1 pt               | 10 pts          | ✅ Todas        |
+| **3er puesto**    | 1 pt               | 12 pts          | ✅ Todas        |
+| **Final**         | 1 pt               | 15 pts          | ✅ Todas        |
 
 ---
 
@@ -32,6 +33,7 @@ La Fase de Grupos mantiene el sistema clásico sin cambios.
 - Si acertás el **resultado** (no necesariamente exacto) de cualquier partido de esa selección en fase eliminatoria, sumás **+5 pts extra**.
 - Se puede cambiar hasta que el primer partido de dieciseisavos se bloquee.
 - No aplica a partidos de la Fase de Grupos.
+- Una vez iniciada la fase eliminatoria, queda bloqueada.
 
 ### 💣 Partido Bomba (×2 base)
 
@@ -60,20 +62,40 @@ La Fase de Grupos mantiene el sistema clásico sin cambios.
 - El jugador más cercano gana puntos bonus al finalizar la ronda.
 - En caso de empate, todos los acertadores reciben el premio completo.
 
+### 🏆 Ronda Final
+
+A efectos de las mecánicas especiales, el Partido por el Tercer Puesto y la Final se consideran una única ronda.
+
+Esto implica que:
+
+- Existe un único Gol de Oro para ambos partidos.
+- El Francotirador se utiliza una sola vez.
+- El Oráculo se calcula considerando ambos encuentros.
+- El Rey de la Fecha se determina utilizando la suma de puntos obtenidos en los dos partidos.
+
 ---
 
 ## Escenarios de puntos máximos
 
-| Ronda     | Solo exacto | + Bomba | + Gol de Oro | + Bomba + GdO | + Capitán |
-| --------- | ----------- | ------- | ------------ | ------------- | --------- |
-| Grupos    | 3           | —       | —            | —             | —         |
-| R32       | 4           | 8       | 12           | 16            | +5        |
-| R16       | 5           | 10      | 15           | 20            | +5        |
-| Cuartos   | 7           | 14      | 21           | 28            | +5        |
-| Semifinal | 10          | 20      | 30           | 40            | +5        |
-| Final     | 15          | 30      | 45           | 60            | +5        |
+| Ronda         | Solo exacto | + Bomba | + Gol de Oro | + Bomba + GdO | + Capitán |
+| ------------- | ----------- | ------- | ------------ | ------------- | --------- |
+| Grupos        | 3           | —       | —            | —             | —         |
+| Dieciseisavos | 4           | 8       | 12           | 16            | +5        |
+| Octavos       | 5           | 10      | 15           | 20            | +5        |
+| Cuartos       | 7           | 14      | 21           | 28            | +5        |
+| Semifinal     | 10          | 20      | 30           | 40            | +5        |
+| 3er puesto    | 12          | 24      | 36           | 48            | +5        |
+| Final         | 15          | 30      | 45           | 60            | +5        |
 
 > Máximo teórico partido: **65 pts** (Final, exacto + Bomba + Gol de Oro + Capitán)
+
+### Lectura de la tabla
+
+- `Solo exacto`: puntos base por acertar marcador exacto en esa ronda.
+- `+ Bomba`: duplica el puntaje base si el partido sorteado como Bomba fue acertado exacto.
+- `+ Gol de Oro`: triplica el puntaje base si el partido elegido como Gol de Oro fue acertado exacto.
+- `+ Bomba + GdO`: ambos multiplicadores se suman sobre la base, no se componen. Total = **×4 base**.
+- `+ Capitán`: suma **+5 pts adicionales** si se acierta el resultado del partido de la selección capitana, aun sin marcador exacto.
 
 ---
 
@@ -86,23 +108,27 @@ La Fase de Grupos mantiene el sistema clásico sin cambios.
 
 ---
 
-## Bugs corregidos (2026-06-22)
+## Bugs corregidos
 
-| #   | Tipo        | Descripción                                                                     | Archivo                        |
-| --- | ----------- | ------------------------------------------------------------------------------- | ------------------------------ |
-| 1   | 🐛 Backend  | El bonus de Capitán (+5 pts) se aplicaba también a partidos de Fase de Grupos   | `ScoreRecalculationService.cs` |
-| 2   | 🐛 Frontend | El badge 🧢 CAPITÁN aparecía en la sección de Fase de Grupos                    | `matches.component.html`       |
-| 3   | 🐛 Backend  | `SetResult` no persistía `WasDecidedByPenalties` aunque el DTO lo traía         | `MatchesController.cs`         |
-| 4   | 🎨 CSS      | `.rules-hero-images { display: none }` referenciaba una clase removida del HTML | `news.component.scss`          |
-| 5   | 📱 Mobile   | `chiqui-standalone` tenía `height: 680px` fijo sin breakpoint mobile            | `news.component.scss`          |
+| #   | Tipo        | Descripción                                                                     | Archivo                         |
+| --- | ----------- | ------------------------------------------------------------------------------- | ------------------------------- |
+| 1   | 🐛 Backend  | El bonus de Capitán (+5 pts) se aplicaba también a partidos de Fase de Grupos   | `ScoreRecalculationService.cs`  |
+| 2   | 🐛 Frontend | El badge 🧢 CAPITÁN aparecía en la sección de Fase de Grupos                    | `matches.component.html`        |
+| 3   | 🐛 Backend  | `SetResult` no persistía `WasDecidedByPenalties` aunque el DTO lo traía         | `MatchesController.cs`          |
+| 4   | 🎨 CSS      | `.rules-hero-images { display: none }` referenciaba una clase removida del HTML | `news.component.scss`           |
+| 5   | 📱 Mobile   | `chiqui-standalone` tenía `height: 680px` fijo sin breakpoint mobile            | `news.component.scss`           |
+| 6   | 🐛 Frontend | El desglose `Escaloneta / TOTAL` aparecía en Fase de Grupos                     | `my-predictions.component.html` |
+| 7   | 🎨 Frontend | Se mejoró la estética del desglose de puntos para fase eliminatoria             | `my-predictions.component.scss` |
+| 8   | 🔄 Frontend | La pantalla Partidos no refrescaba marcadores en vivo                           | `matches.component.ts`          |
 
 ---
 
 ## Migraciones aplicadas
 
-| Migración             | Fecha      | Tablas/Columnas agregadas                                                                                                                                                                                               |
-| --------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AddMechanicsSupport` | 2026-06-22 | `GoldenGoalPicks`, `BombMatches`, `CaptainPicks`, `SharpShooterPredictions`, `OraclePredictions`, `RoundAwards`, columnas `WasDecidedByPenalties` / `BasePointsEarned` / `MultiplierBonusPoints` / `CaptainBonusPoints` |
+| Migración                  | Fecha      | Tablas/Columnas agregadas                                                                                                                                                                                               |
+| -------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AddMechanicsSupport`      | 2026-06-22 | Primer scaffold de tablas/columnas para mecánicas                                                                                                                                                                       |
+| `AddMechanicsSupportFinal` | 2026-06-22 | `GoldenGoalPicks`, `BombMatches`, `CaptainPicks`, `SharpShooterPredictions`, `OraclePredictions`, `RoundAwards`, columnas `WasDecidedByPenalties` / `BasePointsEarned` / `MultiplierBonusPoints` / `CaptainBonusPoints` |
 
 ---
 
@@ -118,11 +144,12 @@ La Fase de Grupos mantiene el sistema clásico sin cambios.
 
 **Polling existente:**
 
-- Background service FIFA sync: cada **5 minutos** (configurable via `FixtureSync:ScoreSyncIntervalMinutes`)
+- Background service FIFA sync: cada **2 minutos** (configurable via `FixtureSync:ScoreSyncIntervalMinutes`)
 - Navbar Argentina fixtures: cada **5 minutos** por usuario activo
-- Standings: cada **60 segundos** mientras el usuario está en esa pantalla
+- Partidos: cada **5 minutos** solo si hay al menos un partido en vivo en esa pantalla
+- Standings: cada **5 minutos** mientras el usuario está en esa pantalla
 
-**Recomendación**: El standings polling a 60s es el más agresivo. Durante días sin partidos en vivo, considerar aumentarlo a 5 min o hacerlo condicional a si hay partidos activos. Para el Mundial con ~4 partidos/día no es un problema significativo.
+**Recomendación**: El marcador en UI depende de la frecuencia del FIFA sync backend. Mantener el sync en 2 min da marcadores razonablemente frescos sin multiplicar consultas por usuario. El polling frontend se mantiene en 5 min para evitar consumo innecesario de CU en Neon.
 
 ---
 
