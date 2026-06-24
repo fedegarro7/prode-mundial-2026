@@ -8,13 +8,9 @@
   background-size: cover;
   background-attachment: fixed;
 
-  // Mobile: imagen horizontal queda mal en portrait — se oscurece más y se centra
+  // Mobile portrait: la imagen no aporta en vertical, se reemplaza por gradiente limpio
   @media (max-width: 768px) {
-    background:
-      linear-gradient(180deg, rgba(2, 8, 24, 0.82) 0%, rgba(2, 8, 24, 0.92) 40%, rgba(2, 8, 24, 0.98) 100%),
-      url('/assets/images/chiqui-secanuca.jpg') no-repeat center 20%;
-    background-size: cover;
-    background-attachment: scroll;
+    background: linear-gradient(160deg, #0d1a2e 0%, #020818 45%, #071524 100%);
   }
 }
 
