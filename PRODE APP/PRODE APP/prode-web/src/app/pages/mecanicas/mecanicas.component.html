@@ -1,0 +1,340 @@
+<div class="mecanicas-page">
+
+  <!-- ── Animated background orbs ──────────────────────────────────────────── -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+  <header class="hero">
+    <span class="hero-icon" aria-hidden="true">📜</span>
+    <h1 class="hero-title">Decreto de Necesidad y Bonificación</h1>
+    <p class="hero-sub">Las reglas están para cumplirse. Salvo que haya que cambiarlas.</p>
+  </header>
+
+  <!-- ── Loading skeleton ──────────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="skeleton-wrap" aria-busy="true" aria-label="Cargando mecánicas">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  }
+
+  @if (!loading) {
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CAPITÁN — siempre visible (no depende de roundContext)
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <section class="mech-section captain-section">
+      <article class="mech-card">
+
+        <div class="mech-card-header">
+          <span class="mech-icon" aria-hidden="true">🧢</span>
+          <div class="mech-header-text">
+            <h2 class="mech-title">Capitán del equipo</h2>
+            <p class="mech-desc">Elegí <strong>una selección</strong> antes de que arranquen los Dieciseisavos. Cada vez que acertés el <strong>resultado</strong> (sin necesitar exacto) de un partido de esa selección en eliminatorias, sumás <strong>+5 pts</strong> extra. Se cierra con el primer partido de Dieciseisavos.</p>
+          </div>
+          @if (captainLocked) {
+            <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
+          }
+        </div>
+
+        @if (captainLocked) {
+          @if (captainTeamName) {
+            <div class="current-pick">
+              <span class="current-label">Tu Capitán:</span>
+              <strong class="current-value">{{ captainTeamName }}</strong>
+            </div>
+          }
+          <select class="mech-select" disabled aria-label="Capitán seleccionado">
+            <option [ngValue]="selectedCaptainId">
+              {{ captainTeamName ?? 'Seleccioná tu Capitán' }}
+            </option>
+          </select>
+        } @else {
+          @if (captainTeamName) {
+            <div class="current-pick">
+              <span class="current-label">Selección actual:</span>
+              <strong class="current-value">{{ captainTeamName }}</strong>
+            </div>
+          }
+          <select
+            class="mech-select"
+            [(ngModel)]="selectedCaptainId"
+            [disabled]="savingCaptain || (roundContext()?.captainTeams?.length ?? 0) === 0"
+            aria-label="Elegí tu Capitán"
+          >
+            <option [ngValue]="null" disabled>Selección</option>
+            @for (team of (roundContext()?.captainTeams ?? []); track team.id) {
+              <option [ngValue]="team.id">{{ team.name }}</option>
+            }
+          </select>
+          @if ((roundContext()?.captainTeams?.length ?? 0) > 0) {
+            <button
+              class="save-btn"
+              [class.is-saving]="savingCaptain"
+              [class.is-saved]="!!captainTeamName && !savingCaptain"
+              [disabled]="!selectedCaptainId || savingCaptain"
+              (click)="saveCaptain()"
+              aria-label="Guardar selección de Capitán"
+            >
+              @if (savingCaptain) {
+                <span class="btn-spinner" aria-hidden="true"></span>
+                <span>Guardando…</span>
+              } @else if (captainTeamName) {
+                <span aria-hidden="true">✓</span>
+                <span>Guardar Capitán</span>
+              } @else {
+                <span>Guardar Capitán</span>
+              }
+            </button>
+          }
+        }
+
+      </article>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         RONDAS — solo cuando roundContext tiene datos
+    ═══════════════════════════════════════════════════════════════════════ -->
+    @if (roundContext() && roundContext()!.rounds.length > 0) {
+
+      <nav class="phase-bar" aria-label="Rondas eliminatorias">
+        @for (round of roundContext()!.rounds; track round.roundKey) {
+          <button
+            class="phase-btn"
+            [class.active]="activeRoundKey() === round.roundKey"
+            [class.locked]="round.isLocked"
+            (click)="selectRound(round.roundKey)"
+            [attr.aria-pressed]="activeRoundKey() === round.roundKey"
+          >
+            {{ round.roundLabel }}
+            @if (round.isLocked) { <span class="phase-lock" aria-hidden="true">🔒</span> }
+          </button>
+        }
+      </nav>
+
+      @if (activeRound) {
+        <div class="round-mechanics">
+
+          <!-- ── Gol de Oro ──────────────────────────────────────────────── -->
+          <section class="mech-section">
+            <article class="mech-card">
+
+              <div class="mech-card-header">
+                <span class="mech-icon" aria-hidden="true">⚽🏅</span>
+                <div class="mech-header-text">
+                  <h2 class="mech-title">Gol de Oro</h2>
+                  <p class="mech-desc">Una vez por ronda, elegí un partido <strong>antes de que empiece</strong>. Si acertás el <strong>marcador exacto</strong>, los puntos base se triplican (<strong>×3</strong>). Combinado con Partido Bomba los multiplicadores se suman: <strong>×4</strong> la base.</p>
+                </div>
+                @if (activeRound.isLocked) {
+                  <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
+                }
+              </div>
+
+              @if (mechanics.hasGoldenGoalFor(activeRound.roundKey)) {
+                <div class="current-pick">
+                  <span class="current-label">Pick actual:</span>
+                  @for (m of activeRound.matches; track m.id) {
+                    @if (m.id === mechanics.goldenGoalMatchFor(activeRound.roundKey)) {
+                      <strong class="current-value">{{ m.homeTeam }} vs {{ m.awayTeam }}</strong>
+                    }
+                  }
+                </div>
+              }
+              <select
+                class="mech-select"
+                [(ngModel)]="selectedGoldenGoal[activeRound.roundKey]"
+                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
+                aria-label="Elegí el partido para Gol de Oro"
+              >
+                <option [ngValue]="null" disabled>Seleccioná un partido</option>
+                @for (m of activeRound.matches; track m.id) {
+                  <option [ngValue]="m.id" [disabled]="m.isLocked">
+                    {{ m.homeTeam }} vs {{ m.awayTeam }}{{ m.isLocked ? ' (cerrado)' : ' — ' + formatDate(m.matchDate) }}
+                  </option>
+                }
+              </select>
+              @if (!activeRound.isLocked && activeRound.matches.length > 0) {
+                <button
+                  class="save-btn"
+                  [class.is-saving]="savingRound[activeRound.roundKey + '_gg']"
+                  [class.is-saved]="goldenGoalSaved(activeRound.roundKey)"
+                  [disabled]="!selectedGoldenGoal[activeRound.roundKey] || savingRound[activeRound.roundKey + '_gg']"
+                  (click)="saveGoldenGoal(activeRound.roundKey)"
+                  aria-label="Guardar Gol de Oro"
+                >
+                  @if (savingRound[activeRound.roundKey + '_gg']) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span>Guardando…</span>
+                  } @else if (goldenGoalSaved(activeRound.roundKey)) {
+                    <span aria-hidden="true">✓</span>
+                    <span>Guardado</span>
+                  } @else {
+                    <span>Guardar Gol de Oro</span>
+                  }
+                </button>
+              }
+
+            </article>
+          </section>
+
+          <!-- ── Francotirador ──────────────────────────────────────────── -->
+          <section class="mech-section">
+            <article class="mech-card">
+
+              <div class="mech-card-header">
+                <span class="mech-icon" aria-hidden="true">🎯</span>
+                <div class="mech-header-text">
+                  <h2 class="mech-title">Francotirador</h2>
+                  <p class="mech-desc">Una vez por ronda, elegí un partido como objetivo. Si ese partido <strong>se define por penales</strong>, recibís <strong>+5 pts</strong> al cierre de la ronda. Se elige antes de que arranque la ronda.</p>
+                </div>
+                @if (activeRound.isLocked) {
+                  <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
+                }
+              </div>
+
+              @if (mechanics.hasSharpShooterFor(activeRound.roundKey)) {
+                <div class="current-pick">
+                  <span class="current-label">Pick actual:</span>
+                  @for (m of activeRound.matches; track m.id) {
+                    @if (m.id === mechanics.sharpShooterMatchFor(activeRound.roundKey)) {
+                      <strong class="current-value">{{ m.homeTeam }} vs {{ m.awayTeam }}</strong>
+                    }
+                  }
+                </div>
+              }
+              <select
+                class="mech-select"
+                [(ngModel)]="selectedSharpShooter[activeRound.roundKey]"
+                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
+                aria-label="Elegí el partido para Francotirador"
+              >
+                <option [ngValue]="null" disabled>Seleccioná un partido</option>
+                @for (m of activeRound.matches; track m.id) {
+                  <option [ngValue]="m.id">
+                    {{ m.homeTeam }} vs {{ m.awayTeam }} — {{ formatDate(m.matchDate) }}
+                  </option>
+                }
+              </select>
+              @if (!activeRound.isLocked && activeRound.matches.length > 0) {
+                <button
+                  class="save-btn"
+                  [class.is-saving]="savingRound[activeRound.roundKey + '_ss']"
+                  [class.is-saved]="sharpShooterSaved(activeRound.roundKey)"
+                  [disabled]="!selectedSharpShooter[activeRound.roundKey] || savingRound[activeRound.roundKey + '_ss']"
+                  (click)="saveSharpShooter(activeRound.roundKey)"
+                  aria-label="Guardar Francotirador"
+                >
+                  @if (savingRound[activeRound.roundKey + '_ss']) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span>Guardando…</span>
+                  } @else if (sharpShooterSaved(activeRound.roundKey)) {
+                    <span aria-hidden="true">✓</span>
+                    <span>Guardado</span>
+                  } @else {
+                    <span>Guardar Francotirador</span>
+                  }
+                </button>
+              }
+
+            </article>
+          </section>
+
+          <!-- ── Oráculo ────────────────────────────────────────────────── -->
+          <section class="mech-section">
+            <article class="mech-card">
+
+              <div class="mech-card-header">
+                <span class="mech-icon" aria-hidden="true">🔮</span>
+                <div class="mech-header-text">
+                  <h2 class="mech-title">Oráculo</h2>
+                  <p class="mech-desc">
+                    Antes de que arranque la ronda, predecí cuántos partidos terminarán en <strong>empate al 90'</strong> y cuántos se definirán <strong>por penales</strong>. El/los más cercanos en cada categoría ganan <strong>+5 pts</strong> por categoría.
+                  </p>
+                </div>
+                @if (activeRound.isLocked) {
+                  <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
+                }
+              </div>
+
+              <div class="oracle-grid">
+                <div class="oracle-item">
+                  <p class="oracle-label" [attr.id]="'oracle-draws-' + activeRound.roundKey">Empates al 90'</p>
+                  <div class="stepper" [class.disabled]="activeRound.isLocked"
+                       role="group" [attr.aria-labelledby]="'oracle-draws-' + activeRound.roundKey">
+                    <button class="step-btn"
+                      [disabled]="activeRound.isLocked || getOracleDraws(activeRound.roundKey) <= 0"
+                      (click)="decrementDraws(activeRound.roundKey)"
+                      aria-label="Restar empate">−</button>
+                    <span class="step-value" aria-live="polite">{{ getOracleDraws(activeRound.roundKey) }}</span>
+                    <button class="step-btn"
+                      [disabled]="activeRound.isLocked || getOracleDraws(activeRound.roundKey) >= activeRound.matchCount"
+                      (click)="incrementDraws(activeRound.roundKey, activeRound.matchCount)"
+                      aria-label="Sumar empate">+</button>
+                  </div>
+                  <p class="oracle-hint">máx {{ activeRound.matchCount }}</p>
+                </div>
+
+                <div class="oracle-item">
+                  <p class="oracle-label" [attr.id]="'oracle-pen-' + activeRound.roundKey">Definiciones por penales</p>
+                  <div class="stepper" [class.disabled]="activeRound.isLocked"
+                       role="group" [attr.aria-labelledby]="'oracle-pen-' + activeRound.roundKey">
+                    <button class="step-btn"
+                      [disabled]="activeRound.isLocked || getOraclePenalties(activeRound.roundKey) <= 0"
+                      (click)="decrementPenalties(activeRound.roundKey)"
+                      aria-label="Restar penal">−</button>
+                    <span class="step-value" aria-live="polite">{{ getOraclePenalties(activeRound.roundKey) }}</span>
+                    <button class="step-btn"
+                      [disabled]="activeRound.isLocked || getOraclePenalties(activeRound.roundKey) >= activeRound.matchCount"
+                      (click)="incrementPenalties(activeRound.roundKey, activeRound.matchCount)"
+                      aria-label="Sumar penal">+</button>
+                  </div>
+                  <p class="oracle-hint">máx {{ activeRound.matchCount }}</p>
+                </div>
+              </div>
+
+              <button
+                class="save-btn"
+                [class.is-saving]="savingRound[activeRound.roundKey + '_oracle']"
+                [class.is-saved]="oracleSaved(activeRound.roundKey)"
+                [disabled]="activeRound.isLocked || savingRound[activeRound.roundKey + '_oracle']"
+                (click)="saveOracle(activeRound.roundKey, activeRound.matchCount)"
+                aria-label="Guardar predicción del Oráculo"
+              >
+                @if (savingRound[activeRound.roundKey + '_oracle']) {
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                  <span>Guardando…</span>
+                } @else if (oracleSaved(activeRound.roundKey)) {
+                  <span aria-hidden="true">✓</span>
+                  <span>Guardado</span>
+                } @else {
+                  <span>Guardar Oráculo</span>
+                }
+              </button>
+
+            </article>
+          </section>
+
+        </div>
+      }
+
+    } @else if (roundContext()) {
+      <p class="empty-msg">Las mecánicas de eliminatoria se activarán cuando arranquen los Dieciseisavos de Final.</p>
+    }
+
+  }
+
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────────────────────── -->
+@if (toastVisible) {
+  <div class="toast"
+    [class.toast-success]="toastType === 'success'"
+    [class.toast-error]="toastType === 'error'"
+    role="status" aria-live="polite"
+  >{{ toastMessage }}</div>
+}

@@ -100,4 +100,12 @@ public class MechanicsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpGet("round-context")]
+    public async Task<IActionResult> GetRoundContext(CancellationToken ct)
+    {
+        if (CurrentUserId is not { }) return Unauthorized();
+        var context = await _mechanicsService.GetRoundContextAsync(ct);
+        return Ok(context);
+    }
 }

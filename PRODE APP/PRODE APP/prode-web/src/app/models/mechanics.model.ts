@@ -57,3 +57,33 @@ export const BASE_POINTS: Record<string, number> = {
   SEMI_FINALS: 10,
   FINAL_ROUND: 12, // 15 for the final itself
 };
+
+// ── Round context (for mechanics selection page) ─────────────────────────────
+
+export interface RoundTeam {
+  id: number;
+  name: string;
+  flagUrl: string;
+}
+
+export interface RoundMatch {
+  id: number;
+  homeTeam: string;
+  awayTeam: string;
+  matchDate: string;
+  isLocked: boolean;
+}
+
+export interface RoundInfo {
+  roundKey: string;
+  roundLabel: string;
+  isLocked: boolean;
+  matchCount: number;
+  matches: RoundMatch[];
+}
+
+export interface RoundContext {
+  isCaptainLocked: boolean;
+  captainTeams: RoundTeam[];
+  rounds: RoundInfo[];
+}

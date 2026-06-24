@@ -3919,11 +3919,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+      "projectUniqueName": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
       "projectName": "Prode.Api",
-      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
       "packagesPath": "C:\\Users\\federico.garro\\.nuget\\packages\\",
-      "outputPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\obj\\",
+      "outputPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4474,7 +4474,7 @@
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Prode.Api depends on xunit.runner.visualstudio (>= 2.9.3) but xunit.runner.visualstudio 2.9.3 was not found. xunit.runner.visualstudio 3.0.0 was resolved instead.",
+      "message": "Prode.Api depende de xunit.runner.visualstudio (>= 2.9.3), pero no se encontró xunit.runner.visualstudio 2.9.3. xunit.runner.visualstudio 3.0.0 se resolvió en su lugar.",
       "libraryId": "xunit.runner.visualstudio",
       "targetGraphs": [
         "net10.0"

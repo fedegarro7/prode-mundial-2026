@@ -63,3 +63,49 @@ public class OraclePredictionDto
 
     public int PenaltyShootoutsPrediction { get; set; }
 }
+
+// ── Round Context (for the interactive mechanics selection page) ──────────────
+
+public class RoundContextDto
+{
+    public bool IsCaptainLocked { get; set; }
+
+    public List<RoundTeamDto> CaptainTeams { get; set; } = [];
+
+    public List<RoundInfoDto> Rounds { get; set; } = [];
+}
+
+public class RoundInfoDto
+{
+    public string RoundKey { get; set; } = string.Empty;
+
+    public string RoundLabel { get; set; } = string.Empty;
+
+    public bool IsLocked { get; set; }
+
+    public int MatchCount { get; set; }
+
+    public List<RoundMatchDto> Matches { get; set; } = [];
+}
+
+public class RoundMatchDto
+{
+    public int Id { get; set; }
+
+    public string HomeTeam { get; set; } = string.Empty;
+
+    public string AwayTeam { get; set; } = string.Empty;
+
+    public DateTime MatchDate { get; set; }
+
+    public bool IsLocked { get; set; }
+}
+
+public class RoundTeamDto
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public string FlagUrl { get; set; } = string.Empty;
+}

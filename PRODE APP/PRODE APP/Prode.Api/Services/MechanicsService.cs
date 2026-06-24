@@ -316,4 +316,101 @@ public class MechanicsService
             .OrderBy(m => m.MatchDate)
             .ToList();
     }
+
+    public async Task<RoundContextDto> GetRoundContextAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+
+        var allKnockoutMatches = await _context.Matches
+            .AsNoTracking()
+            .Include(m => m.HomeTeam)
+            .Include(m => m.AwayTeam)
+            .Where(m => !string.IsNullOrWhiteSpace(m.Stage) && string.IsNullOrWhiteSpace(m.GroupName))
+            .ToListAsync(cancellationToken);
+
+        var knockoutOrder = new[]
+        {
+            WorldCupRoundService.RoundOf32,
+            WorldCupRoundService.RoundOf16,
+            WorldCupRoundService.QuarterFinals,
+            WorldCupRoundService.SemiFinals,
+            WorldCupRoundService.FinalRound
+        };
+
+        var roundLabels = new Dictionary<string, string>
+        {
+            [WorldCupRoundService.RoundOf32]     = "Dieciseisavos de Final",
+            [WorldCupRoundService.RoundOf16]     = "Octavos de Final",
+            [WorldCupRoundService.QuarterFinals] = "Cuartos de Final",
+            [WorldCupRoundService.SemiFinals]    = "Semifinales",
+            [WorldCupRoundService.FinalRound]    = "Ronda Final",
+        };
+
+        var isCaptainLocked = await IsCaptainWindowClosedAsync(now, cancellationToken);
+
+        // Captain teams: all confirmed teams from R32 matches
+        var r32Matches = allKnockoutMatches
+            .Where(m => WorldCupRoundService.GetRoundKey(m) == WorldCupRoundService.RoundOf32)
+            .ToList();
+
+        var captainTeams = r32Matches
+            .SelectMany(m => new[]
+            {
+                m.HomeTeamId.HasValue
+                    ? new RoundTeamDto { Id = m.HomeTeamId.Value, Name = m.HomeTeam!.Name, FlagUrl = m.HomeTeam.FlagUrl }
+                    : null,
+                m.AwayTeamId.HasValue
+                    ? new RoundTeamDto { Id = m.AwayTeamId.Value, Name = m.AwayTeam!.Name, FlagUrl = m.AwayTeam.FlagUrl }
+                    : null,
+            })
+            .Where(t => t != null)
+            .GroupBy(t => t!.Id)
+            .Select(g => g.First()!)
+            .OrderBy(t => t.Name)
+            .ToList();
+
+        var rounds = knockoutOrder
+            .Select(roundKey =>
+            {
+                var matches = allKnockoutMatches
+                    .Where(m => WorldCupRoundService.GetRoundKey(m) == roundKey)
+                    .OrderBy(m => m.MatchDate)
+                    .ToList();
+
+                if (matches.Count == 0) return null;
+
+                var isLocked = WorldCupRoundService.IsRoundStartLocked(matches, now);
+
+                var confirmedMatches = matches
+                    .Where(m => m.HomeTeamId.HasValue && m.AwayTeamId.HasValue)
+                    .Select(m => new RoundMatchDto
+                    {
+                        Id = m.Id,
+                        HomeTeam = m.HomeTeam?.Name ?? m.HomePlaceholder,
+                        AwayTeam = m.AwayTeam?.Name ?? m.AwayPlaceholder,
+                        MatchDate = m.MatchDate,
+                        IsLocked = m.PredictionsLocked || m.MatchDate <= now
+                    })
+                    .ToList();
+
+                return new RoundInfoDto
+                {
+                    RoundKey = roundKey,
+                    RoundLabel = roundLabels.GetValueOrDefault(roundKey, roundKey),
+                    IsLocked = isLocked,
+                    MatchCount = matches.Count,
+                    Matches = confirmedMatches
+                };
+            })
+            .Where(r => r != null)
+            .Cast<RoundInfoDto>()
+            .ToList();
+
+        return new RoundContextDto
+        {
+            IsCaptainLocked = isCaptainLocked,
+            CaptainTeams = captainTeams,
+            Rounds = rounds
+        };
+    }
 }

@@ -10,6 +10,7 @@ import { GroupsComponent } from './pages/groups/groups.component';
 import { MyPredictionsComponent } from './pages/my-predictions/my-predictions.component';
 import { AccountComponent } from './pages/account/account.component';
 import { NewsComponent } from './pages/news/news.component';
+import { MecanicasComponent } from './pages/mecanicas/mecanicas.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -67,6 +68,12 @@ export const routes: Routes = [
 	{
     path: 'noticias',
     component: NewsComponent
+  },
+
+	{
+    path: 'mecanicas',
+    component: MecanicasComponent,
+    canActivate: [authGuard]
   },
 
 ];

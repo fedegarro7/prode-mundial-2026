@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { MechanicsState } from '../models/mechanics.model';
+import { MechanicsState, RoundContext } from '../models/mechanics.model';
 
 @Injectable({ providedIn: 'root' })
 export class MechanicsService {
@@ -64,5 +64,9 @@ export class MechanicsService {
 
   hasOracleFor(roundKey: string): boolean {
     return this.state()?.oraclePredictions.some(o => o.roundKey === roundKey) ?? false;
+  }
+
+  getRoundContext() {
+    return this.http.get<RoundContext>(this.base + '/round-context');
   }
 }
