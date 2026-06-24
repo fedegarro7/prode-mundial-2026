@@ -339,11 +339,11 @@ public class MechanicsService
 
         var roundLabels = new Dictionary<string, string>
         {
-            [WorldCupRoundService.RoundOf32]     = "Dieciseisavos de Final",
-            [WorldCupRoundService.RoundOf16]     = "Octavos de Final",
+            [WorldCupRoundService.RoundOf32] = "Dieciseisavos de Final",
+            [WorldCupRoundService.RoundOf16] = "Octavos de Final",
             [WorldCupRoundService.QuarterFinals] = "Cuartos de Final",
-            [WorldCupRoundService.SemiFinals]    = "Semifinales",
-            [WorldCupRoundService.FinalRound]    = "Ronda Final",
+            [WorldCupRoundService.SemiFinals] = "Semifinales",
+            [WorldCupRoundService.FinalRound] = "Ronda Final",
         };
 
         var isCaptainLocked = await IsCaptainWindowClosedAsync(now, cancellationToken);
