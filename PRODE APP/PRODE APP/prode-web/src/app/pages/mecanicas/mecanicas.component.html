@@ -53,8 +53,14 @@
             <option [ngValue]="selectedCaptainId">
               {{ captainTeamName ?? 'Seleccioná tu Capitán' }}
             </option>
-          </select>
-        } @else {
+          </select>          <button class="save-btn" disabled aria-label="Guardar Capitán (cerrado)">
+            @if (captainTeamName) {
+              <span aria-hidden="true">✓</span>
+              <span>Guardar Capitán</span>
+            } @else {
+              <span>Guardar Capitán</span>
+            }
+          </button>        } @else {
           @if (captainTeamName) {
             <div class="current-pick">
               <span class="current-label">Selección actual:</span>
@@ -72,12 +78,11 @@
               <option [ngValue]="team.id">{{ team.name }}</option>
             }
           </select>
-          @if ((roundContext()?.captainTeams?.length ?? 0) > 0) {
-            <button
+          <button
               class="save-btn"
               [class.is-saving]="savingCaptain"
               [class.is-saved]="!!captainTeamName && !savingCaptain"
-              [disabled]="!selectedCaptainId || savingCaptain"
+              [disabled]="!selectedCaptainId || savingCaptain || (roundContext()?.captainTeams?.length ?? 0) === 0"
               (click)="saveCaptain()"
               aria-label="Guardar selección de Capitán"
             >
@@ -91,7 +96,6 @@
                 <span>Guardar Capitán</span>
               }
             </button>
-          }
         }
 
       </article>
@@ -148,18 +152,19 @@
               <select
                 class="mech-select"
                 [(ngModel)]="selectedGoldenGoal[activeRound.roundKey]"
-                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
+                [disabled]="activeRound.matches.length === 0"
                 aria-label="Elegí el partido para Gol de Oro"
               >
                 <option [ngValue]="null" disabled>Seleccioná un partido</option>
                 @for (m of activeRound.matches; track m.id) {
-                  <option [ngValue]="m.id" [disabled]="m.isLocked">
-                    {{ m.homeTeam }} vs {{ m.awayTeam }}{{ m.isLocked ? ' (cerrado)' : ' — ' + formatDate(m.matchDate) }}
-                  </option>
+                  @if (!m.isLocked) {
+                    <option [ngValue]="m.id">
+                      {{ m.homeTeam }} vs {{ m.awayTeam }} — {{ formatDate(m.matchDate) }}
+                    </option>
+                  }
                 }
               </select>
-              @if (!activeRound.isLocked && activeRound.matches.length > 0) {
-                <button
+              <button
                   class="save-btn"
                   [class.is-saving]="savingRound[activeRound.roundKey + '_gg']"
                   [class.is-saved]="goldenGoalSaved(activeRound.roundKey)"
@@ -177,7 +182,6 @@
                     <span>Guardar Gol de Oro</span>
                   }
                 </button>
-              }
 
             </article>
           </section>
@@ -210,18 +214,19 @@
               <select
                 class="mech-select"
                 [(ngModel)]="selectedSharpShooter[activeRound.roundKey]"
-                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
+                [disabled]="activeRound.matches.length === 0"
                 aria-label="Elegí el partido para Francotirador"
               >
                 <option [ngValue]="null" disabled>Seleccioná un partido</option>
                 @for (m of activeRound.matches; track m.id) {
-                  <option [ngValue]="m.id">
-                    {{ m.homeTeam }} vs {{ m.awayTeam }} — {{ formatDate(m.matchDate) }}
-                  </option>
+                  @if (!m.isLocked) {
+                    <option [ngValue]="m.id">
+                      {{ m.homeTeam }} vs {{ m.awayTeam }} — {{ formatDate(m.matchDate) }}
+                    </option>
+                  }
                 }
               </select>
-              @if (!activeRound.isLocked && activeRound.matches.length > 0) {
-                <button
+              <button
                   class="save-btn"
                   [class.is-saving]="savingRound[activeRound.roundKey + '_ss']"
                   [class.is-saved]="sharpShooterSaved(activeRound.roundKey)"
@@ -239,7 +244,6 @@
                     <span>Guardar Francotirador</span>
                   }
                 </button>
-              }
 
             </article>
           </section>
