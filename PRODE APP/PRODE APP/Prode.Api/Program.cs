@@ -81,7 +81,13 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-  options.UseNpgsql(connectionString);
+  // Append pool settings: release idle connections quickly so Neon can scale to zero.
+  // Connection Idle Lifetime=30  → prune connections idle for 30 s
+  // Connection Pruning Interval=10 → pruning check every 10 s
+  // Keepalive=0                  → no TCP keepalive pings to Neon
+  var pooledConnectionString = connectionString.TrimEnd(';')
+      + ";Connection Idle Lifetime=30;Connection Pruning Interval=10;Keepalive=0";
+  options.UseNpgsql(pooledConnectionString);
 });
 
 var allowedOrigins =

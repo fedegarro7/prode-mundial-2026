@@ -83,8 +83,27 @@ public class FifaScoreSyncBackgroundService : BackgroundService
             var hasSoon = upcoming.Any(d => d > now && d <= now.AddMinutes(30));
             if (hasSoon) return _liveInterval;
 
-            // Matches later today but not imminent.
-            if (upcoming.Count > 0) return IdleMatchDayInterval;
+            // Matches later today but not imminent → sleep until 30 min before the next one.
+            // This gives Neon long windows to scale to zero instead of polling every 15 min.
+            var nextMatch = upcoming
+                .Where(d => d > now)
+                .OrderBy(d => d)
+                .FirstOrDefault();
+
+            if (nextMatch != default)
+            {
+                var sleepUntilWakeUp = nextMatch - now - TimeSpan.FromMinutes(30);
+                if (sleepUntilWakeUp > TimeSpan.FromMinutes(5))
+                {
+                    // Cap at 4 hours so we don't miss anything unexpected
+                    return sleepUntilWakeUp < TimeSpan.FromHours(4)
+                        ? sleepUntilWakeUp
+                        : TimeSpan.FromHours(4);
+                }
+            }
+
+            // Fallback: matches exist today but couldn't compute a good sleep window
+            return IdleMatchDayInterval;
 
             // Rest day — let Neon sleep.
             return RestDayInterval;
