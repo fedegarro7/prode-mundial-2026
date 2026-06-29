@@ -35,68 +35,45 @@
           <span class="mech-icon" aria-hidden="true">🧢</span>
           <div class="mech-header-text">
             <h2 class="mech-title">Capitán del equipo</h2>
-            <p class="mech-desc">Elegí <strong>una selección</strong> antes de que arranquen los Dieciseisavos. Cada vez que acertés el <strong>resultado</strong> (sin necesitar exacto) de un partido de esa selección en eliminatorias, sumás <strong>+5 pts</strong> extra. Se cierra con el primer partido de Dieciseisavos.</p>
+            <p class="mech-desc">Elegí <strong>una selección</strong>. Cada vez que acertés el <strong>resultado</strong> (sin necesitar exacto) de un partido de esa selección en eliminatorias, sumás <strong>+5 pts</strong> extra.</p>
           </div>
-          @if (captainLocked) {
-            <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
-          }
         </div>
 
-        @if (captainLocked) {
-          @if (captainTeamName) {
-            <div class="current-pick">
-              <span class="current-label">Tu Capitán:</span>
-              <strong class="current-value">{{ captainTeamName }}</strong>
-            </div>
+        @if (captainTeamName) {
+          <div class="current-pick">
+            <span class="current-label">Selección actual:</span>
+            <strong class="current-value">{{ captainTeamName }}</strong>
+          </div>
+        }
+        <select
+          class="mech-select"
+          [(ngModel)]="selectedCaptainId"
+          [disabled]="savingCaptain || (roundContext()?.captainTeams?.length ?? 0) === 0"
+          aria-label="Elegí tu Capitán"
+        >
+          <option [ngValue]="null" disabled>Selección</option>
+          @for (team of (roundContext()?.captainTeams ?? []); track team.id) {
+            <option [ngValue]="team.id">{{ team.name }}</option>
           }
-          <select class="mech-select" disabled aria-label="Capitán seleccionado">
-            <option [ngValue]="selectedCaptainId">
-              {{ captainTeamName ?? 'Seleccioná tu Capitán' }}
-            </option>
-          </select>          <button class="save-btn" disabled aria-label="Guardar Capitán (cerrado)">
-            @if (captainTeamName) {
+        </select>
+        <button
+            class="save-btn"
+            [class.is-saving]="savingCaptain"
+            [class.is-saved]="!!captainTeamName && !savingCaptain"
+            [disabled]="!selectedCaptainId || savingCaptain || (roundContext()?.captainTeams?.length ?? 0) === 0"
+            (click)="saveCaptain()"
+            aria-label="Guardar selección de Capitán"
+          >
+            @if (savingCaptain) {
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span>Guardando…</span>
+            } @else if (captainTeamName) {
               <span aria-hidden="true">✓</span>
               <span>Guardar Capitán</span>
             } @else {
               <span>Guardar Capitán</span>
             }
-          </button>        } @else {
-          @if (captainTeamName) {
-            <div class="current-pick">
-              <span class="current-label">Selección actual:</span>
-              <strong class="current-value">{{ captainTeamName }}</strong>
-            </div>
-          }
-          <select
-            class="mech-select"
-            [(ngModel)]="selectedCaptainId"
-            [disabled]="savingCaptain || (roundContext()?.captainTeams?.length ?? 0) === 0"
-            aria-label="Elegí tu Capitán"
-          >
-            <option [ngValue]="null" disabled>Selección</option>
-            @for (team of (roundContext()?.captainTeams ?? []); track team.id) {
-              <option [ngValue]="team.id">{{ team.name }}</option>
-            }
-          </select>
-          <button
-              class="save-btn"
-              [class.is-saving]="savingCaptain"
-              [class.is-saved]="!!captainTeamName && !savingCaptain"
-              [disabled]="!selectedCaptainId || savingCaptain || (roundContext()?.captainTeams?.length ?? 0) === 0"
-              (click)="saveCaptain()"
-              aria-label="Guardar selección de Capitán"
-            >
-              @if (savingCaptain) {
-                <span class="btn-spinner" aria-hidden="true"></span>
-                <span>Guardando…</span>
-              } @else if (captainTeamName) {
-                <span aria-hidden="true">✓</span>
-                <span>Guardar Capitán</span>
-              } @else {
-                <span>Guardar Capitán</span>
-              }
-            </button>
-        }
+          </button>
 
       </article>
     </section>
@@ -196,9 +173,6 @@
                   <h2 class="mech-title">Francotirador</h2>
                   <p class="mech-desc">Una vez por ronda, elegí un partido como objetivo. Si ese partido <strong>se define por penales</strong>, recibís <strong>+5 pts</strong> al cierre de la ronda. Se elige antes de que arranque la ronda.</p>
                 </div>
-                @if (activeRound.isLocked) {
-                  <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
-                }
               </div>
 
               @if (mechanics.hasSharpShooterFor(activeRound.roundKey)) {
@@ -214,7 +188,7 @@
               <select
                 class="mech-select"
                 [(ngModel)]="selectedSharpShooter[activeRound.roundKey]"
-                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
+                [disabled]="activeRound.matches.length === 0"
                 aria-label="Elegí el partido para Francotirador"
               >
                 <option [ngValue]="null" disabled>Seleccioná un partido</option>
@@ -230,7 +204,7 @@
                   class="save-btn"
                   [class.is-saving]="savingRound[activeRound.roundKey + '_ss']"
                   [class.is-saved]="sharpShooterSaved(activeRound.roundKey)"
-                  [disabled]="activeRound.isLocked || !selectedSharpShooter[activeRound.roundKey] || savingRound[activeRound.roundKey + '_ss']"
+                  [disabled]="!selectedSharpShooter[activeRound.roundKey] || savingRound[activeRound.roundKey + '_ss']"
                   (click)="saveSharpShooter(activeRound.roundKey)"
                   aria-label="Guardar Francotirador"
                 >
@@ -260,23 +234,20 @@
                     Antes de que arranque la ronda, predecí cuántos partidos terminarán en <strong>empate al 90'</strong> y cuántos se definirán <strong>por penales</strong>. El/los más cercanos en cada categoría ganan <strong>+5 pts</strong> por categoría.
                   </p>
                 </div>
-                @if (activeRound.isLocked) {
-                  <span class="lock-badge" aria-label="Sección cerrada">🔒 Cerrado</span>
-                }
               </div>
 
               <div class="oracle-grid">
                 <div class="oracle-item">
                   <p class="oracle-label" [attr.id]="'oracle-draws-' + activeRound.roundKey">Empates al 90'</p>
-                  <div class="stepper" [class.disabled]="activeRound.isLocked"
+                  <div class="stepper"
                        role="group" [attr.aria-labelledby]="'oracle-draws-' + activeRound.roundKey">
                     <button class="step-btn"
-                      [disabled]="activeRound.isLocked || getOracleDraws(activeRound.roundKey) <= 0"
+                      [disabled]="getOracleDraws(activeRound.roundKey) <= 0"
                       (click)="decrementDraws(activeRound.roundKey)"
                       aria-label="Restar empate">−</button>
                     <span class="step-value" aria-live="polite">{{ getOracleDraws(activeRound.roundKey) }}</span>
                     <button class="step-btn"
-                      [disabled]="activeRound.isLocked || getOracleDraws(activeRound.roundKey) >= activeRound.matchCount"
+                      [disabled]="getOracleDraws(activeRound.roundKey) >= activeRound.matchCount"
                       (click)="incrementDraws(activeRound.roundKey, activeRound.matchCount)"
                       aria-label="Sumar empate">+</button>
                   </div>
@@ -285,15 +256,15 @@
 
                 <div class="oracle-item">
                   <p class="oracle-label" [attr.id]="'oracle-pen-' + activeRound.roundKey">Definiciones por penales</p>
-                  <div class="stepper" [class.disabled]="activeRound.isLocked"
+                  <div class="stepper"
                        role="group" [attr.aria-labelledby]="'oracle-pen-' + activeRound.roundKey">
                     <button class="step-btn"
-                      [disabled]="activeRound.isLocked || getOraclePenalties(activeRound.roundKey) <= 0"
+                      [disabled]="getOraclePenalties(activeRound.roundKey) <= 0"
                       (click)="decrementPenalties(activeRound.roundKey)"
                       aria-label="Restar penal">−</button>
                     <span class="step-value" aria-live="polite">{{ getOraclePenalties(activeRound.roundKey) }}</span>
                     <button class="step-btn"
-                      [disabled]="activeRound.isLocked || getOraclePenalties(activeRound.roundKey) >= activeRound.matchCount"
+                      [disabled]="getOraclePenalties(activeRound.roundKey) >= activeRound.matchCount"
                       (click)="incrementPenalties(activeRound.roundKey, activeRound.matchCount)"
                       aria-label="Sumar penal">+</button>
                   </div>
@@ -305,7 +276,7 @@
                 class="save-btn"
                 [class.is-saving]="savingRound[activeRound.roundKey + '_oracle']"
                 [class.is-saved]="oracleSaved(activeRound.roundKey)"
-                [disabled]="activeRound.isLocked || savingRound[activeRound.roundKey + '_oracle']"
+                [disabled]="savingRound[activeRound.roundKey + '_oracle']"
                 (click)="saveOracle(activeRound.roundKey, activeRound.matchCount)"
                 aria-label="Guardar predicción del Oráculo"
               >

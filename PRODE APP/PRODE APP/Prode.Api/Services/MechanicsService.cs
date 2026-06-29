@@ -34,7 +34,7 @@ public class MechanicsService
                 {
                     TeamId = captain.TeamId,
                     TeamName = captain.Team.Name,
-                    IsLocked = await IsCaptainWindowClosedAsync(now, cancellationToken)
+                    IsLocked = false
                 },
             GoldenGoals = await _context.GoldenGoalPicks
                 .AsNoTracking()
@@ -74,13 +74,6 @@ public class MechanicsService
         CancellationToken cancellationToken = default
     )
     {
-        var now = DateTime.UtcNow;
-
-        if (await IsCaptainWindowClosedAsync(now, cancellationToken))
-        {
-            throw new InvalidOperationException("La eleccion de capitan ya esta cerrada");
-        }
-
         var teamExists = await _context.Teams
             .AnyAsync(t => t.Id == teamId, cancellationToken);
 
@@ -167,8 +160,6 @@ public class MechanicsService
             throw new InvalidOperationException("Francotirador solo aplica a rondas eliminatorias");
         }
 
-        await EnsureRoundHasNotStartedAsync(roundKey, cancellationToken);
-
         var existing = await _context.SharpShooterPredictions
             .FirstOrDefaultAsync(p =>
                 p.UserId == userId &&
@@ -219,8 +210,6 @@ public class MechanicsService
         {
             throw new InvalidOperationException("La prediccion excede la cantidad de partidos de la ronda");
         }
-
-        await EnsureRoundHasNotStartedAsync(roundKey, cancellationToken);
 
         var existing = await _context.OraclePredictions
             .FirstOrDefaultAsync(p =>

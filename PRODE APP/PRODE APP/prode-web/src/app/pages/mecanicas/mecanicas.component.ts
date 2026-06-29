@@ -157,7 +157,7 @@ export class MecanicasComponent implements OnInit, OnDestroy {
 
   // ── Captain ──────────────────────────────────────────────────────────────
   get captainLocked(): boolean {
-    return this.roundContext()?.isCaptainLocked ?? false;
+    return false;
   }
 
   get captainTeamName(): string | null {
