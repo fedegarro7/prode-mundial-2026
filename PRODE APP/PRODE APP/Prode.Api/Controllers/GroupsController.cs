@@ -22,12 +22,69 @@ public class GroupsController : ControllerBase
 {
     private readonly AppDbContext _context;
 
+    private static readonly Guid ProtectedMemberId = Guid.Parse("019e6f5b-29fe-723a-9de4-b8fc59b1c11d");
+    private const string ProtectedGroupName = "BFC Los Pibes";
+
     public GroupsController(AppDbContext context) => _context = context;
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private Guid CurrentUserId =>
         Guid.Parse(User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+    private async Task EnsureProtectedMembershipAsync(CancellationToken cancellationToken = default)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(
+            u => u.Id == ProtectedMemberId,
+            cancellationToken
+        );
+
+        if (user is null)
+        {
+            return;
+        }
+
+        var group = await _context.PrivateGroups.FirstOrDefaultAsync(
+            g => g.Name.Trim().ToLower() == ProtectedGroupName.ToLower(),
+            cancellationToken
+        );
+
+        if (group is null)
+        {
+            return;
+        }
+
+        var membership = await _context.GroupMemberships.FirstOrDefaultAsync(
+            m => m.GroupId == group.Id && m.UserId == user.Id,
+            cancellationToken
+        );
+
+        var changed = false;
+
+        if (membership is null)
+        {
+            _context.GroupMemberships.Add(new GroupMembership
+            {
+                GroupId = group.Id,
+                UserId = user.Id,
+                Status = MembershipStatus.Approved,
+                RequestedAt = DateTime.UtcNow,
+                ReviewedAt = DateTime.UtcNow
+            });
+            changed = true;
+        }
+        else if (membership.Status != MembershipStatus.Approved)
+        {
+            membership.Status = MembershipStatus.Approved;
+            membership.ReviewedAt = DateTime.UtcNow;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
 
     /// <summary>Generates a random 6-character alphanumeric invite code.</summary>
     private static string GenerateInviteCode()
@@ -118,6 +175,8 @@ public class GroupsController : ControllerBase
     {
         var userId = CurrentUserId;
 
+        await EnsureProtectedMembershipAsync();
+
         // Owned groups (always visible to the owner)
         var owned = await _context.PrivateGroups
             .Where(g => g.OwnerId == userId)
@@ -152,6 +211,7 @@ public class GroupsController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var userId = CurrentUserId;
+        await EnsureProtectedMembershipAsync();
         var group = await _context.PrivateGroups
             .Include(g => g.Owner)
             .Include(g => g.Memberships)
@@ -177,6 +237,8 @@ public class GroupsController : ControllerBase
     public async Task<IActionResult> GetGroupRankings(int id)
     {
         var userId = CurrentUserId;
+
+        await EnsureProtectedMembershipAsync();
 
         var group = await _context.PrivateGroups
             .Include(g => g.Memberships)
@@ -376,11 +438,22 @@ public class GroupsController : ControllerBase
     {
         var userId = CurrentUserId;
 
+        await EnsureProtectedMembershipAsync();
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
         var membership = await _context.GroupMemberships
             .Include(m => m.Group)
             .FirstOrDefaultAsync(m => m.GroupId == id && m.UserId == userId);
 
         if (membership is null) return NotFound();
+
+        if (user is not null &&
+            user.Id == ProtectedMemberId &&
+            string.Equals(membership.Group.Name?.Trim(), ProtectedGroupName, StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Chomba no puede abandonar BFC Los Pibes.");
+        }
 
         if (membership.Group.OwnerId == userId)
             return BadRequest("El creador del grupo no puede abandonarlo. Eliminá el grupo.");
@@ -416,6 +489,8 @@ public class GroupsController : ControllerBase
     public async Task<IActionResult> GetAllGroupsAdmin()
     {
         var userId = CurrentUserId;
+
+        await EnsureProtectedMembershipAsync();
 
         var groups = await _context.PrivateGroups
             .Include(g => g.Owner)

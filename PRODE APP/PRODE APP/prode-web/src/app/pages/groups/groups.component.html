@@ -179,7 +179,7 @@
                 <div class="tab-actions">
                   @if (group.isOwner) {
                     <button class="btn btn-danger-ghost btn-xs" (click)="deleteGroup(group)">Eliminar</button>
-                  } @else if (group.membershipStatus === 'Approved') {
+                  } @else if (group.membershipStatus === 'Approved' && canLeaveGroups) {
                     <button class="btn btn-ghost btn-xs" (click)="leaveGroup(group)">Abandonar</button>
                   }
                 </div>

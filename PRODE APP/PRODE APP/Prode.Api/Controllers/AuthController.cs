@@ -326,6 +326,7 @@ public class AuthController : ControllerBase
     {
         return new AuthResponseDto
         {
+            Id = user.Id,
             Name = user.Name,
             Email = user.Email,
             IsAdmin = user.IsAdmin,

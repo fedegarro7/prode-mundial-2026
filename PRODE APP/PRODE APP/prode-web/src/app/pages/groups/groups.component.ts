@@ -27,6 +27,8 @@ type DetailTab = 'ranking' | 'requests' | 'invite';
 })
 export class GroupsComponent implements OnInit, OnDestroy {
 
+  private static readonly protectedMemberId = '019e6f5b-29fe-723a-9de4-b8fc59b1c11d';
+
   private svc = inject(GroupsService);
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
@@ -176,6 +178,10 @@ private hash(value: string): number {
   error    = signal<string | null>(null);
 
   get isAdmin(): boolean { return !!this.auth.currentUser()?.isAdmin; }
+
+  get canLeaveGroups(): boolean {
+    return this.auth.currentUser()?.id !== GroupsComponent.protectedMemberId;
+  }
 
   // ── Admin state ───────────────────────────────────────────────────────────
   adminGroups        = signal<AdminGroup[]>([]);
