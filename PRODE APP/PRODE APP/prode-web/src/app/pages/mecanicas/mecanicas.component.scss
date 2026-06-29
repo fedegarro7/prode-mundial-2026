@@ -20,7 +20,8 @@
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-
+  display: block;
+  overflow-x: hidden;
   z-index: -1;
 }
 
@@ -62,6 +63,7 @@ $border:     rgba(255, 255, 255, 0.12);
   filter: blur(90px);
   opacity: 0.13;
   animation: orb-float 14s ease-in-out infinite;
+  will-change: transform;
 }
 
 

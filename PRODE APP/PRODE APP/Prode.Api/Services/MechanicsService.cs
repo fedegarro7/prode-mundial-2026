@@ -122,10 +122,7 @@ public class MechanicsService
             throw new InvalidOperationException("Gol de Oro solo aplica a rondas eliminatorias");
         }
 
-        if (match.PredictionsLocked || match.MatchDate <= DateTime.UtcNow)
-        {
-            throw new InvalidOperationException("El Gol de Oro debe elegirse antes del inicio del partido");
-        }
+        await EnsureRoundHasNotStartedAsync(roundKey, cancellationToken);
 
         var existing = await _context.GoldenGoalPicks
             .FirstOrDefaultAsync(p =>

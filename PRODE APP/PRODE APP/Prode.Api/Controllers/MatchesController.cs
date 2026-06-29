@@ -518,6 +518,54 @@ public class MatchesController : ControllerBase
         };
     }
 
+    /// <summary>
+    /// Admin-only: returns all assigned bomb matches per round, including unrevealed ones.
+    /// </summary>
+    [HttpGet("admin/bomb-matches")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAdminBombMatches()
+    {
+        var bombs = await _context.BombMatches
+            .AsNoTracking()
+            .ToListAsync();
+
+        if (bombs.Count == 0)
+            return Ok(new List<object>());
+
+        var matchIds = bombs.Select(b => b.MatchId).ToList();
+        var matches = await _context.Matches
+            .AsNoTracking()
+            .Include(m => m.HomeTeam)
+            .Include(m => m.AwayTeam)
+            .Where(m => matchIds.Contains(m.Id))
+            .ToDictionaryAsync(m => m.Id);
+
+        var now = DateTime.UtcNow;
+        var visibleBombs = await _bombMatchService.GetVisibleBombMatchesAsync(now);
+
+        var result = bombs.Select(b =>
+        {
+            matches.TryGetValue(b.MatchId, out var match);
+            return new
+            {
+                RoundKey = b.RoundKey,
+                MatchId = b.MatchId,
+                AssignedAt = b.AssignedAt,
+                IsRevealedToPlayers = visibleBombs.ContainsKey(b.MatchId),
+                Match = match == null ? null : new
+                {
+                    match.Id,
+                    HomeTeam = match.HomeTeam?.Name ?? match.HomePlaceholder,
+                    AwayTeam = match.AwayTeam?.Name ?? match.AwayPlaceholder,
+                    match.MatchDate,
+                    match.IsFinished
+                }
+            };
+        }).ToList();
+
+        return Ok(result);
+    }
+
     private static DateTime NormalizeUtc(DateTime dateTime)
     {
         return dateTime.Kind switch

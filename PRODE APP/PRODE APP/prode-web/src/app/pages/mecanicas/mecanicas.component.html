@@ -152,7 +152,7 @@
               <select
                 class="mech-select"
                 [(ngModel)]="selectedGoldenGoal[activeRound.roundKey]"
-                [disabled]="activeRound.matches.length === 0"
+                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
                 aria-label="Elegí el partido para Gol de Oro"
               >
                 <option [ngValue]="null" disabled>Seleccioná un partido</option>
@@ -168,7 +168,7 @@
                   class="save-btn"
                   [class.is-saving]="savingRound[activeRound.roundKey + '_gg']"
                   [class.is-saved]="goldenGoalSaved(activeRound.roundKey)"
-                  [disabled]="!selectedGoldenGoal[activeRound.roundKey] || savingRound[activeRound.roundKey + '_gg']"
+                  [disabled]="activeRound.isLocked || !selectedGoldenGoal[activeRound.roundKey] || savingRound[activeRound.roundKey + '_gg']"
                   (click)="saveGoldenGoal(activeRound.roundKey)"
                   aria-label="Guardar Gol de Oro"
                 >
@@ -214,7 +214,7 @@
               <select
                 class="mech-select"
                 [(ngModel)]="selectedSharpShooter[activeRound.roundKey]"
-                [disabled]="activeRound.matches.length === 0"
+                [disabled]="activeRound.isLocked || activeRound.matches.length === 0"
                 aria-label="Elegí el partido para Francotirador"
               >
                 <option [ngValue]="null" disabled>Seleccioná un partido</option>
@@ -230,7 +230,7 @@
                   class="save-btn"
                   [class.is-saving]="savingRound[activeRound.roundKey + '_ss']"
                   [class.is-saved]="sharpShooterSaved(activeRound.roundKey)"
-                  [disabled]="!selectedSharpShooter[activeRound.roundKey] || savingRound[activeRound.roundKey + '_ss']"
+                  [disabled]="activeRound.isLocked || !selectedSharpShooter[activeRound.roundKey] || savingRound[activeRound.roundKey + '_ss']"
                   (click)="saveSharpShooter(activeRound.roundKey)"
                   aria-label="Guardar Francotirador"
                 >
