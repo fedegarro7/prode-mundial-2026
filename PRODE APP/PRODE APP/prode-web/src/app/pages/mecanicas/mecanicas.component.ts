@@ -201,6 +201,16 @@ export class MecanicasComponent implements OnInit, OnDestroy {
     return savedId !== null && savedId === this.selectedGoldenGoal[roundKey];
   }
 
+  isGoldenGoalSelectionLocked(roundKey: string): boolean {
+    const matchId = this.selectedGoldenGoal[roundKey];
+    if (!matchId) return false;
+
+    const round = this.activeRound;
+    const match = round?.matches.find(m => m.id === matchId);
+
+    return match?.isLocked ?? false;
+  }
+
   // ── Francotirador ────────────────────────────────────────────────────────
   saveSharpShooter(roundKey: string): void {
     const matchId = this.selectedSharpShooter[roundKey];

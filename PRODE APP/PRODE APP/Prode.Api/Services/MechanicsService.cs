@@ -122,7 +122,12 @@ public class MechanicsService
             throw new InvalidOperationException("Gol de Oro solo aplica a rondas eliminatorias");
         }
 
-        await EnsureRoundHasNotStartedAsync(roundKey, cancellationToken);
+        var now = DateTime.UtcNow;
+
+        if (match.PredictionsLocked || match.MatchDate <= now)
+        {
+            throw new InvalidOperationException("El partido de Gol de Oro ya comenzo");
+        }
 
         var existing = await _context.GoldenGoalPicks
             .FirstOrDefaultAsync(p =>
