@@ -48,6 +48,20 @@ public class StandingsController : ControllerBase
                 m.AwayTeamId.HasValue)
             .ToListAsync();
 
+        // Identify teams that appear in any knockout match (used to mark best-third qualifiers)
+        var knockoutTeamPairs = await _context.Matches
+            .AsNoTracking()
+            .Where(m => string.IsNullOrWhiteSpace(m.GroupName))
+            .Select(m => new { m.HomeTeamId, m.AwayTeamId })
+            .ToListAsync();
+
+        var knockoutTeamIds = new HashSet<int>();
+        foreach (var pair in knockoutTeamPairs)
+        {
+            if (pair.HomeTeamId.HasValue) knockoutTeamIds.Add(pair.HomeTeamId.Value);
+            if (pair.AwayTeamId.HasValue) knockoutTeamIds.Add(pair.AwayTeamId.Value);
+        }
+
         // Check for any currently-active match across all stages
         var allActiveMatches = await _context.Matches
             .AsNoTracking()
@@ -129,9 +143,13 @@ public class StandingsController : ControllerBase
 
             if (entries.Count == 0) continue;
 
-            // Assign positions after sort
+            // Assign positions after sort; mark 3rd-place teams that qualified as best thirds
             for (var i = 0; i < entries.Count; i++)
+            {
                 entries[i].Position = i + 1;
+                if (entries[i].Position == 3)
+                    entries[i].QualifiesAsThird = knockoutTeamIds.Contains(entries[i].TeamId);
+            }
 
             result.Add(new GroupStandingDto { GroupName = groupName, Entries = entries });
         }

@@ -63,4 +63,12 @@ public class GroupPredictionParticipantDto
     public int? AwayScorePrediction { get; set; }
 
     public int PointsEarned { get; set; }
+
+    public bool IsCaptain { get; set; }
+
+    public bool IsGoldenGoal { get; set; }
+
+    public bool IsSharpShooter { get; set; }
+
+    public bool IsPleno { get; set; }
 }

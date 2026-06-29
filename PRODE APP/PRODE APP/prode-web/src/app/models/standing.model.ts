@@ -12,6 +12,7 @@ export interface StandingEntry {
   goalsAgainst: number;
   goalDifference: number;
   points: number;
+  qualifiesAsThird?: boolean;
 }
 
 export interface GroupStanding {

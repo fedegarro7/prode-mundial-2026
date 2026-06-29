@@ -750,7 +750,7 @@ $accent:     #818cf8;  // indigo suave
 
 .group-predictions-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center;
   gap: .5rem;
   padding: .5rem .6rem;
@@ -788,6 +788,13 @@ $accent:     #818cf8;  // indigo suave
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .04em;
+}
+
+.participant-badges {
+  display: flex;
+  gap: 2px;
+  font-size: .9rem;
+  line-height: 1;
 }
 
 .participant-score {

@@ -251,6 +251,15 @@
                               }
                             </span>
 
+                            @if (participant.isCaptain || participant.isGoldenGoal || participant.isSharpShooter || participant.isPleno) {
+                              <span class="participant-badges" aria-label="Mecánicas">
+                                @if (participant.isCaptain) {<span title="Capitán juega aquí">🧢</span>}
+                                @if (participant.isSharpShooter) {<span title="Francotirador">🎯</span>}
+                                @if (participant.isGoldenGoal) {<span title="Gol de Oro">🥇</span>}
+                                @if (participant.isPleno) {<span title="Pleno exacto">🪜</span>}
+                              </span>
+                            }
+
                             @if (participant.hasPrediction) {
                               <span class="participant-score">
                                 {{ participant.homeScorePrediction }} - {{ participant.awayScorePrediction }}

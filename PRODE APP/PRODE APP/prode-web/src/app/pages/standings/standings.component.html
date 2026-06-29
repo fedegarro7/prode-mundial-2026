@@ -66,10 +66,10 @@
               </thead>
               <tbody>
                 @for (entry of group.entries; track entry.teamId) {
-                  <tr [class.qualify-row]="entry.position <= 2">
+                  <tr [class.qualify-row]="entry.position <= 2" [class.qualify-third-row]="entry.position === 3 && entry.qualifiesAsThird">
                     <td class="col-pos">
-                      @if (entry.position <= 2) {
-                        <span class="qualify-dot" aria-label="Clasifica" aria-hidden="true">●</span>
+                      @if (entry.position <= 2 || entry.qualifiesAsThird) {
+                        <span class="qualify-dot" [class.qualify-dot--third]="entry.qualifiesAsThird" aria-label="Clasifica" aria-hidden="true">●</span>
                       }
                       {{ entry.position }}
                     </td>
@@ -111,9 +111,127 @@
     <footer class="legend" aria-label="Leyenda">
       <span class="legend-dot" aria-hidden="true">●</span>
       <span>Clasifica a la siguiente ronda</span>
+      <span class="legend-dot legend-dot--third" aria-hidden="true">●</span>
+      <span>Mejor tercero clasificado</span>
       <span class="legend-sep" aria-hidden="true">&middot;</span>
       <span>PJ Partidos jugados &nbsp; G Victorias &nbsp; E Empates &nbsp; P Derrotas &nbsp; DG Diferencia de goles &nbsp; Pts Puntos</span>
     </footer>
+  }
+
+  <!-- ── Knockout bracket ─────────────────────────────────────────────────── -->
+  @if (!bracketLoading && bracketRounds.length > 0) {
+    <section class="bracket-section" aria-label="Cuadro eliminatorio">
+
+      <header class="bracket-header">
+        <span class="bracket-header-icon" aria-hidden="true">🏆</span>
+        <h2 class="bracket-header-title">CUADRO ELIMINATORIO</h2>
+      </header>
+
+      <div class="bracket" role="region" aria-label="Bracket eliminatorio">
+
+        @for (round of bracketRounds; track round.key) {
+          <div class="bracket-round">
+
+            <div class="round-label">{{ round.label }}</div>
+
+            <div class="bracket-col">
+              @for (match of round.matches; track match.id) {
+
+                <div class="bracket-slot" [style.height.px]="slotHeight(round.key)">
+
+                  <div class="bracket-match" [class.finished]="match.isFinished">
+
+                    <!-- Home team -->
+                    <div class="bm-team" [class.winner]="isHomeWinner(match)">
+                      @if (match.homeTeam) {
+                        <img
+                          [src]="match.homeTeam.flagUrl"
+                          [alt]="match.homeTeam.name"
+                          [title]="match.homeTeam.name"
+                          class="bm-flag"
+                          width="20" height="15"
+                          loading="lazy"
+                        />
+                        <span class="bm-name">{{ match.homeTeam.name | esName }}</span>
+                      } @else {
+                        <span class="bm-ph">{{ match.homePlaceholder || '?' }}</span>
+                      }
+                      @if (match.homeScore != null) {
+                        <span class="bm-score">{{ match.homeScore }}</span>
+                      }
+                    </div>
+
+                    <!-- Away team -->
+                    <div class="bm-team" [class.winner]="isAwayWinner(match)">
+                      @if (match.awayTeam) {
+                        <img
+                          [src]="match.awayTeam.flagUrl"
+                          [alt]="match.awayTeam.name"
+                          [title]="match.awayTeam.name"
+                          class="bm-flag"
+                          width="20" height="15"
+                          loading="lazy"
+                        />
+                        <span class="bm-name">{{ match.awayTeam.name | esName }}</span>
+                      } @else {
+                        <span class="bm-ph">{{ match.awayPlaceholder || '?' }}</span>
+                      }
+                      @if (match.awayScore != null) {
+                        <span class="bm-score">{{ match.awayScore }}</span>
+                      }
+                    </div>
+
+                    @if (match.wasDecidedByPenalties && match.isFinished) {
+                      <div class="bm-pen-note">def. en penales</div>
+                    }
+
+                  </div>
+
+                </div>
+
+              }
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+      <!-- 3er y 4to Puesto — shown separately below the bracket -->
+      @if (thirdPlaceMatch) {
+        <div class="third-place-wrapper">
+          <div class="third-place-label">🥉 3er y 4to Puesto</div>
+          <div class="bracket-match third-place-card" [class.finished]="thirdPlaceMatch.isFinished">
+            <div class="bm-team" [class.winner]="isHomeWinner(thirdPlaceMatch)">
+              @if (thirdPlaceMatch.homeTeam) {
+                <img [src]="thirdPlaceMatch.homeTeam.flagUrl" [alt]="thirdPlaceMatch.homeTeam.name" [title]="thirdPlaceMatch.homeTeam.name" class="bm-flag" width="20" height="15" loading="lazy" />
+                <span class="bm-name">{{ thirdPlaceMatch.homeTeam.name | esName }}</span>
+              } @else {
+                <span class="bm-ph">{{ thirdPlaceMatch.homePlaceholder || '?' }}</span>
+              }
+              @if (thirdPlaceMatch.homeScore != null) {
+                <span class="bm-score">{{ thirdPlaceMatch.homeScore }}</span>
+              }
+            </div>
+            <div class="bm-team" [class.winner]="isAwayWinner(thirdPlaceMatch)">
+              @if (thirdPlaceMatch.awayTeam) {
+                <img [src]="thirdPlaceMatch.awayTeam.flagUrl" [alt]="thirdPlaceMatch.awayTeam.name" [title]="thirdPlaceMatch.awayTeam.name" class="bm-flag" width="20" height="15" loading="lazy" />
+                <span class="bm-name">{{ thirdPlaceMatch.awayTeam.name | esName }}</span>
+              } @else {
+                <span class="bm-ph">{{ thirdPlaceMatch.awayPlaceholder || '?' }}</span>
+              }
+              @if (thirdPlaceMatch.awayScore != null) {
+                <span class="bm-score">{{ thirdPlaceMatch.awayScore }}</span>
+              }
+            </div>
+            @if (thirdPlaceMatch.wasDecidedByPenalties && thirdPlaceMatch.isFinished) {
+              <div class="bm-pen-note">def. en penales</div>
+            }
+          </div>
+        </div>
+      }
+
+    </section>
   }
 
   <!-- Empty state (no group data at all — DB not yet seeded) -->

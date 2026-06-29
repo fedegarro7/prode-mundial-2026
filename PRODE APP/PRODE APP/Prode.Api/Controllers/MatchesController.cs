@@ -256,6 +256,39 @@ public class MatchesController : ControllerBase
 
         var visibleBombMatches = await _bombMatchService.GetVisibleBombMatchesAsync(DateTime.UtcNow);
 
+        var allGroupUserIds = userGroups
+            .SelectMany(g => g.Memberships.Select(m => m.UserId).Append(g.OwnerId))
+            .Append(userId)
+            .Distinct()
+            .ToList();
+
+        var captainPicks = allGroupUserIds.Count > 0
+            ? await _context.CaptainPicks
+                .AsNoTracking()
+                .Where(p => allGroupUserIds.Contains(p.UserId))
+                .ToDictionaryAsync(p => p.UserId, p => p.TeamId)
+            : new Dictionary<Guid, int>();
+
+        var goldenGoalSet = allGroupUserIds.Count > 0
+            ? (await _context.GoldenGoalPicks
+                .AsNoTracking()
+                .Where(p => allGroupUserIds.Contains(p.UserId))
+                .Select(p => new { p.UserId, p.MatchId })
+                .ToListAsync())
+                .Select(p => (p.UserId, p.MatchId))
+                .ToHashSet()
+            : new HashSet<(Guid, int)>();
+
+        var sharpShooterSet = allGroupUserIds.Count > 0
+            ? (await _context.SharpShooterPredictions
+                .AsNoTracking()
+                .Where(p => allGroupUserIds.Contains(p.UserId))
+                .Select(p => new { p.UserId, p.MatchId })
+                .ToListAsync())
+                .Select(p => (p.UserId, p.MatchId))
+                .ToHashSet()
+            : new HashSet<(Guid, int)>();
+
         var response = matches
             .Select(match => new UpcomingMatchDto
             {
@@ -316,7 +349,7 @@ public class MatchesController : ControllerBase
                         .FirstOrDefault(),
 
                 GroupPredictions =
-                    BuildGroupPredictions(match, userGroups, userId),
+                    BuildGroupPredictions(match, userGroups, userId, captainPicks, goldenGoalSet, sharpShooterSet),
 
                 IsBombMatch = visibleBombMatches.ContainsKey(match.Id)
             })
@@ -393,6 +426,7 @@ public class MatchesController : ControllerBase
             HomeScore = match.HomeScore,
             AwayScore = match.AwayScore,
             IsFinished = match.IsFinished,
+            WasDecidedByPenalties = match.WasDecidedByPenalties,
             PredictionsLocked = match.PredictionsLocked,
             IsBombMatch = isBombMatch,
 
@@ -424,7 +458,10 @@ public class MatchesController : ControllerBase
     private static List<MatchGroupPredictionsDto> BuildGroupPredictions(
         Match match,
         List<PrivateGroup> userGroups,
-        Guid currentUserId
+        Guid currentUserId,
+        Dictionary<Guid, int> captainPicks,
+        HashSet<(Guid UserId, int MatchId)> goldenGoalSet,
+        HashSet<(Guid UserId, int MatchId)> sharpShooterSet
     )
     {
         var canRevealPredictions =
@@ -436,6 +473,8 @@ public class MatchesController : ControllerBase
         {
             return [];
         }
+
+        var isKnockout = string.IsNullOrWhiteSpace(match.GroupName);
 
         var predictionsByUser = match.Predictions
             .GroupBy(p => p.UserId)
@@ -454,6 +493,15 @@ public class MatchesController : ControllerBase
                     {
                         predictionsByUser.TryGetValue(user.Id, out var prediction);
 
+                        var isCaptain = isKnockout &&
+                            captainPicks.TryGetValue(user.Id, out var captainTeamId) &&
+                            (match.HomeTeamId == captainTeamId || match.AwayTeamId == captainTeamId);
+
+                        var isPleno = prediction != null && match.IsFinished &&
+                            match.HomeScore.HasValue && match.AwayScore.HasValue &&
+                            prediction.HomeScorePrediction == match.HomeScore.Value &&
+                            prediction.AwayScorePrediction == match.AwayScore.Value;
+
                         return new GroupPredictionParticipantDto
                         {
                             UserId = user.Id,
@@ -465,7 +513,11 @@ public class MatchesController : ControllerBase
                             PointsEarned =
                                 match.IsFinished && prediction != null
                                     ? prediction.PointsEarned
-                                    : 0
+                                    : 0,
+                            IsCaptain = isCaptain,
+                            IsGoldenGoal = goldenGoalSet.Contains((user.Id, match.Id)),
+                            IsSharpShooter = sharpShooterSet.Contains((user.Id, match.Id)),
+                            IsPleno = isPleno
                         };
                     });
 
@@ -519,12 +571,29 @@ public class MatchesController : ControllerBase
     }
 
     /// <summary>
-    /// Admin-only: returns all assigned bomb matches per round, including unrevealed ones.
+    /// Admin-only: triggers bomb assignment for all started knockout rounds, then returns all bomb matches.
     /// </summary>
     [HttpGet("admin/bomb-matches")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAdminBombMatches()
     {
+        var now = DateTime.UtcNow;
+
+        // Trigger lazy assignment for every knockout round that has already started
+        var knockoutRounds = new[]
+        {
+            WorldCupRoundService.RoundOf32,
+            WorldCupRoundService.RoundOf16,
+            WorldCupRoundService.QuarterFinals,
+            WorldCupRoundService.SemiFinals,
+            WorldCupRoundService.FinalRound
+        };
+
+        foreach (var roundKey in knockoutRounds)
+        {
+            await _bombMatchService.EnsureAssignedForRoundAsync(roundKey, now);
+        }
+
         var bombs = await _context.BombMatches
             .AsNoTracking()
             .ToListAsync();
@@ -540,7 +609,6 @@ public class MatchesController : ControllerBase
             .Where(m => matchIds.Contains(m.Id))
             .ToDictionaryAsync(m => m.Id);
 
-        var now = DateTime.UtcNow;
         var visibleBombs = await _bombMatchService.GetVisibleBombMatchesAsync(now);
 
         var result = bombs.Select(b =>

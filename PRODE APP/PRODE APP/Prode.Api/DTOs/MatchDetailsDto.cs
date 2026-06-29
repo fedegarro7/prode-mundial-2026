@@ -30,6 +30,8 @@ public class MatchDetailsDto
 
     public bool IsFinished { get; set; }
 
+    public bool WasDecidedByPenalties { get; set; }
+
     public bool PredictionsLocked { get; set; }
 
     public bool IsBombMatch { get; set; }

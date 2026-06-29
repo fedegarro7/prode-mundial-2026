@@ -16,4 +16,5 @@ public class StandingEntryDto
     public int GoalsAgainst { get; set; }
     public int GoalDifference { get; set; }
     public int Points { get; set; }
+    public bool QualifiesAsThird { get; set; }
 }

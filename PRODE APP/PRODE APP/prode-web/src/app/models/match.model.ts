@@ -32,6 +32,10 @@ export interface GroupPredictionParticipant {
   homeScorePrediction?: number | null;
   awayScorePrediction?: number | null;
   pointsEarned: number;
+  isCaptain?: boolean;
+  isGoldenGoal?: boolean;
+  isSharpShooter?: boolean;
+  isPleno?: boolean;
 }
 
 export interface MatchGroupPredictions {
@@ -55,11 +59,11 @@ export interface Match {
   homeScore?: number;
   awayScore?: number;
   isFinished: boolean;
+  wasDecidedByPenalties?: boolean;
   predictionsLocked: boolean;
   myPrediction?: MyPrediction | null;
   groupPredictions?: MatchGroupPredictions[];
   homePrediction?: number | null;
   awayPrediction?: number | null;
   isBombMatch?: boolean;
-  wasDecidedByPenalties?: boolean;
 }
