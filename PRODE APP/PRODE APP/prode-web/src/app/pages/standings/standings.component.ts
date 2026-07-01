@@ -149,10 +149,34 @@ export class StandingsComponent implements OnInit, OnDestroy {
       else                                                            rounds[4].matches.push(m);
     }
 
+    const r16SlotBySourceMatchNumber = new Map<number, number>();
+    for (const roundOf16Match of rounds[1].matches) {
+      const targetSlot = roundOf16Match.matchNumber ?? Number.MAX_SAFE_INTEGER;
+      for (const sourceMatchNumber of this.extractWinnerMatchNumbers(roundOf16Match)) {
+        r16SlotBySourceMatchNumber.set(sourceMatchNumber, targetSlot);
+      }
+    }
+
     for (const r of rounds) {
       r.matches.sort((a, b) => {
-        // Sort by official bracket position (matchNumber) when available,
-        // so that R32 pairs that feed into the same R16 slot stay together.
+        // R32 should be ordered by the R16 slot they feed into, not by play date.
+        // That keeps sibling winners adjacent and aligned with the 8vos bracket.
+        if (r.key === 'r32') {
+          const aSource = a.matchNumber ?? Number.MAX_SAFE_INTEGER;
+          const bSource = b.matchNumber ?? Number.MAX_SAFE_INTEGER;
+          const aTarget = r16SlotBySourceMatchNumber.get(aSource) ?? Number.MAX_SAFE_INTEGER;
+          const bTarget = r16SlotBySourceMatchNumber.get(bSource) ?? Number.MAX_SAFE_INTEGER;
+
+          if (aTarget !== bTarget) {
+            return aTarget - bTarget;
+          }
+
+          if (aSource !== bSource) {
+            return aSource - bSource;
+          }
+        }
+
+        // Other rounds keep official bracket position when available.
         if (a.matchNumber != null && b.matchNumber != null) {
           return a.matchNumber - b.matchNumber;
         }
@@ -182,6 +206,22 @@ export class StandingsComponent implements OnInit, OnDestroy {
   isThirdPlace(m: Match): boolean {
     const s = m.stage.toUpperCase();
     return s.includes('THIRD') || s.includes('TERCER') || s.includes('PLAY-OFF');
+  }
+
+  private extractWinnerMatchNumbers(match: Match): number[] {
+    const placeholders = [match.homePlaceholder, match.awayPlaceholder];
+    const sourceMatchNumbers: number[] = [];
+
+    for (const placeholder of placeholders) {
+      const normalized = placeholder.trim().toUpperCase();
+      const winnerMatchNumber = normalized.match(/^W(\d+)$/);
+
+      if (winnerMatchNumber) {
+        sourceMatchNumbers.push(Number(winnerMatchNumber[1]));
+      }
+    }
+
+    return sourceMatchNumbers;
   }
 
   ngOnDestroy(): void {
