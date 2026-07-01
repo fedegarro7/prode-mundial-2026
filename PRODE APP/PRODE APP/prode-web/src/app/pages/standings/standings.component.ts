@@ -16,10 +16,12 @@ import { GroupStanding } from '../../models/standing.model';
 import { Match } from '../../models/match.model';
 import { EsNamePipe } from '../../pipes/es-name.pipe';
 
-/** Fast refresh during live matches (60 s). */
+/** Fast refresh while a match is live (5 min). */
 const POLL_LIVE_MS   = 300_000;
-/** Slow refresh when no match is in progress (5 min). */
-const POLL_IDLE_MS   = 300_000;
+/** Slow refresh when no match is in progress (15 min).
+ *  Keeping this well above Neon's 300 s auto-suspend threshold
+ *  so the compute can actually scale to zero between polls. */
+const POLL_IDLE_MS   = 900_000;
 
 export interface BracketRound {
   key: string;

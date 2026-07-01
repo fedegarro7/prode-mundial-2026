@@ -102,12 +102,12 @@ public class FifaScoreSyncBackgroundService : BackgroundService
                 }
             }
 
-            // Fallback: matches exist today but couldn't compute a good sleep window
+            // Fallback: matches exist today but couldn't compute a good sleep window.
             return IdleMatchDayInterval;
-
-            // Rest day — let Neon sleep.
-            return RestDayInterval;
         }
+
+        // No matches scheduled today — let Neon auto-suspend.
+        return RestDayInterval;
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Could not compute next sync interval, using idle default");
