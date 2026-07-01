@@ -61,12 +61,16 @@ public class DashboardController : ControllerBase
         var totalPredictions = await _context.Predictions
             .CountAsync(p => p.UserId == userId);
 
-        var totalPoints = await _context.Predictions
-            .Where(p =>
-                p.UserId == userId &&
-                p.Match.IsFinished
-            )
-            .SumAsync(p => p.PointsEarned);
+        var totalPoints =
+            await _context.Predictions
+                .Where(p => p.UserId == userId && p.Match.IsFinished)
+                .SumAsync(p => p.PointsEarned)
+            + await _context.SharpShooterPredictions
+                .Where(p => p.UserId == userId)
+                .SumAsync(p => p.PointsAwarded)
+            + await _context.RoundAwards
+                .Where(a => a.UserId == userId)
+                .SumAsync(a => a.PointsAwarded);
 
         var pendingPredictions = await _context.Matches
             .CountAsync(m =>
@@ -90,7 +94,11 @@ public class DashboardController : ControllerBase
                 u.Id,
                 Points = u.Predictions
                     .Where(p => p.Match.IsFinished)
-                    .Sum(p => p.PointsEarned),
+                    .Sum(p => p.PointsEarned)
+                    + u.SharpShooterPredictions
+                        .Sum(p => p.PointsAwarded)
+                    + u.RoundAwards
+                        .Sum(a => a.PointsAwarded),
                 u.Name
             })
             .OrderByDescending(u => u.Points)

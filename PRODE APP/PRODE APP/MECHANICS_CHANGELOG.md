@@ -52,7 +52,7 @@ La Fase de Grupos mantiene el sistema clásico sin cambios.
 ### 🎯 Francotirador (+5 pts bonus)
 
 - Una vez por ronda, elegís un partido como objetivo.
-- Si ese partido **se define por penales** (`WasDecidedByPenalties = true`), recibís +5 pts al finalizar la ronda.
+- Si ese partido **se define por penales** (`WasDecidedByPenalties = true`), recibís +5 pts.
 
 ### 🔮 Oráculo (pts variables)
 

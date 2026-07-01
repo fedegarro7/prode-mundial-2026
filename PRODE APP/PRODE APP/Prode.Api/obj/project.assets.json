@@ -4474,7 +4474,7 @@
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Prode.Api depends on xunit.runner.visualstudio (>= 2.9.3) but xunit.runner.visualstudio 2.9.3 was not found. xunit.runner.visualstudio 3.0.0 was resolved instead.",
+      "message": "Prode.Api depende de xunit.runner.visualstudio (>= 2.9.3), pero no se encontró xunit.runner.visualstudio 2.9.3. xunit.runner.visualstudio 3.0.0 se resolvió en su lugar.",
       "libraryId": "xunit.runner.visualstudio",
       "targetGraphs": [
         "net10.0"

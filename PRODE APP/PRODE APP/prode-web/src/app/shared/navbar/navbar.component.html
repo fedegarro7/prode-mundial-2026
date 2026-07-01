@@ -14,7 +14,7 @@
            routerLinkActive="active"
            (click)="notifyRoute('/matches')">Partidos</a>
       </li>
-      <li><a routerLink="/standings" routerLinkActive="active">Posiciones</a></li>
+      <li><a routerLink="/standings" routerLinkActive="active">Cuadro eliminatorio</a></li>
       <li><a routerLink="/groups"    routerLinkActive="active" class="nav-link-badge">
         Grupos
         @if (user && groupsService.pendingCount() > 0) {

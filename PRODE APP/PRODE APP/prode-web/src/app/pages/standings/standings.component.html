@@ -26,98 +26,6 @@
     </div>
   }
 
-  <!-- Skeleton loading -->
-  @if (loading) {
-    <div class="groups-grid" aria-label="Cargando posiciones" aria-busy="true">
-      @for (n of [1,2,3,4,5,6]; track n) {
-        <div class="group-card skeleton-card" aria-hidden="true">
-          <div class="sk-title"></div>
-          @for (r of [1,2,3,4]; track r) {
-            <div class="sk-row"></div>
-          }
-        </div>
-      }
-    </div>
-  }
-
-  <!-- Standings tables -->
-  @if (!loading && !error && groups.length > 0) {
-    <div class="groups-grid">
-      @for (group of groups; track group.groupName) {
-        <section class="group-card" [attr.aria-label]="group.groupName">
-          <h2 class="group-title">{{ group.groupName | esName }}</h2>
-
-          <div class="table-wrapper">
-            <table>
-              <caption class="sr-only">Tabla de posiciones {{ group.groupName }}</caption>
-              <thead>
-                <tr>
-                  <th scope="col" class="col-pos" aria-label="Posición">#</th>
-                  <th scope="col" class="col-team">Equipo</th>
-                  <th scope="col" title="Partidos Jugados">PJ</th>
-                  <th scope="col" title="Victorias" class="hide-xs">G</th>
-                  <th scope="col" title="Empates" class="hide-xs">E</th>
-                  <th scope="col" title="Derrotas" class="hide-xs">P</th>
-                  <th scope="col" title="Goles a Favor" class="hide-xs">GF</th>
-                  <th scope="col" title="Goles en Contra" class="hide-xs">GC</th>
-                  <th scope="col" title="Diferencia de Goles">DG</th>
-                  <th scope="col" title="Puntos" class="col-pts">Pts</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (entry of group.entries; track entry.teamId) {
-                  <tr [class.qualify-row]="entry.position <= 2" [class.qualify-third-row]="entry.position === 3 && entry.qualifiesAsThird">
-                    <td class="col-pos">
-                      @if (entry.position <= 2 || entry.qualifiesAsThird) {
-                        <span class="qualify-dot" [class.qualify-dot--third]="entry.qualifiesAsThird" aria-label="Clasifica" aria-hidden="true">●</span>
-                      }
-                      {{ entry.position }}
-                    </td>
-                    <td class="col-team">
-                      <div class="team-cell">
-                        <img
-                          [src]="entry.flagUrl"
-                          [alt]="entry.teamName + ' flag'"
-                          title="{{ entry.teamName }}"
-                          class="flag"
-                          width="24"
-                          height="18"
-                          loading="lazy"
-                        />
-                        <span class="team-name">{{ entry.teamName | esName }}</span>
-                      </div>
-                    </td>
-                    <td>{{ entry.played }}</td>
-                    <td class="hide-xs">{{ entry.won }}</td>
-                    <td class="hide-xs">{{ entry.drawn }}</td>
-                    <td class="hide-xs">{{ entry.lost }}</td>
-                    <td class="hide-xs">{{ entry.goalsFor }}</td>
-                    <td class="hide-xs">{{ entry.goalsAgainst }}</td>
-                    <td [class.positive]="entry.goalDifference > 0" [class.negative]="entry.goalDifference < 0">
-                      {{ entry.goalDifference > 0 ? '+' : '' }}{{ entry.goalDifference }}
-                    </td>
-                    <td class="col-pts">{{ entry.points }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-        </section>
-      }
-    </div>
-
-    <!-- Legend -->
-    <footer class="legend" aria-label="Leyenda">
-      <span class="legend-dot" aria-hidden="true">●</span>
-      <span>Clasifica a la siguiente ronda</span>
-      <span class="legend-dot legend-dot--third" aria-hidden="true">●</span>
-      <span>Mejor tercero clasificado</span>
-      <span class="legend-sep" aria-hidden="true">&middot;</span>
-      <span>PJ Partidos jugados &nbsp; G Victorias &nbsp; E Empates &nbsp; P Derrotas &nbsp; DG Diferencia de goles &nbsp; Pts Puntos</span>
-    </footer>
-  }
-
   <!-- ── Knockout bracket ─────────────────────────────────────────────────── -->
   @if (!bracketLoading && bracketRounds.length > 0) {
     <section class="bracket-section" aria-label="Cuadro eliminatorio">
@@ -232,6 +140,98 @@
       }
 
     </section>
+  }
+
+  <!-- Skeleton loading -->
+  @if (loading) {
+    <div class="groups-grid" aria-label="Cargando posiciones" aria-busy="true">
+      @for (n of [1,2,3,4,5,6]; track n) {
+        <div class="group-card skeleton-card" aria-hidden="true">
+          <div class="sk-title"></div>
+          @for (r of [1,2,3,4]; track r) {
+            <div class="sk-row"></div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Standings tables -->
+  @if (!loading && !error && groups.length > 0) {
+    <div class="groups-grid">
+      @for (group of groups; track group.groupName) {
+        <section class="group-card" [attr.aria-label]="group.groupName">
+          <h2 class="group-title">{{ group.groupName | esName }}</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <caption class="sr-only">Tabla de posiciones {{ group.groupName }}</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="col-pos" aria-label="Posición">#</th>
+                  <th scope="col" class="col-team">Equipo</th>
+                  <th scope="col" title="Partidos Jugados">PJ</th>
+                  <th scope="col" title="Victorias" class="hide-xs">G</th>
+                  <th scope="col" title="Empates" class="hide-xs">E</th>
+                  <th scope="col" title="Derrotas" class="hide-xs">P</th>
+                  <th scope="col" title="Goles a Favor" class="hide-xs">GF</th>
+                  <th scope="col" title="Goles en Contra" class="hide-xs">GC</th>
+                  <th scope="col" title="Diferencia de Goles">DG</th>
+                  <th scope="col" title="Puntos" class="col-pts">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (entry of group.entries; track entry.teamId) {
+                  <tr [class.qualify-row]="entry.position <= 2" [class.qualify-third-row]="entry.position === 3 && entry.qualifiesAsThird">
+                    <td class="col-pos">
+                      @if (entry.position <= 2 || entry.qualifiesAsThird) {
+                        <span class="qualify-dot" [class.qualify-dot--third]="entry.qualifiesAsThird" aria-label="Clasifica" aria-hidden="true">●</span>
+                      }
+                      {{ entry.position }}
+                    </td>
+                    <td class="col-team">
+                      <div class="team-cell">
+                        <img
+                          [src]="entry.flagUrl"
+                          [alt]="entry.teamName + ' flag'"
+                          title="{{ entry.teamName }}"
+                          class="flag"
+                          width="24"
+                          height="18"
+                          loading="lazy"
+                        />
+                        <span class="team-name">{{ entry.teamName | esName }}</span>
+                      </div>
+                    </td>
+                    <td>{{ entry.played }}</td>
+                    <td class="hide-xs">{{ entry.won }}</td>
+                    <td class="hide-xs">{{ entry.drawn }}</td>
+                    <td class="hide-xs">{{ entry.lost }}</td>
+                    <td class="hide-xs">{{ entry.goalsFor }}</td>
+                    <td class="hide-xs">{{ entry.goalsAgainst }}</td>
+                    <td [class.positive]="entry.goalDifference > 0" [class.negative]="entry.goalDifference < 0">
+                      {{ entry.goalDifference > 0 ? '+' : '' }}{{ entry.goalDifference }}
+                    </td>
+                    <td class="col-pts">{{ entry.points }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+      }
+    </div>
+
+    <!-- Legend -->
+    <footer class="legend" aria-label="Leyenda">
+      <span class="legend-dot" aria-hidden="true">●</span>
+      <span>Clasifica a la siguiente ronda</span>
+      <span class="legend-dot legend-dot--third" aria-hidden="true">●</span>
+      <span>Mejor tercero clasificado</span>
+      <span class="legend-sep" aria-hidden="true">&middot;</span>
+      <span>PJ Partidos jugados &nbsp; G Victorias &nbsp; E Empates &nbsp; P Derrotas &nbsp; DG Diferencia de goles &nbsp; Pts Puntos</span>
+    </footer>
   }
 
   <!-- Empty state (no group data at all — DB not yet seeded) -->

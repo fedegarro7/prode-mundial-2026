@@ -30,6 +30,14 @@ public class MatchesController : ControllerBase
         _bombMatchService = bombMatchService;
     }
 
+    [HttpPost("recalculate-round/{roundKey}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RecalculateRound(string roundKey)
+    {
+        await _scoreRecalculationService.RecalculateForRoundAsync(roundKey);
+        return Ok(new { message = $"Recalculación completada para ronda '{roundKey}'." });
+    }
+
     [HttpGet]
     public async Task<IActionResult> Get()
     {
@@ -279,15 +287,14 @@ public class MatchesController : ControllerBase
                 .ToHashSet()
             : new HashSet<(Guid, int)>();
 
-        var sharpShooterSet = allGroupUserIds.Count > 0
+        var sharpShooterDict = allGroupUserIds.Count > 0
             ? (await _context.SharpShooterPredictions
                 .AsNoTracking()
                 .Where(p => allGroupUserIds.Contains(p.UserId))
-                .Select(p => new { p.UserId, p.MatchId })
+                .Select(p => new { p.UserId, p.MatchId, p.PointsAwarded })
                 .ToListAsync())
-                .Select(p => (p.UserId, p.MatchId))
-                .ToHashSet()
-            : new HashSet<(Guid, int)>();
+                .ToDictionary(p => (p.UserId, p.MatchId), p => p.PointsAwarded)
+            : new Dictionary<(Guid, int), int>();
 
         var response = matches
             .Select(match => new UpcomingMatchDto
@@ -334,8 +341,11 @@ public class MatchesController : ControllerBase
                             AwayScorePrediction =
                                 p.AwayScorePrediction,
 
-                            PointsEarned =
-                                match.IsFinished ? p.PointsEarned : 0,
+                            PointsEarned = match.IsFinished
+                                ? p.PointsEarned +
+                                  (sharpShooterDict.TryGetValue((userId, match.Id), out var mySSBonus)
+                                      ? mySSBonus : 0)
+                                : 0,
 
                             BasePointsEarned =
                                 match.IsFinished ? p.BasePointsEarned : 0,
@@ -349,7 +359,7 @@ public class MatchesController : ControllerBase
                         .FirstOrDefault(),
 
                 GroupPredictions =
-                    BuildGroupPredictions(match, userGroups, userId, captainPicks, goldenGoalSet, sharpShooterSet),
+                    BuildGroupPredictions(match, userGroups, userId, captainPicks, goldenGoalSet, sharpShooterDict),
 
                 IsBombMatch = visibleBombMatches.ContainsKey(match.Id)
             })
@@ -461,7 +471,7 @@ public class MatchesController : ControllerBase
         Guid currentUserId,
         Dictionary<Guid, int> captainPicks,
         HashSet<(Guid UserId, int MatchId)> goldenGoalSet,
-        HashSet<(Guid UserId, int MatchId)> sharpShooterSet
+        Dictionary<(Guid UserId, int MatchId), int> sharpShooterDict
     )
     {
         var canRevealPredictions =
@@ -510,13 +520,14 @@ public class MatchesController : ControllerBase
                             HasPrediction = prediction != null,
                             HomeScorePrediction = prediction?.HomeScorePrediction,
                             AwayScorePrediction = prediction?.AwayScorePrediction,
-                            PointsEarned =
-                                match.IsFinished && prediction != null
-                                    ? prediction.PointsEarned
-                                    : 0,
+                            PointsEarned = match.IsFinished && prediction != null
+                                ? prediction.PointsEarned +
+                                  (sharpShooterDict.TryGetValue((user.Id, match.Id), out var ssPoints)
+                                      ? ssPoints : 0)
+                                : 0,
                             IsCaptain = isCaptain,
                             IsGoldenGoal = goldenGoalSet.Contains((user.Id, match.Id)),
-                            IsSharpShooter = sharpShooterSet.Contains((user.Id, match.Id)),
+                            IsSharpShooter = sharpShooterDict.ContainsKey((user.Id, match.Id)),
                             IsPleno = isPleno
                         };
                     });

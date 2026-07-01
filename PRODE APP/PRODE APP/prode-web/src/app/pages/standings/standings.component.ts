@@ -150,9 +150,14 @@ export class StandingsComponent implements OnInit, OnDestroy {
     }
 
     for (const r of rounds) {
-      r.matches.sort((a, b) =>
-        new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()
-      );
+      r.matches.sort((a, b) => {
+        // Sort by official bracket position (matchNumber) when available,
+        // so that R32 pairs that feed into the same R16 slot stay together.
+        if (a.matchNumber != null && b.matchNumber != null) {
+          return a.matchNumber - b.matchNumber;
+        }
+        return new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime();
+      });
     }
 
     return rounds.filter(r => r.matches.length > 0);

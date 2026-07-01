@@ -137,7 +137,11 @@ public class GroupsController : ControllerBase
                 u.Name,
                 Points = u.Predictions
                     .Where(p => p.Match.IsFinished)
-                    .Sum(p => p.PointsEarned),
+                    .Sum(p => p.PointsEarned)
+                    + u.SharpShooterPredictions
+                        .Sum(p => p.PointsAwarded)
+                    + u.RoundAwards
+                        .Sum(a => a.PointsAwarded),
                 Plenos = u.Predictions
                     .Count(p => p.Match.IsFinished && p.PointsEarned == 3),
                 Parciales = u.Predictions

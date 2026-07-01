@@ -50,6 +50,10 @@ public class RankingsController : ControllerBase
                     x.Predictions
                         .Where(p => p.Match.IsFinished)
                         .Sum(p => p.PointsEarned)
+                    + x.SharpShooterPredictions
+                        .Sum(p => p.PointsAwarded)
+                    + x.RoundAwards
+                        .Sum(a => a.PointsAwarded)
             })
             .OrderByDescending(x => x.TotalPoints)
             .ToListAsync();
