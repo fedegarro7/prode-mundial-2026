@@ -218,11 +218,14 @@ public class MatchesController : ControllerBase
 
         var visibleBombMatches = await _bombMatchService.GetVisibleBombMatchesAsync(DateTime.UtcNow);
         var revealedRoundKeys = visibleBombMatches.Values.Select(b => b.RoundKey).ToHashSet();
+        var hasGoldenGoalForMatch = userId.HasValue
+            && await _context.GoldenGoalPicks.AnyAsync(p => p.UserId == userId.Value && p.MatchId == match.Id);
         var response = ToMatchDetailsDto(
             match,
             myPrediction,
             visibleBombMatches.ContainsKey(match.Id),
-            BombRevealedForRound(match, revealedRoundKeys)
+            BombRevealedForRound(match, revealedRoundKeys),
+            hasGoldenGoalForMatch
         );
 
         return Ok(response);
@@ -349,8 +352,13 @@ public class MatchesController : ControllerBase
                                 p.AwayScorePrediction,
 
                             // Hide multiplier bonus until bomb is revealed for the round.
+                            // Golden Goal bonus is always shown (the user picked their own GG).
                             PointsEarned = match.IsFinished
-                                ? (BombRevealedForRound(match, revealedRoundKeys) ? p.PointsEarned : p.BasePointsEarned + p.CaptainBonusPoints)
+                                ? (BombRevealedForRound(match, revealedRoundKeys)
+                                    ? p.PointsEarned
+                                    : p.BasePointsEarned + p.CaptainBonusPoints +
+                                      (goldenGoalSet.Contains((userId, match.Id)) && match.HomeScore == p.HomeScorePrediction && match.AwayScore == p.AwayScorePrediction
+                                          ? p.BasePointsEarned * 2 : 0))
                                   + (sharpShooterDict.TryGetValue((userId, match.Id), out var mySSBonus) ? mySSBonus : 0)
                                 : 0,
 
@@ -358,7 +366,12 @@ public class MatchesController : ControllerBase
                                 match.IsFinished ? p.BasePointsEarned : 0,
 
                             MultiplierBonusPoints =
-                                match.IsFinished && BombRevealedForRound(match, revealedRoundKeys) ? p.MultiplierBonusPoints : 0,
+                                match.IsFinished
+                                    ? (BombRevealedForRound(match, revealedRoundKeys)
+                                        ? p.MultiplierBonusPoints
+                                        : (goldenGoalSet.Contains((userId, match.Id)) && match.HomeScore == p.HomeScorePrediction && match.AwayScore == p.AwayScorePrediction
+                                            ? p.BasePointsEarned * 2 : 0))
+                                    : 0,
 
                             CaptainBonusPoints =
                                 match.IsFinished ? p.CaptainBonusPoints : 0
@@ -425,9 +438,19 @@ public class MatchesController : ControllerBase
         Match match,
         Prediction? myPrediction,
         bool isBombMatch = false,
-        bool bombRevealedForRound = true
+        bool bombRevealedForRound = true,
+        bool hasGoldenGoalForMatch = false
     )
     {
+        // When bomb not yet revealed, keep the GG bonus visible but hide the bomb bonus.
+        var ggBonus = !bombRevealedForRound
+            && hasGoldenGoalForMatch
+            && myPrediction != null
+            && match.HomeScore.HasValue && match.AwayScore.HasValue
+            && myPrediction.HomeScorePrediction == match.HomeScore.Value
+            && myPrediction.AwayScorePrediction == match.AwayScore.Value
+            ? myPrediction.BasePointsEarned * 2 : 0;
+
         return new MatchDetailsDto
         {
             Id = match.Id,
@@ -458,18 +481,20 @@ public class MatchesController : ControllerBase
                     AwayScorePrediction =
                         myPrediction.AwayScorePrediction,
 
-                    // Hide multiplier breakdown until bomb is revealed for the round.
+                    // Hide bomb bonus until bomb is revealed; GG bonus is always shown.
                     PointsEarned = match.IsFinished
                         ? (bombRevealedForRound
                             ? myPrediction.PointsEarned
-                            : myPrediction.BasePointsEarned + myPrediction.CaptainBonusPoints)
+                            : myPrediction.BasePointsEarned + myPrediction.CaptainBonusPoints + ggBonus)
                         : 0,
 
                     BasePointsEarned =
                         match.IsFinished ? myPrediction.BasePointsEarned : 0,
 
                     MultiplierBonusPoints =
-                        match.IsFinished && bombRevealedForRound ? myPrediction.MultiplierBonusPoints : 0,
+                        match.IsFinished
+                            ? (bombRevealedForRound ? myPrediction.MultiplierBonusPoints : ggBonus)
+                            : 0,
 
                     CaptainBonusPoints =
                         match.IsFinished ? myPrediction.CaptainBonusPoints : 0
@@ -525,6 +550,11 @@ public class MatchesController : ControllerBase
                             prediction.HomeScorePrediction == match.HomeScore.Value &&
                             prediction.AwayScorePrediction == match.AwayScore.Value;
 
+                        // When the bomb is not yet revealed, hide the bomb bonus but keep the
+                        // Golden Goal bonus visible (users chose their own GG pick).
+                        var ggBonus = !bombRevealedForRound && isPleno && goldenGoalSet.Contains((user.Id, match.Id))
+                            ? (prediction?.BasePointsEarned ?? 0) * 2 : 0;
+
                         return new GroupPredictionParticipantDto
                         {
                             UserId = user.Id,
@@ -533,9 +563,9 @@ public class MatchesController : ControllerBase
                             HasPrediction = prediction != null,
                             HomeScorePrediction = prediction?.HomeScorePrediction,
                             AwayScorePrediction = prediction?.AwayScorePrediction,
-                            // Hide multiplier bonus until bomb is revealed for the round.
+                            // Hide bomb bonus until bomb is revealed; GG bonus is always shown.
                             PointsEarned = match.IsFinished && prediction != null
-                                ? (bombRevealedForRound ? prediction.PointsEarned : prediction.BasePointsEarned + prediction.CaptainBonusPoints)
+                                ? (bombRevealedForRound ? prediction.PointsEarned : prediction.BasePointsEarned + ggBonus + prediction.CaptainBonusPoints)
                                   + (sharpShooterDict.TryGetValue((user.Id, match.Id), out var ssPoints) ? ssPoints : 0)
                                 : 0,
                             IsCaptain = isCaptain,
