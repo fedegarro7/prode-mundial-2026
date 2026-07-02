@@ -16,16 +16,19 @@ public class FifaFixtureSyncService
     private readonly AppDbContext _context;
     private readonly HttpClient _httpClient;
     private readonly ILogger<FifaFixtureSyncService> _logger;
+    private readonly ScoreRecalculationService _scoreRecalculationService;
 
     public FifaFixtureSyncService(
         AppDbContext context,
         HttpClient httpClient,
-        ILogger<FifaFixtureSyncService> logger
+        ILogger<FifaFixtureSyncService> logger,
+        ScoreRecalculationService scoreRecalculationService
     )
     {
         _context = context;
         _httpClient = httpClient;
         _logger = logger;
+        _scoreRecalculationService = scoreRecalculationService;
     }
 
     public async Task<FifaFixtureSyncResult> SyncWorldCup2026Async(
@@ -94,8 +97,15 @@ public class FifaFixtureSyncService
         await UpsertStadiumsAsync(stadiums.Values, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        await UpsertMatchesAsync(matches, cancellationToken);
+        var knockoutRoundsToRescore = await UpsertMatchesAsync(matches, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Knockout rounds need a full mechanics recalculation (Golden Goal, Partido Bomba, Capitán).
+        // This is done AFTER saving so the updated match scores are visible to the recalculator.
+        foreach (var roundKey in knockoutRoundsToRescore)
+        {
+            await _scoreRecalculationService.RecalculateForRoundAsync(roundKey, cancellationToken);
+        }
 
         _logger.LogInformation(
             "Synced {MatchCount} FIFA World Cup 2026 matches from {SourceUrl}",
@@ -168,7 +178,7 @@ public class FifaFixtureSyncService
         }
     }
 
-    private async Task UpsertMatchesAsync(
+    private async Task<HashSet<string>> UpsertMatchesAsync(
         IEnumerable<FifaMatchData> matchData,
         CancellationToken cancellationToken
     )
@@ -263,15 +273,29 @@ public class FifaFixtureSyncService
                 !awayTeamId.HasValue;
         }
 
-        // Recalculate PointsEarned for every prediction of newly-scored matches.
+        // Recalculate predictions for newly-scored matches.
+        // Group-stage matches have no mechanics, so the simple scorer is sufficient.
+        // Knockout matches require full mechanics context (Golden Goal, Partido Bomba, Capitán);
+        // their round keys are returned so the caller can invoke ScoreRecalculationService.
+        var knockoutRoundsToRescore = new HashSet<string>();
         foreach (var match in toRescore)
         {
-            foreach (var prediction in match.Predictions)
+            var roundKey = WorldCupRoundService.GetRoundKey(match);
+            if (WorldCupRoundService.IsKnockoutRound(roundKey))
             {
-                prediction.PointsEarned =
-                    scoring.CalculatePoints(prediction, match);
+                knockoutRoundsToRescore.Add(roundKey);
+            }
+            else
+            {
+                foreach (var prediction in match.Predictions)
+                {
+                    prediction.PointsEarned =
+                        scoring.CalculatePoints(prediction, match);
+                }
             }
         }
+
+        return knockoutRoundsToRescore;
     }
 
     private static FifaTeamData? ParseTeam(

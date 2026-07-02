@@ -217,7 +217,13 @@ public class MatchesController : ControllerBase
         }
 
         var visibleBombMatches = await _bombMatchService.GetVisibleBombMatchesAsync(DateTime.UtcNow);
-        var response = ToMatchDetailsDto(match, myPrediction, visibleBombMatches.ContainsKey(match.Id));
+        var revealedRoundKeys = visibleBombMatches.Values.Select(b => b.RoundKey).ToHashSet();
+        var response = ToMatchDetailsDto(
+            match,
+            myPrediction,
+            visibleBombMatches.ContainsKey(match.Id),
+            BombRevealedForRound(match, revealedRoundKeys)
+        );
 
         return Ok(response);
     }
@@ -263,6 +269,7 @@ public class MatchesController : ControllerBase
             .ToListAsync();
 
         var visibleBombMatches = await _bombMatchService.GetVisibleBombMatchesAsync(DateTime.UtcNow);
+        var revealedRoundKeys = visibleBombMatches.Values.Select(b => b.RoundKey).ToHashSet();
 
         var allGroupUserIds = userGroups
             .SelectMany(g => g.Memberships.Select(m => m.UserId).Append(g.OwnerId))
@@ -341,17 +348,17 @@ public class MatchesController : ControllerBase
                             AwayScorePrediction =
                                 p.AwayScorePrediction,
 
+                            // Hide multiplier bonus until bomb is revealed for the round.
                             PointsEarned = match.IsFinished
-                                ? p.PointsEarned +
-                                  (sharpShooterDict.TryGetValue((userId, match.Id), out var mySSBonus)
-                                      ? mySSBonus : 0)
+                                ? (BombRevealedForRound(match, revealedRoundKeys) ? p.PointsEarned : p.BasePointsEarned + p.CaptainBonusPoints)
+                                  + (sharpShooterDict.TryGetValue((userId, match.Id), out var mySSBonus) ? mySSBonus : 0)
                                 : 0,
 
                             BasePointsEarned =
                                 match.IsFinished ? p.BasePointsEarned : 0,
 
                             MultiplierBonusPoints =
-                                match.IsFinished ? p.MultiplierBonusPoints : 0,
+                                match.IsFinished && BombRevealedForRound(match, revealedRoundKeys) ? p.MultiplierBonusPoints : 0,
 
                             CaptainBonusPoints =
                                 match.IsFinished ? p.CaptainBonusPoints : 0
@@ -359,7 +366,7 @@ public class MatchesController : ControllerBase
                         .FirstOrDefault(),
 
                 GroupPredictions =
-                    BuildGroupPredictions(match, userGroups, userId, captainPicks, goldenGoalSet, sharpShooterDict),
+                    BuildGroupPredictions(match, userGroups, userId, captainPicks, goldenGoalSet, sharpShooterDict, BombRevealedForRound(match, revealedRoundKeys)),
 
                 IsBombMatch = visibleBombMatches.ContainsKey(match.Id)
             })
@@ -417,7 +424,8 @@ public class MatchesController : ControllerBase
     private static MatchDetailsDto ToMatchDetailsDto(
         Match match,
         Prediction? myPrediction,
-        bool isBombMatch = false
+        bool isBombMatch = false,
+        bool bombRevealedForRound = true
     )
     {
         return new MatchDetailsDto
@@ -450,14 +458,18 @@ public class MatchesController : ControllerBase
                     AwayScorePrediction =
                         myPrediction.AwayScorePrediction,
 
-                    PointsEarned =
-                        match.IsFinished ? myPrediction.PointsEarned : 0,
+                    // Hide multiplier breakdown until bomb is revealed for the round.
+                    PointsEarned = match.IsFinished
+                        ? (bombRevealedForRound
+                            ? myPrediction.PointsEarned
+                            : myPrediction.BasePointsEarned + myPrediction.CaptainBonusPoints)
+                        : 0,
 
                     BasePointsEarned =
                         match.IsFinished ? myPrediction.BasePointsEarned : 0,
 
                     MultiplierBonusPoints =
-                        match.IsFinished ? myPrediction.MultiplierBonusPoints : 0,
+                        match.IsFinished && bombRevealedForRound ? myPrediction.MultiplierBonusPoints : 0,
 
                     CaptainBonusPoints =
                         match.IsFinished ? myPrediction.CaptainBonusPoints : 0
@@ -471,7 +483,8 @@ public class MatchesController : ControllerBase
         Guid currentUserId,
         Dictionary<Guid, int> captainPicks,
         HashSet<(Guid UserId, int MatchId)> goldenGoalSet,
-        Dictionary<(Guid UserId, int MatchId), int> sharpShooterDict
+        Dictionary<(Guid UserId, int MatchId), int> sharpShooterDict,
+        bool bombRevealedForRound = true
     )
     {
         var canRevealPredictions =
@@ -520,10 +533,10 @@ public class MatchesController : ControllerBase
                             HasPrediction = prediction != null,
                             HomeScorePrediction = prediction?.HomeScorePrediction,
                             AwayScorePrediction = prediction?.AwayScorePrediction,
+                            // Hide multiplier bonus until bomb is revealed for the round.
                             PointsEarned = match.IsFinished && prediction != null
-                                ? prediction.PointsEarned +
-                                  (sharpShooterDict.TryGetValue((user.Id, match.Id), out var ssPoints)
-                                      ? ssPoints : 0)
+                                ? (bombRevealedForRound ? prediction.PointsEarned : prediction.BasePointsEarned + prediction.CaptainBonusPoints)
+                                  + (sharpShooterDict.TryGetValue((user.Id, match.Id), out var ssPoints) ? ssPoints : 0)
                                 : 0,
                             IsCaptain = isCaptain,
                             IsGoldenGoal = goldenGoalSet.Contains((user.Id, match.Id)),
@@ -549,6 +562,17 @@ public class MatchesController : ControllerBase
                 };
             })
             .ToList();
+    }
+
+    /// <summary>
+    /// Returns true when the bomb for the given match's knockout round has been revealed
+    /// (i.e. all matches in that round are finished). Always returns true for group-stage
+    /// matches, which have no bomb mechanic.
+    /// </summary>
+    private static bool BombRevealedForRound(Match match, HashSet<string> revealedRoundKeys)
+    {
+        if (!string.IsNullOrWhiteSpace(match.GroupName)) return true;
+        return revealedRoundKeys.Contains(WorldCupRoundService.GetRoundKey(match));
     }
 
     private static TeamDto? ToTeamDto(Team? team)

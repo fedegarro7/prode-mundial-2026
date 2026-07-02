@@ -90,11 +90,12 @@ public class BombMatchService
                 .Where(m => WorldCupRoundService.GetRoundKey(m) == bomb.RoundKey)
                 .ToList();
 
-            // Reveal only when every match in the round is locked or has started
-            var allLocked = roundMatches.Count > 0 &&
-                roundMatches.All(m => m.PredictionsLocked || m.MatchDate <= now);
+            // Reveal only once every match in the round is finished.
+            // This prevents players from identifying the bomb match via early score anomalies.
+            var allFinished = roundMatches.Count > 0 &&
+                roundMatches.All(m => m.IsFinished);
 
-            if (allLocked)
+            if (allFinished)
             {
                 result[bomb.MatchId] = bomb;
             }
