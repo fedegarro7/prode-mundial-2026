@@ -736,7 +736,7 @@ $whatsapp:  #25d366;
   max-width: 400px;
   width: 100%;
   position: relative;
-  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3), 
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3),
               inset 0 1px 0 rgba(255, 255, 255, 0.2);
   color: white;
   text-align: center;
@@ -819,7 +819,7 @@ $whatsapp:  #25d366;
 
     .mechanic-item {
       background: rgba(245, 158, 11, 0.08);
-      
+
       &:hover {
         background: rgba(245, 158, 11, 0.12);
       }
@@ -1046,7 +1046,7 @@ $whatsapp:  #25d366;
 .oracle-section {
   padding: 0.5rem 0;
   border-bottom: 1px solid rgba($text, 0.1);
-  
+
   &:last-child {
     border-bottom: none;
   }

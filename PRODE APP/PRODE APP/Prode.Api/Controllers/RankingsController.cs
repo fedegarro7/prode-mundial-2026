@@ -268,7 +268,7 @@ public class RankingsController : ControllerBase
                 var matchPred = predictions.FirstOrDefault(p => p.MatchId == gg.MatchId && p.UserId == member.Id);
                 var isExact = false;
                 var matchDesc = $"Partido {gg.MatchId}";
-                
+
                 if (gg.Match != null)
                 {
                     matchDesc = $"{gg.Match.HomeTeam?.Name ?? gg.Match.HomePlaceholder} vs {gg.Match.AwayTeam?.Name ?? gg.Match.AwayPlaceholder}";

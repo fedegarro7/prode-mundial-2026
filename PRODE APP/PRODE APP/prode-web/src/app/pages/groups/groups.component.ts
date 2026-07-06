@@ -403,10 +403,10 @@ private hash(value: string): number {
   getRoundKingsFor(groupId: number): any[] {
     const bonus = this.extraBonusFor(groupId);
     if (!bonus?.users) return [];
-    
+
     // Find the maximum points
     const maxPoints = Math.max(...bonus.users.map(u => u.totalExtraPoints), 0);
-    
+
     // Return all users with max points (handle ties)
     return bonus.users.filter(u => u.totalExtraPoints === maxPoints && maxPoints > 0);
   }
