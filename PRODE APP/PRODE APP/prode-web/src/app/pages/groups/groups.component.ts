@@ -317,7 +317,8 @@ private hash(value: string): number {
     const available = this.getAvailableRounds();
     const defaultRound = available.length > 0 ? available[available.length - 1].key : 'ROUND_OF_32';
     const roundKey = this.selectedRoundMap()[groupId] || defaultRound;
-    if (this.extraBonusMap()[groupId]) return; // already cached
+    const cached = this.extraBonusMap()[groupId];
+    if (cached !== undefined) return; // already cached (even if it's null = empty data)
 
     this.setLoading(groupId, true);
     this.extraBonusSvc.getGroupExtraBonus(groupId, roundKey).pipe(takeUntil(this.destroy$)).subscribe({
@@ -327,8 +328,8 @@ private hash(value: string): number {
         this.setLoading(groupId, false);
       },
       error: (err) => {
-        console.error('Error loading extra bonus:', err);
-        this.extraBonusMap.update(m => ({ ...m, [groupId]: null }));
+        console.error('Error loading extra bonus for group', groupId, ':', err);
+        // Don't cache errors - leave undefined to allow retry
         this.setLoading(groupId, false);
       }
     });
@@ -342,15 +343,16 @@ private hash(value: string): number {
   }
   setSelectedRound(groupId: number, roundKey: string): void {
     this.selectedRoundMap.update(m => ({ ...m, [groupId]: roundKey }));
-    this.extraBonusMap.update(m => ({ ...m, [groupId]: null })); // invalidate cache
+    this.extraBonusMap.update(m => ({ ...m, [groupId]: undefined })); // invalidate cache
     this.setLoading(groupId, true);
     this.extraBonusSvc.getGroupExtraBonus(groupId, roundKey).pipe(takeUntil(this.destroy$)).subscribe({
       next: (eb) => {
         this.extraBonusMap.update(m => ({ ...m, [groupId]: eb }));
         this.setLoading(groupId, false);
       },
-      error: () => {
-        this.extraBonusMap.update(m => ({ ...m, [groupId]: null }));
+      error: (err) => {
+        console.error('Error loading extra bonus for group', groupId, 'round', roundKey, ':', err);
+        // Don't cache errors - leave undefined to allow retry
         this.setLoading(groupId, false);
       }
     });
