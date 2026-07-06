@@ -210,7 +210,7 @@ private hash(value: string): number {
   /** Per-group cached data — loaded once per session per group. */
   rankingsMap = signal<Record<number, GroupRanking[]>>({});
   requestsMap = signal<Record<number, JoinRequest[]>>({});
-  extraBonusMap = signal<Record<number, RoundExtraBonuses | null>>({});
+  extraBonusMap = signal<Record<number, RoundExtraBonuses | null | undefined>>({});
   selectedRoundMap = signal<Record<number, string>>({});
   loadingMap  = signal<Record<number, boolean>>({});
 
