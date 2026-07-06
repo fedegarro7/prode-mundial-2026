@@ -622,6 +622,227 @@ $whatsapp:  #25d366;
   color: rgba($celeste, .95);
 }
 
+// ── Extra Bonus Tab ──────────────────────────────────────────────────────────
+.extra-bonus-container {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.round-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text;
+    white-space: nowrap;
+  }
+
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid $border;
+    border-radius: 6px;
+    background: rgba(0,0,0,.3);
+    color: $text;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 200px;
+
+    &:hover { border-color: $border-h; }
+    &:focus {
+      outline: none;
+      border-color: $accent;
+      box-shadow: 0 0 0 2px rgba($accent, 0.2);
+    }
+
+    option {
+      background: $bg;
+      color: $text;
+    }
+  }
+}
+
+
+
+.round-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $celeste;
+  margin: 0;
+  text-align: center;
+}
+
+.extra-bonus-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.extra-bonus-user-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $surface-h;
+    border-color: $border-h;
+  }
+
+  &.round-king {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, rgba(245,158,11,.08) 0%, rgba(245,158,11,.03) 100%);
+    box-shadow: 0 0 0 1px rgba(245,158,11,.25), 0 4px 16px rgba(245,158,11,.12);
+  }
+}
+
+.user-name {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: $celeste;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.round-king-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  background: rgba(245,158,11,.15);
+  border: 1px solid rgba(245,158,11,.35);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.bonus-section {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(0,0,0,.2);
+  border-radius: 8px;
+  border-left: 3px solid $accent;
+}
+
+.bonus-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.bonus-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.bonus-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $text;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bonus-match {
+  font-size: 0.8rem;
+  color: $muted;
+}
+
+.captain-match {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: $muted;
+  margin-top: 0.25rem;
+
+  .match-desc { flex: 1; min-width: 0; }
+  .match-pts  { font-weight: 600; color: $green; flex-shrink: 0; }
+}
+
+.sharpshooter-match {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: $muted;
+  margin-top: 0.25rem;
+
+  .match-desc { flex: 1; min-width: 0; }
+  .match-pts  { font-weight: 600; color: $green; flex-shrink: 0; }
+}
+
+.oracle-prediction {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.5rem;
+  background: rgba(0,0,0,.3);
+  border-radius: 6px;
+
+  .oracle-type {
+    font-weight: 700;
+    color: $celeste;
+  }
+
+  .oracle-pred {
+    color: $muted;
+  }
+
+  .oracle-distance {
+    color: rgba($muted, .7);
+    font-size: 0.75rem;
+  }
+
+  .oracle-winner {
+    font-weight: 700;
+    color: $green;
+    padding-top: 0.25rem;
+  }
+}
+
+.bonus-points {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $gold;
+  margin-top: 0.25rem;
+}
+
+.user-total {
+  padding-top: 0.75rem;
+  border-top: 1px solid $border;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $celeste;
+  text-align: right;
+
+  strong {
+    color: $gold;
+    font-size: 1.1rem;
+  }
+}
+
 @media (max-width: 520px) {
   .ranking-list {
     padding-inline: .75rem;
@@ -655,6 +876,21 @@ $whatsapp:  #25d366;
 
   .rank-pts {
     font-size: .88rem;
+  }
+
+  .extra-bonus-table {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .round-selector {
+    flex-direction: column;
+    align-items: stretch;
+
+    select {
+      min-width: unset;
+    }
   }
 }
 

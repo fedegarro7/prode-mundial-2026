@@ -36,6 +36,9 @@ public class Match
 
     public bool WasDecidedByPenalties { get; set; }
 
+    /// <summary>True when the match was tied after 90 min and a winner was found in extra time (no penalty shootout).</summary>
+    public bool WentToExtraTime { get; set; }
+
     public bool IsFinished { get; set; }
 
     public bool PredictionsLocked { get; set; }

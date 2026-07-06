@@ -8,10 +8,13 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { GroupsService } from '../../services/groups.service';
+import { ExtraBonusService } from '../../services/extra-bonus.service';
+import { RankingService } from '../../services/ranking.service';
 import { Group, GroupRanking, JoinRequest, AdminGroup } from '../../models/group.model';
+import { RoundExtraBonuses } from '../../models/extra-bonus.model';
 import { AuthService } from '../../services/auth.service';
 
-type DetailTab = 'ranking' | 'requests' | 'invite';
+type DetailTab = 'ranking' | 'requests' | 'invite' | 'extra-bonus';
 
 /**
  * Groups page — accordion layout.
@@ -30,6 +33,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
   private static readonly protectedMemberId = '019e6f5b-29fe-723a-9de4-b8fc59b1c11d';
 
   private svc = inject(GroupsService);
+  private extraBonusSvc = inject(ExtraBonusService);
+  private rankingSvc = inject(RankingService);
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
@@ -205,7 +210,12 @@ private hash(value: string): number {
   /** Per-group cached data — loaded once per session per group. */
   rankingsMap = signal<Record<number, GroupRanking[]>>({});
   requestsMap = signal<Record<number, JoinRequest[]>>({});
+  extraBonusMap = signal<Record<number, RoundExtraBonuses | null>>({});
+  selectedRoundMap = signal<Record<number, string>>({});
   loadingMap  = signal<Record<number, boolean>>({});
+
+  /** Current active round key — used to filter available rounds in the dropdown. */
+  currentRoundKey = signal<string | null>(null);
 
   // ── Create form ────────────────────────────────────────────────────────────
   showCreateForm = signal(false);
@@ -230,6 +240,11 @@ private hash(value: string): number {
 
     this.loadGroups();
     if (this.isAdmin) this.loadAdminGroups();
+
+    this.rankingSvc.getRoundSummary().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (s) => this.currentRoundKey.set(s.roundKey),
+      error: () => {} // non-critical: dropdown shows all rounds as fallback
+    });
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
@@ -270,6 +285,7 @@ private hash(value: string): number {
     this.openTab.set(tab);
     if (tab === 'ranking')  this.ensureRankings(group.id, group);
     if (tab === 'requests') this.ensureRequests(group.id);
+    if (tab === 'extra-bonus') this.ensureExtraBonus(group.id);
   }
 
   private setLoading(groupId: number, val: boolean): void {
@@ -292,6 +308,84 @@ private hash(value: string): number {
       next: (r) => { this.requestsMap.update(m => ({ ...m, [groupId]: r })); this.setLoading(groupId, false); },
       error: () => { this.requestsMap.update(m => ({ ...m, [groupId]: [] })); this.setLoading(groupId, false); }
     });
+  }
+
+  private ensureExtraBonus(groupId: number): void {
+    const available = this.getAvailableRounds();
+    const defaultRound = available.length > 0 ? available[available.length - 1].key : 'ROUND_OF_32';
+    const roundKey = this.selectedRoundMap()[groupId] || defaultRound;
+    if (this.extraBonusMap()[groupId]) return; // already cached
+
+    this.setLoading(groupId, true);
+    this.extraBonusSvc.getGroupExtraBonus(groupId, roundKey).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (eb) => {
+        this.extraBonusMap.update(m => ({ ...m, [groupId]: eb }));
+        this.selectedRoundMap.update(m => ({ ...m, [groupId]: eb.roundKey }));
+        this.setLoading(groupId, false);
+      },
+      error: (err) => {
+        console.error('Error loading extra bonus:', err);
+        this.extraBonusMap.update(m => ({ ...m, [groupId]: null }));
+        this.setLoading(groupId, false);
+      }
+    });
+  }
+
+  extraBonusFor(groupId: number): RoundExtraBonuses | null { return this.extraBonusMap()[groupId] ?? null; }
+  getSelectedRound(groupId: number): string {
+    const available = this.getAvailableRounds();
+    const defaultRound = available.length > 0 ? available[available.length - 1].key : 'ROUND_OF_32';
+    return this.selectedRoundMap()[groupId] || defaultRound;
+  }
+  setSelectedRound(groupId: number, roundKey: string): void {
+    this.selectedRoundMap.update(m => ({ ...m, [groupId]: roundKey }));
+    this.extraBonusMap.update(m => ({ ...m, [groupId]: null })); // invalidate cache
+    this.setLoading(groupId, true);
+    this.extraBonusSvc.getGroupExtraBonus(groupId, roundKey).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (eb) => {
+        this.extraBonusMap.update(m => ({ ...m, [groupId]: eb }));
+        this.setLoading(groupId, false);
+      },
+      error: () => {
+        this.extraBonusMap.update(m => ({ ...m, [groupId]: null }));
+        this.setLoading(groupId, false);
+      }
+    });
+  }
+
+  onRoundChange(groupId: number, event: any): void {
+    const value = event?.target?.value;
+    if (value) {
+      this.setSelectedRound(groupId, value);
+    }
+  }
+
+  sumSharpShooterPoints(shots: any[]): number {
+    return shots.reduce((acc, shot) => acc + (shot.pointsEarned || 0), 0);
+  }
+
+  // All available rounds in tournament order (excluding GROUP_STAGE as no mechanics were available then)
+  private readonly TOURNAMENT_ROUNDS = [
+    { key: 'ROUND_OF_32', label: 'Dieciseisavos de Final' },
+    { key: 'ROUND_OF_16', label: 'Octavos de Final' },
+    { key: 'QUARTER_FINALS', label: 'Cuartos de Final' },
+    { key: 'SEMI_FINALS', label: 'Semifinales' },
+    { key: 'FINAL_ROUND', label: 'Ronda Final' }
+  ];
+
+  getAvailableRounds(): Array<{ key: string; label: string }> {
+    const current = this.currentRoundKey();
+    if (!current) return this.TOURNAMENT_ROUNDS; // fallback: show all
+
+    const currentIdx = this.TOURNAMENT_ROUNDS.findIndex(r => r.key === current);
+    if (currentIdx <= 0) return []; // no completed rounds yet
+
+    // Only show rounds that have already been completed (strictly before current)
+    return this.TOURNAMENT_ROUNDS.slice(0, currentIdx);
+  }
+
+  getRoundLabel(roundKey: string): string {
+    return this.TOURNAMENT_ROUNDS.find(r => r.key === roundKey)?.label || roundKey;
   }
 
   isLoading(groupId: number): boolean { return !!this.loadingMap()[groupId]; }

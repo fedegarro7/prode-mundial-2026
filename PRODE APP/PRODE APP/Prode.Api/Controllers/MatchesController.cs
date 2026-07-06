@@ -169,6 +169,8 @@ public class MatchesController : ControllerBase
 
         match.WasDecidedByPenalties = result.WasDecidedByPenalties;
 
+        match.WentToExtraTime = result.WentToExtraTime;
+
         match.IsFinished = true;
 
         match.PredictionsLocked = true;

@@ -159,6 +159,11 @@
                           (click)="setTab('ranking', group)">
                     🏅 Ranking
                   </button>
+                  <button role="tab" class="tab-btn" [class.active]="openTab() === 'extra-bonus'"
+                          [attr.aria-selected]="openTab() === 'extra-bonus'"
+                          (click)="setTab('extra-bonus', group)">
+                    ⭐ Puntos Extra
+                  </button>
                   @if (group.isOwner) {
                     <button role="tab" class="tab-btn" [class.active]="openTab() === 'requests'"
                             [attr.aria-selected]="openTab() === 'requests'"
@@ -298,6 +303,136 @@
                     <strong>Solicitudes</strong> para aprobarla o rechazarla.
                   </p>
                 </div>
+              }
+
+              <!-- ── Extra Bonus tab ─────────────────────────────────── -->
+              @if (openTab() === 'extra-bonus') {
+                @if (isLoading(group.id)) {
+                  <div class="tab-spinner" aria-label="Cargando puntos extra">
+                    <div class="spinner"></div>
+                    <p>Cargando puntos extra...</p>
+                  </div>
+                } @else if (group.membershipStatus === 'Pending') {
+                  <div class="info-box">
+                    <p>⏳ Tu solicitud está pendiente de aprobación por el dueño del grupo.</p>
+                  </div>
+                } @else {
+                  <div class="extra-bonus-container">
+                    <!-- Selector de ronda SIEMPRE VISIBLE -->
+                    <div class="round-selector">
+                      <label for="round-select-{{ group.id }}">📅 Seleccionar ronda:</label>
+                      <select [id]="'round-select-' + group.id"
+                              title="Seleccionar ronda para ver puntos extra"
+                              [ngModel]="getSelectedRound(group.id)"
+                              (ngModelChange)="setSelectedRound(group.id, $event)">
+                        @for (round of getAvailableRounds(); track round.key) {
+                          <option [value]="round.key">{{ round.label }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <!-- Contenido de datos -->
+                    @let extraBonus = extraBonusFor(group.id);
+                    @if (extraBonus) {
+                      <p class="round-label">📊 Ronda: <strong>{{ extraBonus.roundLabel }}</strong></p>
+
+                      <div class="extra-bonus-table">
+                        @if (extraBonus.users && extraBonus.users.length > 0) {
+                          @for (user of extraBonus.users; track user.userId) {
+                            <div class="extra-bonus-user-card" [class.round-king]="user.isRoundKing">
+                              <h4 class="user-name">
+                                @if (user.isRoundKing) {
+                                  <span class="round-king-badge">👑 Rey de la Fecha</span>
+                                }
+                                {{ user.userName }}
+                              </h4>
+                              
+                              @if (user.goldenGoal) {
+                                <div class="bonus-section">
+                                  <span class="bonus-icon">🥇</span>
+                                  <div class="bonus-details">
+                                    <span class="bonus-label">Gol de Oro</span>
+                                    <span class="bonus-match">{{ user.goldenGoal.matchDescription }}</span>
+                                    <span class="bonus-points">+{{ user.goldenGoal.pointsEarned }} pts</span>
+                                  </div>
+                                </div>
+                              }
+
+                              @if (user.captain) {
+                                <div class="bonus-section">
+                                  <span class="bonus-icon">🧢</span>
+                                  <div class="bonus-details">
+                                    <span class="bonus-label">Capitán: {{ user.captain.teamName }}</span>
+                                    @for (match of user.captain.matches; track match.matchId) {
+                                      <div class="captain-match">
+                                        <span class="match-desc">{{ match.matchDescription }}</span>
+                                        <span class="match-pts">+{{ match.pointsEarned }} pts</span>
+                                      </div>
+                                    }
+                                    <span class="bonus-points">Total: +{{ user.captain.pointsEarned }} pts</span>
+                                  </div>
+                                </div>
+                              }
+
+                              @if (user.sharpShooter.length > 0) {
+                                <div class="bonus-section">
+                                  <span class="bonus-icon">🎯</span>
+                                  <div class="bonus-details">
+                                    <span class="bonus-label">Francotirador</span>
+                                    @for (shot of user.sharpShooter; track shot.matchId) {
+                                      <div class="sharpshooter-match">
+                                        <span class="match-desc">{{ shot.matchDescription }}</span>
+                                        <span class="match-pts">+{{ shot.pointsEarned }} pts</span>
+                                      </div>
+                                    }
+                                    <span class="bonus-points">Total: +{{ sumSharpShooterPoints(user.sharpShooter) }} pts</span>
+                                  </div>
+                                </div>
+                              }
+
+                              @if (user.oracleDraws || user.oraclePenalties) {
+                                <div class="bonus-section">
+                                  <span class="bonus-icon">🔮</span>
+                                  <div class="bonus-details">
+                                    <span class="bonus-label">Oráculo</span>
+                                    @if (user.oracleDraws) {
+                                      <div class="oracle-prediction">
+                                        <span class="oracle-type">Empates:</span>
+                                        <span class="oracle-pred">Predijo: {{ user.oracleDraws.prediction }} | Real: {{ user.oracleDraws.actual }}</span>
+                                        <span class="oracle-distance">Diferencia: {{ user.oracleDraws.distance }}</span>
+                                        @if (user.oracleDraws.isWinner) {
+                                          <span class="oracle-winner">✓ ¡Acertó! +{{ user.oracleDraws.pointsEarned }} pts</span>
+                                        }
+                                      </div>
+                                    }
+                                    @if (user.oraclePenalties) {
+                                      <div class="oracle-prediction">
+                                        <span class="oracle-type">Penales:</span>
+                                        <span class="oracle-pred">Predijo: {{ user.oraclePenalties.prediction }} | Real: {{ user.oraclePenalties.actual }}</span>
+                                        <span class="oracle-distance">Diferencia: {{ user.oraclePenalties.distance }}</span>
+                                        @if (user.oraclePenalties.isWinner) {
+                                          <span class="oracle-winner">✓ ¡Acertó! +{{ user.oraclePenalties.pointsEarned }} pts</span>
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                </div>
+                              }
+
+                              <div class="user-total">
+                                Puntos Extra Total: <strong>{{ user.totalExtraPoints }}</strong>
+                              </div>
+                            </div>
+                          }
+                        } @else {
+                          <p class="tab-empty">ℹ️ No hay datos de puntos extra para esta ronda.</p>
+                        }
+                      </div>
+                    } @else {
+                      <p class="tab-empty">ℹ️ Cargando datos para esta ronda...</p>
+                    }
+                  </div>
+                }
               }
 
             </div>

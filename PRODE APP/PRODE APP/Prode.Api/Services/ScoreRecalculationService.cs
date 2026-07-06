@@ -184,7 +184,10 @@ public class ScoreRecalculationService
 
     private void AwardOraclePoints(string roundKey, List<Match> roundMatches)
     {
-        var realDraws = roundMatches.Count(m => m.HomeScore == m.AwayScore);
+        // A "draw after 90 min" includes matches that went to penalties (scores stay tied)
+        // AND matches decided in extra time (WentToExtraTime = true, final score differs).
+        var realDraws = roundMatches.Count(m =>
+            (m.HomeScore == m.AwayScore) || m.WentToExtraTime);
         var realPenalties = roundMatches.Count(m => m.WasDecidedByPenalties);
 
         var predictions = _context.OraclePredictions
