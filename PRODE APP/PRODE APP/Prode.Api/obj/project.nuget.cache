@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "J9we9NnTUlA=",
+  "dgSpecHash": "ZxWpF1tjVbA=",
   "success": true,
-  "projectFilePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+  "projectFilePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\federico.garro\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\federico.garro\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
@@ -69,9 +69,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "Prode.Api depende de xunit.runner.visualstudio (>= 2.9.3), pero no se encontró xunit.runner.visualstudio 2.9.3. xunit.runner.visualstudio 3.0.0 se resolvió en su lugar.",
-      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+      "projectPath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\Prode.Api\\Prode.Api.csproj",
+      "filePath": "C:\\MMP\\Repos\\prode-mundial-2026\\PRODE APP\\PRODE APP\\prode.api\\Prode.Api.csproj",
       "libraryId": "xunit.runner.visualstudio",
       "targetGraphs": [
         "net10.0"

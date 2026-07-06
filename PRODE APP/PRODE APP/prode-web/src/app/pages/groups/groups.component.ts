@@ -217,6 +217,9 @@ private hash(value: string): number {
   /** Current active round key — used to filter available rounds in the dropdown. */
   currentRoundKey = signal<string | null>(null);
 
+  // ── Extra bonus modal state ────────────────────────────────────────────────
+  expandedMechanic = signal<{ userId: string; mechanic: string } | null>(null);
+
   // ── Create form ────────────────────────────────────────────────────────────
   showCreateForm = signal(false);
   newGroupName = '';
@@ -391,6 +394,36 @@ private hash(value: string): number {
   isLoading(groupId: number): boolean { return !!this.loadingMap()[groupId]; }
   rankingsFor(groupId: number): GroupRanking[] { return this.rankingsMap()[groupId] ?? []; }
   requestsFor(groupId: number): JoinRequest[] { return this.requestsMap()[groupId] ?? []; }
+
+  getRoundKingFor(groupId: number): any {
+    const bonus = this.extraBonusFor(groupId);
+    return bonus?.users?.find(u => u.isRoundKing) || null;
+  }
+
+  getRoundKingsFor(groupId: number): any[] {
+    const bonus = this.extraBonusFor(groupId);
+    if (!bonus?.users) return [];
+    
+    // Find the maximum points
+    const maxPoints = Math.max(...bonus.users.map(u => u.totalExtraPoints), 0);
+    
+    // Return all users with max points (handle ties)
+    return bonus.users.filter(u => u.totalExtraPoints === maxPoints && maxPoints > 0);
+  }
+
+  toggleMechanicDetails(userId: string, mechanic: string): void {
+    const current = this.expandedMechanic();
+    if (current?.userId === userId && current?.mechanic === mechanic) {
+      this.expandedMechanic.set(null);
+    } else {
+      this.expandedMechanic.set({ userId, mechanic });
+    }
+  }
+
+  isMechanicExpanded(userId: string, mechanic: string): boolean {
+    const current = this.expandedMechanic();
+    return current?.userId === userId && current?.mechanic === mechanic;
+  }
 
   // ── Create group ───────────────────────────────────────────────────────────
 

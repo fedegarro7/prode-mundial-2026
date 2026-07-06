@@ -261,30 +261,35 @@ public class RankingsController : ControllerBase
                 UserName = member.Name
             };
 
-            // Golden Goal
+            // Golden Goal — always show when the user made a pick for this round
             var gg = goldenGoals.FirstOrDefault(g => g.UserId == member.Id);
-            if (gg != null && gg.Match != null)
+            if (gg != null)
             {
                 var matchPred = predictions.FirstOrDefault(p => p.MatchId == gg.MatchId && p.UserId == member.Id);
-                if (matchPred != null && matchPred.Match != null && matchPred.Match.IsFinished)
+                var isExact = false;
+                var matchDesc = $"Partido {gg.MatchId}";
+                
+                if (gg.Match != null)
                 {
-                    var isExact = matchPred.HomeScorePrediction == matchPred.Match.HomeScore &&
-                                  matchPred.AwayScorePrediction == matchPred.Match.AwayScore;
-                    if (isExact)
-                    {
-                        details.GoldenGoal = new GoldenGoalBonusDto
-                        {
-                            MatchId = gg.MatchId,
-                            MatchDescription = $"{gg.Match.HomeTeam?.Name ?? gg.Match.HomePlaceholder} vs {gg.Match.AwayTeam?.Name ?? gg.Match.AwayPlaceholder}",
-                            PointsEarned = gg.Match.HomeScore == gg.Match.AwayScore ? 12 : 6
-                        };
-                    }
+                    matchDesc = $"{gg.Match.HomeTeam?.Name ?? gg.Match.HomePlaceholder} vs {gg.Match.AwayTeam?.Name ?? gg.Match.AwayPlaceholder}";
+                    isExact = matchPred != null &&
+                              matchPred.Match != null &&
+                              matchPred.Match.IsFinished &&
+                              matchPred.HomeScorePrediction == matchPred.Match.HomeScore &&
+                              matchPred.AwayScorePrediction == matchPred.Match.AwayScore;
                 }
+
+                details.GoldenGoal = new GoldenGoalBonusDto
+                {
+                    MatchId = gg.MatchId,
+                    MatchDescription = matchDesc,
+                    PointsEarned = isExact ? (gg.Match?.HomeScore == gg.Match?.AwayScore ? 12 : 6) : 0
+                };
             }
 
-            // Captain
+            // Captain — always show when the user has a pick, even if 0 pts this round
             var captain = captainPicks.FirstOrDefault(c => c.UserId == member.Id);
-            if (captain != null)
+            if (captain != null && captain.Team != null)
             {
                 var captainMatches = new List<CaptainMatchContributionDto>();
                 var totalCaptainPoints = 0;
@@ -313,16 +318,13 @@ public class RankingsController : ControllerBase
                     }
                 }
 
-                if (totalCaptainPoints > 0 && captain.Team != null)
+                details.Captain = new CaptainBonusDto
                 {
-                    details.Captain = new CaptainBonusDto
-                    {
-                        TeamId = captain.TeamId,
-                        TeamName = captain.Team.Name,
-                        Matches = captainMatches,
-                        PointsEarned = totalCaptainPoints
-                    };
-                }
+                    TeamId = captain.TeamId,
+                    TeamName = captain.Team.Name,
+                    Matches = captainMatches,
+                    PointsEarned = totalCaptainPoints
+                };
             }
 
             // Sharp Shooter
@@ -340,37 +342,31 @@ public class RankingsController : ControllerBase
                 }
             }
 
-            // Oracle
+            // Oracle — always show for all users who made predictions, winner or not
             var myOracle = oracles.FirstOrDefault(o => o.UserId == member.Id);
             if (myOracle != null)
             {
                 var drawsAward = oracleAwards.FirstOrDefault(a =>
                     a.UserId == member.Id && a.AwardType == ScoreRecalculationService.OracleDrawsAward);
-                if (drawsAward != null)
+                details.OracleDraws = new OracleBonusDto
                 {
-                    details.OracleDraws = new OracleBonusDto
-                    {
-                        Category = "Empates",
-                        Prediction = myOracle.DrawsAfterNinetyPrediction,
-                        Actual = realDraws,
-                        PointsEarned = drawsAward.PointsAwarded,
-                        IsWinner = true
-                    };
-                }
+                    Category = "Empates",
+                    Prediction = myOracle.DrawsAfterNinetyPrediction,
+                    Actual = realDraws,
+                    PointsEarned = drawsAward?.PointsAwarded ?? 0,
+                    IsWinner = drawsAward != null
+                };
 
                 var penaltiesAward = oracleAwards.FirstOrDefault(a =>
                     a.UserId == member.Id && a.AwardType == ScoreRecalculationService.OraclePenaltiesAward);
-                if (penaltiesAward != null)
+                details.OraclePenalties = new OracleBonusDto
                 {
-                    details.OraclePenalties = new OracleBonusDto
-                    {
-                        Category = "Penales",
-                        Prediction = myOracle.PenaltyShootoutsPrediction,
-                        Actual = realPenalties,
-                        PointsEarned = penaltiesAward.PointsAwarded,
-                        IsWinner = true
-                    };
-                }
+                    Category = "Penales",
+                    Prediction = myOracle.PenaltyShootoutsPrediction,
+                    Actual = realPenalties,
+                    PointsEarned = penaltiesAward?.PointsAwarded ?? 0,
+                    IsWinner = penaltiesAward != null
+                };
             }
 
             details.IsRoundKing = oracleAwards.Any(a =>
