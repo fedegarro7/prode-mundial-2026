@@ -240,8 +240,8 @@ public class RankingsController : ControllerBase
             .ToListAsync();
 
         var oracleAwards = await _context.RoundAwards
-            .Where(a => a.RoundKey == roundKey && 
-                   (a.AwardType == ScoreRecalculationService.OracleDrawsAward || 
+            .Where(a => a.RoundKey == roundKey &&
+                   (a.AwardType == ScoreRecalculationService.OracleDrawsAward ||
                     a.AwardType == ScoreRecalculationService.OraclePenaltiesAward ||
                     a.AwardType == ScoreRecalculationService.RoundKingAward) &&
                    memberIds.Contains(a.UserId))
@@ -344,7 +344,7 @@ public class RankingsController : ControllerBase
             var myOracle = oracles.FirstOrDefault(o => o.UserId == member.Id);
             if (myOracle != null)
             {
-                var drawsAward = oracleAwards.FirstOrDefault(a => 
+                var drawsAward = oracleAwards.FirstOrDefault(a =>
                     a.UserId == member.Id && a.AwardType == ScoreRecalculationService.OracleDrawsAward);
                 if (drawsAward != null)
                 {
