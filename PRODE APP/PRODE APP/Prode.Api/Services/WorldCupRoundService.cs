@@ -53,6 +53,7 @@ public static class WorldCupRoundService
             stage.Contains("THIRD") ||
             stage.Contains("TERCER") ||
             stage.Contains("PLAY-OFF") ||
+            stage.Contains("BRONZE") ||
             stage == "FINAL" ||
             stage.Contains("GRAN FINAL")
         )

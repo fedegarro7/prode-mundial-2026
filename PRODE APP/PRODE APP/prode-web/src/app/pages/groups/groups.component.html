@@ -662,32 +662,247 @@
               [attr.aria-labelledby]="'admin-group-header-' + g.id"
               role="region">
 
-              <p class="admin-section-title">Tabla de posiciones</p>
-              @if (g.rankings.length === 0) {
-                <p class="tab-empty">Todavía no hay miembros con puntaje.</p>
-              } @else {
-                <div class="ranking-list" role="table" aria-label="Ranking del grupo en vista admin">
-                  <div class="ranking-head" role="row">
-                    <span role="columnheader">#</span>
-                    <span role="columnheader">Usuario</span>
-                    <span role="columnheader" class="pts-head">Pts</span>
-                  </div>
-                  @for (entry of g.rankings; track entry.userId) {
-                    <div class="ranking-row" role="row">
-                      <span class="rank-pos" role="cell">{{ entry.position }}</span>
-                      <span class="rank-name" role="cell">
-                        {{ entry.userName }}
-                        @if (entry.isCurrentUser) {
-                          <span class="you-label">vos</span>
-                        }
-                        @if (titleFor(entry, g.rankings); as title) {
-                          <span class="rank-title">{{ title }}</span>
-                        }
-                      </span>
-                      <span class="rank-pts" role="cell">{{ entry.totalPoints }}</span>
-                    </div>
-                  }
+              <!-- Tabs -->
+              <div class="tabs-row">
+                <div class="tabs" role="tablist">
+                  <button role="tab" class="tab-btn" [class.active]="adminOpenTab() === 'ranking'"
+                          [attr.aria-selected]="adminOpenTab() === 'ranking'"
+                          (click)="setAdminTab('ranking', g.id)">
+                    🏅 Ranking
+                  </button>
+                  <button role="tab" class="tab-btn" [class.active]="adminOpenTab() === 'extra-bonus'"
+                          [attr.aria-selected]="adminOpenTab() === 'extra-bonus'"
+                          (click)="setAdminTab('extra-bonus', g.id)">
+                    ⭐ Puntos Extra
+                  </button>
                 </div>
+              </div>
+
+              <!-- Loading spinner -->
+              @if (adminIsLoading(g.id)) {
+                <div class="tab-spinner" aria-label="Cargando">
+                  <div class="spinner"></div>
+                </div>
+              }
+
+              <!-- ── Ranking tab ──────────────────────────────────────── -->
+              @if (adminOpenTab() === 'ranking' && !adminIsLoading(g.id)) {
+                <p class="admin-section-title">Tabla de posiciones</p>
+                @if (g.rankings.length === 0) {
+                  <p class="tab-empty">Todavía no hay miembros con puntaje.</p>
+                } @else {
+                  <div class="ranking-list" role="table" aria-label="Ranking del grupo en vista admin">
+                    <div class="ranking-head" role="row">
+                      <span role="columnheader">#</span>
+                      <span role="columnheader">Usuario</span>
+                      <span role="columnheader" class="pts-head">Pts</span>
+                    </div>
+                    @for (entry of g.rankings; track entry.userId) {
+                      <div class="ranking-row" role="row">
+                        <span class="rank-pos" role="cell">{{ entry.position }}</span>
+                        <span class="rank-name" role="cell">
+                          {{ entry.userName }}
+                          @if (entry.isCurrentUser) {
+                            <span class="you-label">vos</span>
+                          }
+                          @if (titleFor(entry, g.rankings); as title) {
+                            <span class="rank-title">{{ title }}</span>
+                          }
+                        </span>
+                        <span class="rank-pts" role="cell">{{ entry.totalPoints }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+
+              <!-- ── Extra Bonus tab ──────────────────────────────────– -->
+              @if (adminOpenTab() === 'extra-bonus') {
+                @if (adminIsLoading(g.id)) {
+                  <div class="tab-spinner" aria-label="Cargando puntos extra">
+                    <div class="spinner"></div>
+                    <p>Cargando puntos extra...</p>
+                  </div>
+                } @else {
+                  <div class="extra-bonus-container">
+                    <!-- Selector de ronda -->
+                    <div class="round-selector">
+                      <label [for]="'admin-round-select-' + g.id">📅 Seleccionar ronda:</label>
+                      <select [id]="'admin-round-select-' + g.id"
+                              title="Seleccionar ronda para ver puntos extra"
+                              [ngModel]="getAdminSelectedRound(g.id)"
+                              (ngModelChange)="setAdminSelectedRound(g.id, $event)">
+                        @for (round of getAvailableRounds(); track round.key) {
+                          <option [value]="round.key">{{ round.label }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <!-- Contenido de datos -->
+                    @let extraBonus = adminExtraBonusFor(g.id);
+                    @if (extraBonus) {
+                      <p class="round-label">📊 Ronda: <strong>{{ extraBonus.roundLabel }}</strong></p>
+
+                      <div class="extra-bonus-table">
+                        @if (extraBonus.users && extraBonus.users.length > 0) {
+                          @for (user of extraBonus.users; track user.userId) {
+                            <div class="extra-bonus-user-card" [class.round-king]="getRoundKingsFor(g.id).some(k => k.userId === user.userId)">
+                              <!-- Header: nombre y total -->
+                              <div class="card-header">
+                                <div class="user-info">
+                                  @if (getRoundKingsFor(g.id).some(k => k.userId === user.userId)) {
+                                    <span class="king-mini-badge">👑</span>
+                                  }
+                                  <span class="user-name">{{ user.userName }}</span>
+                                </div>
+                                <span class="user-total">{{ user.totalExtraPoints }} pts</span>
+                              </div>
+
+                              <!-- Todas las mecánicas en grid compacto -->
+                              <div class="mechanics-grid">
+
+                                <!-- Golden Goal -->
+                                <div class="mechanic-item" (click)="toggleMechanicDetails(user.userId, 'goldenGoal')"
+                                     [class.active]="isMechanicExpanded(user.userId, 'goldenGoal')"
+                                     [class.has-data]="!!user.goldenGoal">
+                                  <span class="mechanic-icon">🥇</span>
+                                  <div class="mechanic-content">
+                                    <span class="mechanic-label">Gol de Oro</span>
+                                    @if (user.goldenGoal) {
+                                      <span class="mechanic-points">+{{ user.goldenGoal.pointsEarned }}</span>
+                                    } @else {
+                                      <span class="mechanic-empty">—</span>
+                                    }
+                                  </div>
+                                </div>
+
+                                <!-- Captain -->
+                                <div class="mechanic-item" (click)="toggleMechanicDetails(user.userId, 'captain')"
+                                     [class.active]="isMechanicExpanded(user.userId, 'captain')"
+                                     [class.has-data]="!!user.captain">
+                                  <span class="mechanic-icon">🧢</span>
+                                  <div class="mechanic-content">
+                                    <span class="mechanic-label">Capitán</span>
+                                    @if (user.captain) {
+                                      <span class="mechanic-points">+{{ user.captain.pointsEarned }}</span>
+                                    } @else {
+                                      <span class="mechanic-empty">—</span>
+                                    }
+                                  </div>
+                                </div>
+
+                                <!-- Sharp Shooter -->
+                                <div class="mechanic-item" (click)="toggleMechanicDetails(user.userId, 'sharpShooter')"
+                                     [class.active]="isMechanicExpanded(user.userId, 'sharpShooter')"
+                                     [class.has-data]="user.sharpShooter.length > 0">
+                                  <span class="mechanic-icon">🎯</span>
+                                  <div class="mechanic-content">
+                                    <span class="mechanic-label">Francotirador</span>
+                                    @if (user.sharpShooter.length > 0) {
+                                      <span class="mechanic-points">+{{ sumSharpShooterPoints(user.sharpShooter) }}</span>
+                                    } @else {
+                                      <span class="mechanic-empty">—</span>
+                                    }
+                                  </div>
+                                </div>
+
+                                <!-- Oracle -->
+                                <div class="mechanic-item" (click)="toggleMechanicDetails(user.userId, 'oracle')"
+                                     [class.active]="isMechanicExpanded(user.userId, 'oracle')"
+                                     [class.has-data]="!!user.oracleDraws || !!user.oraclePenalties">
+                                  <span class="mechanic-icon">🔮</span>
+                                  <div class="mechanic-content">
+                                    <span class="mechanic-label">Oráculo</span>
+                                    @if (user.oracleDraws || user.oraclePenalties) {
+                                      <span class="mechanic-points">+{{ (user.oracleDraws?.pointsEarned ?? 0) + (user.oraclePenalties?.pointsEarned ?? 0) }}</span>
+                                    } @else {
+                                      <span class="mechanic-empty">—</span>
+                                    }
+                                  </div>
+                                </div>
+
+                              </div>
+
+                              <!-- Detailed panels when expanded -->
+                              @if (isMechanicExpanded(user.userId, 'goldenGoal') && user.goldenGoal) {
+                                <div class="mechanic-detail-panel">
+                                  <h4>Gol de Oro</h4>
+                                  <div class="detail-content">
+                                    <p><strong>Partido:</strong> {{ user.goldenGoal.matchDescription }}</p>
+                                    <p><strong>Puntos ganados:</strong> +{{ user.goldenGoal.pointsEarned }}</p>
+                                  </div>
+                                </div>
+                              }
+
+                              @if (isMechanicExpanded(user.userId, 'captain') && user.captain) {
+                                <div class="mechanic-detail-panel">
+                                  <h4>Capitán</h4>
+                                  <div class="detail-content">
+                                    <p><strong>Equipo:</strong> {{ user.captain.teamName }}</p>
+                                    @if (user.captain.matches && user.captain.matches.length > 0) {
+                                      <div class="captain-matches">
+                                        @for (match of user.captain.matches; track match.matchId) {
+                                          <div class="match-row">
+                                            <span class="match-desc">{{ match.matchDescription }}</span>
+                                            <span class="match-points">{{ match.pointsEarned > 0 ? '+' : '' }}{{ match.pointsEarned }}</span>
+                                          </div>
+                                        }
+                                      </div>
+                                    }
+                                    <p class="total"><strong>Total:</strong> +{{ user.captain.pointsEarned }}</p>
+                                  </div>
+                                </div>
+                              }
+
+                              @if (isMechanicExpanded(user.userId, 'sharpShooter') && user.sharpShooter.length > 0) {
+                                <div class="mechanic-detail-panel">
+                                  <h4>Francotirador</h4>
+                                  <div class="detail-content">
+                                    @for (ss of user.sharpShooter; track ss.matchId) {
+                                      <div class="match-row">
+                                        <span class="match-desc">{{ ss.matchDescription }}</span>
+                                        <span class="match-points">+{{ ss.pointsEarned }}</span>
+                                      </div>
+                                    }
+                                    <p class="total"><strong>Total:</strong> +{{ sumSharpShooterPoints(user.sharpShooter) }}</p>
+                                  </div>
+                                </div>
+                              }
+
+                              @if (isMechanicExpanded(user.userId, 'oracle') && (user.oracleDraws || user.oraclePenalties)) {
+                                <div class="mechanic-detail-panel">
+                                  <h4>Oráculo</h4>
+                                  <div class="detail-content">
+                                    @if (user.oracleDraws) {
+                                      <div class="oracle-category">
+                                        <p><strong>Empates correctos:</strong> {{ user.oracleDraws.prediction }} acertados</p>
+                                        <p class="detail-info">Real: {{ user.oracleDraws.actual }} | Distancia: {{ user.oracleDraws.distance }}</p>
+                                        <p><strong>Puntos:</strong> +{{ user.oracleDraws.pointsEarned }}</p>
+                                      </div>
+                                    }
+                                    @if (user.oraclePenalties) {
+                                      <div class="oracle-category">
+                                        <p><strong>Penales correctos:</strong> {{ user.oraclePenalties.prediction }} acertados</p>
+                                        <p class="detail-info">Real: {{ user.oraclePenalties.actual }} | Distancia: {{ user.oraclePenalties.distance }}</p>
+                                        <p><strong>Puntos:</strong> +{{ user.oraclePenalties.pointsEarned }}</p>
+                                      </div>
+                                    }
+                                    <p class="total"><strong>Total:</strong> +{{ (user.oracleDraws?.pointsEarned ?? 0) + (user.oraclePenalties?.pointsEarned ?? 0) }}</p>
+                                  </div>
+                                </div>
+                              }
+
+                            </div>
+                          }
+                        } @else {
+                          <p class="tab-empty">No hay datos de puntos extra para esta ronda.</p>
+                        }
+                      </div>
+                    } @else {
+                      <p class="tab-empty">Cargando puntos extra...</p>
+                    }
+                  </div>
+                }
               }
 
             </div>

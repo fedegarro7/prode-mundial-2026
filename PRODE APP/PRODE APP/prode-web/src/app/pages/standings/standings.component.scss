@@ -387,12 +387,38 @@ tbody tr {
   color: $gold-light;
 }
 
+// ── Bracket and finals side-by-side wrapper ───────────────────────────────────
+.bracket-content-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  justify-content: center;
+  padding: 0 20px;
+  
+  @media (max-width: 1200px) {
+    gap: 30px;
+  }
+
+  @media (max-width: 900px) {
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 40px;
+  }
+}
+
 // ── Bracket container (horizontal scroll) ─────────────────────────────────────
 .bracket {
   display: flex;
   gap: 0;
   overflow-x: auto;
   padding-bottom: 16px;
+  justify-content: flex-start;
+  flex: 0 0 auto;
 
   // Subtle scrollbar
   scrollbar-width: thin;
@@ -408,7 +434,7 @@ tbody tr {
   display: flex;
   flex-direction: column;
   min-width: 150px;
-  flex: 1 1 0;
+  flex: 0 0 auto;
 
   // Connector: a thin vertical rule on the right side links this round to the next
   position: relative;
@@ -604,4 +630,117 @@ tbody tr {
 
 .third-place-card {
   width: min(220px, 100%);
+}
+
+// ── Finals container (vertical stack: 3rd place top, final bottom) ─────────────
+.finals-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  padding: 0;
+  flex: 0 0 auto;
+  min-width: 220px;
+  max-width: 280px;
+
+  // Top vertical line connecting from semifinals
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba($gold, 0.2), rgba($gold, 0.5));
+  }
+
+  @media (max-width: 1200px) {
+    gap: 24px;
+
+    &::before {
+      height: 30px;
+      top: -30px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: row;
+    gap: 16px;
+    max-width: 100%;
+    min-width: 100%;
+    justify-content: center;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    max-width: 260px;
+  }
+}
+
+.final-match-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 220px;
+  max-width: 260px;
+}
+
+// 3er Puesto: Top position
+.third-place-wrapper {
+  &::after {
+    display: none;
+  }
+}
+
+// Final: Bottom position
+.final-wrapper {
+  &::before {
+    display: none;
+  }
+}
+
+.final-match-label {
+  text-align: center;
+  font-family: 'Bebas Neue', 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $gold;
+  font-weight: 700;
+  opacity: 1;
+  font-weight: 600;
+
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+  }
+}
+
+.final-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba($gold, 0.35);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 20px rgba($gold, 0.05);
+
+  &.finished {
+    border-color: rgba($gold, 0.5);
+    box-shadow: 0 0 30px rgba($gold, 0.15);
+  }
+
+  &:hover {
+    border-color: rgba($gold, 0.5);
+    box-shadow: 0 0 40px rgba($gold, 0.2);
+    transform: translateY(-2px);
+  }
 }

@@ -35,78 +35,154 @@
         <h2 class="bracket-header-title">CUADRO ELIMINATORIO</h2>
       </header>
 
-      <div class="bracket" role="region" aria-label="Bracket eliminatorio">
+      <!-- Bracket and finals side-by-side wrapper -->
+      <div class="bracket-content-wrapper">
+        
+        <div class="bracket" role="region" aria-label="Bracket eliminatorio">
 
-        @for (round of bracketRounds; track round.key) {
-          <div class="bracket-round">
+          @for (round of bracketRounds; track round.key) {
+            <div class="bracket-round">
 
-            <div class="round-label">{{ round.label }}</div>
+              <div class="round-label">{{ round.label }}</div>
 
-            <div class="bracket-col">
-              @for (match of round.matches; track match.id) {
+              <div class="bracket-col">
+                @for (match of round.matches; track match.id) {
 
-                <div class="bracket-slot" [style.height.px]="slotHeight(round.key)">
+                  <div class="bracket-slot" [style.height.px]="slotHeight(round.key)">
 
-                  <div class="bracket-match" [class.finished]="match.isFinished">
+                    <div class="bracket-match" [class.finished]="match.isFinished">
 
-                    <!-- Home team -->
-                    <div class="bm-team" [class.winner]="isHomeWinner(match)">
-                      @if (match.homeTeam) {
-                        <img
-                          [src]="match.homeTeam.flagUrl"
-                          [alt]="match.homeTeam.name"
-                          [title]="match.homeTeam.name"
-                          class="bm-flag"
-                          width="20" height="15"
-                          loading="lazy"
-                        />
-                        <span class="bm-name">{{ match.homeTeam.name | esName }}</span>
-                      } @else {
-                        <span class="bm-ph">{{ match.homePlaceholder || '?' }}</span>
+                      <!-- Home team -->
+                      <div class="bm-team" [class.winner]="isHomeWinner(match)">
+                        @if (match.homeTeam) {
+                          <img
+                            [src]="match.homeTeam.flagUrl"
+                            [alt]="match.homeTeam.name"
+                            [title]="match.homeTeam.name"
+                            class="bm-flag"
+                            width="20" height="15"
+                            loading="lazy"
+                          />
+                          <span class="bm-name">{{ match.homeTeam.name | esName }}</span>
+                        } @else {
+                          <span class="bm-ph">{{ match.homePlaceholder || '?' }}</span>
+                        }
+                        @if (match.homeScore != null) {
+                          <span class="bm-score">{{ match.homeScore }}</span>
+                        }
+                      </div>
+
+                      <!-- Away team -->
+                      <div class="bm-team" [class.winner]="isAwayWinner(match)">
+                        @if (match.awayTeam) {
+                          <img
+                            [src]="match.awayTeam.flagUrl"
+                            [alt]="match.awayTeam.name"
+                            [title]="match.awayTeam.name"
+                            class="bm-flag"
+                            width="20" height="15"
+                            loading="lazy"
+                          />
+                          <span class="bm-name">{{ match.awayTeam.name | esName }}</span>
+                        } @else {
+                          <span class="bm-ph">{{ match.awayPlaceholder || '?' }}</span>
+                        }
+                        @if (match.awayScore != null) {
+                          <span class="bm-score">{{ match.awayScore }}</span>
+                        }
+                      </div>
+
+                      @if (match.wasDecidedByPenalties && match.isFinished) {
+                        <div class="bm-pen-note">def. en penales</div>
                       }
-                      @if (match.homeScore != null) {
-                        <span class="bm-score">{{ match.homeScore }}</span>
-                      }
+
                     </div>
-
-                    <!-- Away team -->
-                    <div class="bm-team" [class.winner]="isAwayWinner(match)">
-                      @if (match.awayTeam) {
-                        <img
-                          [src]="match.awayTeam.flagUrl"
-                          [alt]="match.awayTeam.name"
-                          [title]="match.awayTeam.name"
-                          class="bm-flag"
-                          width="20" height="15"
-                          loading="lazy"
-                        />
-                        <span class="bm-name">{{ match.awayTeam.name | esName }}</span>
-                      } @else {
-                        <span class="bm-ph">{{ match.awayPlaceholder || '?' }}</span>
-                      }
-                      @if (match.awayScore != null) {
-                        <span class="bm-score">{{ match.awayScore }}</span>
-                      }
-                    </div>
-
-                    @if (match.wasDecidedByPenalties && match.isFinished) {
-                      <div class="bm-pen-note">def. en penales</div>
-                    }
 
                   </div>
 
-                </div>
+                }
+              </div>
 
-              }
             </div>
+          }
 
-          </div>
-        }
+        </div>
+
+        <!-- Final matches (3rd place + Final) as lateral continuation -->
+        <div class="finals-container">
+          <!-- 3er Puesto (Top) -->
+          @if (thirdPlaceMatch) {
+            <div class="final-match-wrapper third-place-wrapper">
+              <div class="final-match-label">🥉 3er Puesto</div>
+              <div class="bracket-match third-place-card" [class.finished]="thirdPlaceMatch.isFinished">
+                <div class="bm-team" [class.winner]="isHomeWinner(thirdPlaceMatch)">
+                  @if (thirdPlaceMatch.homeTeam) {
+                    <img [src]="thirdPlaceMatch.homeTeam.flagUrl" [alt]="thirdPlaceMatch.homeTeam.name" [title]="thirdPlaceMatch.homeTeam.name" class="bm-flag" width="20" height="15" loading="lazy" />
+                    <span class="bm-name">{{ thirdPlaceMatch.homeTeam.name | esName }}</span>
+                  } @else {
+                    <span class="bm-ph">{{ thirdPlaceMatch.homePlaceholder || '?' }}</span>
+                  }
+                  @if (thirdPlaceMatch.homeScore != null) {
+                    <span class="bm-score">{{ thirdPlaceMatch.homeScore }}</span>
+                  }
+                </div>
+                <div class="bm-team" [class.winner]="isAwayWinner(thirdPlaceMatch)">
+                  @if (thirdPlaceMatch.awayTeam) {
+                    <img [src]="thirdPlaceMatch.awayTeam.flagUrl" [alt]="thirdPlaceMatch.awayTeam.name" [title]="thirdPlaceMatch.awayTeam.name" class="bm-flag" width="20" height="15" loading="lazy" />
+                    <span class="bm-name">{{ thirdPlaceMatch.awayTeam.name | esName }}</span>
+                  } @else {
+                    <span class="bm-ph">{{ thirdPlaceMatch.awayPlaceholder || '?' }}</span>
+                  }
+                  @if (thirdPlaceMatch.awayScore != null) {
+                    <span class="bm-score">{{ thirdPlaceMatch.awayScore }}</span>
+                  }
+                </div>
+                @if (thirdPlaceMatch.wasDecidedByPenalties && thirdPlaceMatch.isFinished) {
+                  <div class="bm-pen-note">def. en penales</div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Final (Bottom) -->
+          @if (finalMatch) {
+            <div class="final-match-wrapper final-wrapper">
+              <div class="final-match-label">🏆 Final</div>
+              <div class="bracket-match final-card" [class.finished]="finalMatch.isFinished">
+                <div class="bm-team" [class.winner]="isHomeWinner(finalMatch)">
+                  @if (finalMatch.homeTeam) {
+                    <img [src]="finalMatch.homeTeam.flagUrl" [alt]="finalMatch.homeTeam.name" [title]="finalMatch.homeTeam.name" class="bm-flag" width="20" height="15" loading="lazy" />
+                    <span class="bm-name">{{ finalMatch.homeTeam.name | esName }}</span>
+                  } @else {
+                    <span class="bm-ph">{{ finalMatch.homePlaceholder || '?' }}</span>
+                  }
+                  @if (finalMatch.homeScore != null) {
+                    <span class="bm-score">{{ finalMatch.homeScore }}</span>
+                  }
+                </div>
+                <div class="bm-team" [class.winner]="isAwayWinner(finalMatch)">
+                  @if (finalMatch.awayTeam) {
+                    <img [src]="finalMatch.awayTeam.flagUrl" [alt]="finalMatch.awayTeam.name" [title]="finalMatch.awayTeam.name" class="bm-flag" width="20" height="15" loading="lazy" />
+                    <span class="bm-name">{{ finalMatch.awayTeam.name | esName }}</span>
+                  } @else {
+                    <span class="bm-ph">{{ finalMatch.awayPlaceholder || '?' }}</span>
+                  }
+                  @if (finalMatch.awayScore != null) {
+                    <span class="bm-score">{{ finalMatch.awayScore }}</span>
+                  }
+                </div>
+                @if (finalMatch.wasDecidedByPenalties && finalMatch.isFinished) {
+                  <div class="bm-pen-note">def. en penales</div>
+                }
+              </div>
+            </div>
+          }
+        </div>
 
       </div>
 
       <!-- 3er y 4to Puesto — shown separately below the bracket -->
-      @if (thirdPlaceMatch) {
+      @if (false && thirdPlaceMatch) {
         <div class="third-place-wrapper">
           <div class="third-place-label">🥉 3er y 4to Puesto</div>
           <div class="bracket-match third-place-card" [class.finished]="thirdPlaceMatch.isFinished">

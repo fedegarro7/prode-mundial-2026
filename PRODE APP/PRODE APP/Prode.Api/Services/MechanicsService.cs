@@ -383,8 +383,14 @@ public class MechanicsService
 
                 var isLocked = WorldCupRoundService.IsRoundStartLocked(matches, now);
 
-                var confirmedMatches = matches
-                    .Where(m => m.HomeTeamId.HasValue && m.AwayTeamId.HasValue)
+                // For final round, show all matches (including those with placeholders)
+                // since the final round always has 2 matches (Final and Third Place) that users need to pick mechanics for.
+                // For other rounds, only show confirmed matches.
+                var eligibleMatches = roundKey == WorldCupRoundService.FinalRound
+                    ? matches
+                    : matches.Where(m => m.HomeTeamId.HasValue && m.AwayTeamId.HasValue).ToList();
+
+                var confirmedMatches = eligibleMatches
                     .Select(m => new RoundMatchDto
                     {
                         Id = m.Id,

@@ -199,8 +199,19 @@ private hash(value: string): number {
   }
 
   toggleAdminGroup(id: number): void {
-    this.adminOpenGroupId.set(this.adminOpenGroupId() === id ? null : id);
+    if (this.adminOpenGroupId() === id) {
+      this.adminOpenGroupId.set(null);
+    } else {
+      this.adminOpenGroupId.set(id);
+      this.adminOpenTab.set('ranking');  // Reset to ranking when opening a new admin group
+    }
   }
+
+  // ── Admin tab state ───────────────────────────────────────────────────────
+  adminOpenTab = signal<DetailTab>('ranking');
+  adminExtraBonusMap = signal<Record<number, RoundExtraBonuses | null | undefined>>({});
+  adminSelectedRoundMap = signal<Record<number, string>>({});
+  adminLoadingMap = signal<Record<number, boolean>>({});
 
   // ── Accordion state ────────────────────────────────────────────────────────
   /** ID of the currently-open group accordion (null = all closed). */
@@ -291,6 +302,11 @@ private hash(value: string): number {
     if (tab === 'extra-bonus') this.ensureExtraBonus(group.id);
   }
 
+  setAdminTab(tab: DetailTab, groupId: number): void {
+    this.adminOpenTab.set(tab);
+    if (tab === 'extra-bonus') this.ensureAdminExtraBonus(groupId);
+  }
+
   private setLoading(groupId: number, val: boolean): void {
     this.loadingMap.update(m => ({ ...m, [groupId]: val }));
   }
@@ -336,6 +352,52 @@ private hash(value: string): number {
   }
 
   extraBonusFor(groupId: number): RoundExtraBonuses | null { return this.extraBonusMap()[groupId] ?? null; }
+
+  private ensureAdminExtraBonus(groupId: number): void {
+    const available = this.getAvailableRounds();
+    const defaultRound = available.length > 0 ? available[available.length - 1].key : 'ROUND_OF_32';
+    const roundKey = this.adminSelectedRoundMap()[groupId] || defaultRound;
+    const cached = this.adminExtraBonusMap()[groupId];
+    if (cached !== undefined) return;
+
+    this.setAdminLoading(groupId, true);
+    this.extraBonusSvc.getGroupExtraBonus(groupId, roundKey).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (eb) => {
+        this.adminExtraBonusMap.update(m => ({ ...m, [groupId]: eb }));
+        this.adminSelectedRoundMap.update(m => ({ ...m, [groupId]: eb.roundKey }));
+        this.setAdminLoading(groupId, false);
+      },
+      error: (err) => {
+        console.error('Error loading extra bonus for admin group', groupId, ':', err);
+        this.setAdminLoading(groupId, false);
+      }
+    });
+  }
+
+  private setAdminLoading(groupId: number, val: boolean): void {
+    this.adminLoadingMap.update(m => ({ ...m, [groupId]: val }));
+  }
+
+  adminIsLoading(groupId: number): boolean {
+    return this.adminLoadingMap()[groupId] ?? false;
+  }
+
+  adminExtraBonusFor(groupId: number): RoundExtraBonuses | null {
+    return this.adminExtraBonusMap()[groupId] ?? null;
+  }
+
+  setAdminSelectedRound(groupId: number, roundKey: string): void {
+    this.adminSelectedRoundMap.update(m => ({ ...m, [groupId]: roundKey }));
+    this.adminExtraBonusMap.update(m => ({ ...m, [groupId]: undefined }));
+    this.ensureAdminExtraBonus(groupId);
+  }
+
+  getAdminSelectedRound(groupId: number): string {
+    const available = this.getAvailableRounds();
+    const defaultRound = available.length > 0 ? available[available.length - 1].key : 'ROUND_OF_32';
+    return this.adminSelectedRoundMap()[groupId] || defaultRound;
+  }
+
   getSelectedRound(groupId: number): string {
     const available = this.getAvailableRounds();
     const defaultRound = available.length > 0 ? available[available.length - 1].key : 'ROUND_OF_32';

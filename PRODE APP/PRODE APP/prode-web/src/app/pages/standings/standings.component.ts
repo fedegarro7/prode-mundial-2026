@@ -58,6 +58,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
   bracketRounds: BracketRound[] = [];
   bracketLoading = true;
   thirdPlaceMatch: Match | null = null;
+  finalMatch: Match | null = null;
 
   ngOnInit(): void {
     this.schedulePoll(0);
@@ -151,6 +152,12 @@ export class StandingsComponent implements OnInit, OnDestroy {
       else                                                            rounds[4].matches.push(m);
     }
 
+    // Extract the final match (last one in the final round) and remove it from the bracket
+    if (rounds[4].matches.length > 0) {
+      rounds[4].matches.sort((a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
+      this.finalMatch = rounds[4].matches.pop() ?? null; // Remove from bracket and store separately
+    }
+
     const r16SlotBySourceMatchNumber = new Map<number, number>();
     for (const roundOf16Match of rounds[1].matches) {
       const targetSlot = roundOf16Match.matchNumber ?? Number.MAX_SAFE_INTEGER;
@@ -207,7 +214,13 @@ export class StandingsComponent implements OnInit, OnDestroy {
 
   isThirdPlace(m: Match): boolean {
     const s = m.stage.toUpperCase();
-    return s.includes('THIRD') || s.includes('TERCER') || s.includes('PLAY-OFF');
+    return s.includes('THIRD') || s.includes('TERCER') || s.includes('PLAY-OFF') || s.includes('BRONZE');
+  }
+
+  isFinalMatch(m: Match): boolean {
+    if (this.isThirdPlace(m)) return false;
+    const s = m.stage.toUpperCase();
+    return s.includes('FINAL');
   }
 
   private extractWinnerMatchNumbers(match: Match): number[] {

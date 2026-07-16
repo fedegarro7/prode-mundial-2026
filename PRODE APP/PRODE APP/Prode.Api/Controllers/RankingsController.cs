@@ -157,8 +157,9 @@ public class RankingsController : ControllerBase
             return Unauthorized();
 
         var userId = Guid.Parse(userIdClaim.Value);
+        var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-        // Verify user is member of group
+        // Verify user is member of group OR is admin
         var group = await _context.PrivateGroups
             .Include(g => g.Memberships)
             .FirstOrDefaultAsync(g => g.Id == groupId);
@@ -168,8 +169,11 @@ public class RankingsController : ControllerBase
 
         var isMember = group.OwnerId == userId ||
             group.Memberships.Any(m => m.UserId == userId && m.Status == MembershipStatus.Approved);
+        
+        var isAdmin = currentUser?.IsAdmin ?? false;
 
-        if (!isMember)
+        // Allow access if user is member OR is admin
+        if (!isMember && !isAdmin)
             return Forbid();
 
         var roundLabel = RoundLabels.GetValueOrDefault(roundKey, roundKey);
