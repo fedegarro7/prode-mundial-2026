@@ -169,7 +169,7 @@ public class RankingsController : ControllerBase
 
         var isMember = group.OwnerId == userId ||
             group.Memberships.Any(m => m.UserId == userId && m.Status == MembershipStatus.Approved);
-        
+
         var isAdmin = currentUser?.IsAdmin ?? false;
 
         // Allow access if user is member OR is admin
